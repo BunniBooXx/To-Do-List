@@ -1,0 +1,93 @@
+/* Importing the Ballet font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Ballet&display=swap');
+
+/* Page Styling */
+.tasks-page {
+  padding: 20px;
+  text-align: center;
+  background-color: #fdf0f8; /* Soft pink background */
+  min-height: 100vh;
+}
+
+/* Main Title Styling */
+.tasks-title {
+  font-size: 42px;
+  color: #ffffff;
+  font-family: 'Ballet', cursive;
+  font-style: bolder;
+  position: relative;
+  display: inline-block;
+  padding: 20px 50px;
+  background: linear-gradient(145deg, #f6acb1, #f0939e); /* Soft gradient for title background */
+  border: 3px solid #f9ccd8;
+  border-radius: 40px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), inset 0 4px 8px rgba(255, 255, 255, 0.5);
+  margin-bottom: 30px;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  animation: pop-in 0.5s ease-out;
+}
+
+/* Heart decorations around the title */
+.tasks-title::before,
+.tasks-title::after {
+  content: "💖 💕 💖";
+  font-size: 24px;
+  position: absolute;
+  color: #f3a9b8;
+}
+
+.tasks-title::before {
+  top: -10px;
+  left: -70px;
+  transform: rotate(-10deg);
+}
+
+.tasks-title::after {
+  top: -10px;
+  right: -70px;
+  transform: rotate(10deg);
+}
+
+/* Subtle Shimmer Animation */
+@keyframes shimmer {
+  0% {
+    transform: translateY(0px);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 0.8;
+  }
+}
+
+/* Pop-in Animation for Entrance */
+@keyframes pop-in {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .tasks-title {
+    font-size: 32px;
+    padding: 15px 30px;
+  }
+
+  .tasks-title::before,
+  .tasks-title::after {
+    font-size: 20px;
+    left: -40px;
+    right: -40px;
+    top: -10px;
+  }
+}

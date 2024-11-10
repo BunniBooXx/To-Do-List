@@ -1,0 +1,47 @@
+/* Subcategory.css */
+.subcategory-page {
+    padding: 20px;
+    text-align: center;
+    background-color: #ffe5ec;
+  }
+  
+  .subcategory-title {
+    font-size: 24px;
+    color: #cc6060;
+    margin-bottom: 15px;
+  }
+  
+  .subcategory-list {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .subcategory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fde2e4;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .subcategory-item span {
+    font-size: 18px;
+    color: #6b4f4f;
+    font-family: 'Caveat', cursive;
+  }
+  
+  .subcategory-item button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .subcategory-item button:hover {
+    transform: scale(1.1);
+  }
+  

@@ -1,0 +1,111 @@
+/* Calendar container styling */
+.calendar {
+    background: linear-gradient(145deg, #f8d7e1, #fcd5ce);
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15), inset 0 4px 8px rgba(255, 255, 255, 0.5);
+    text-align: center;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+  }
+  
+  /* Calendar title styling */
+  .calendar-title {
+    font-family: 'Ballet', cursive;
+    font-size: 36px;
+    font-style: bolder;
+    color: #d9637b;
+    margin-bottom: 20px;
+    position: relative;
+    padding: 10px 20px;
+    background: linear-gradient(145deg, #ffe4ec, #fcd5ce);
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Hearts and bows decorations around calendar */
+  .calendar::before,
+  .calendar::after {
+    content: "💕🎀";
+    font-size: 30px;
+    color: #f3a9b8;
+    position: absolute;
+  }
+  
+  .calendar::before {
+    top: -20px;
+    left: -20px;
+    transform: rotate(-15deg);
+  }
+  
+  .calendar::after {
+    bottom: -20px;
+    right: -20px;
+    transform: rotate(15deg);
+  }
+  
+  /* Date input styling */
+  .calendar input[type="date"] {
+    font-size: 18px;
+    background: #ffe6ec;
+    color: #8b4f5f;
+    border: 2px solid #d88b96;
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+    outline: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  /* Subtle shadow animation on focus */
+  .calendar input[type="date"]:focus {
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15), inset 0 3px 6px rgba(255, 255, 255, 0.6);
+  }
+  
+  /* Header styling for tasks */
+  .date-tasks h2 {
+    color: #d9637b;
+    font-family: 'Ballet', cursive;
+    margin-bottom: 20px;
+    font-size: 24px;
+    position: relative;
+  }
+  
+  .date-tasks h2::after {
+    content: "🌸";
+    position: absolute;
+    font-size: 18px;
+    top: -10px;
+    right: -25px;
+  }
+  
+  /* Add Task button styling */
+  .add-task-button {
+    background: linear-gradient(145deg, #ffcce0, #f9d0d9);
+    border: 2px solid #d88b96;
+    color: #d9637b;
+    font-size: 16px;
+    border-radius: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15), inset 0 3px 5px rgba(255, 255, 255, 0.6);
+    transition: all 0.3s ease;
+    margin-top: 15px;
+  }
+  
+  /* Button hover effect with a shimmer */
+  .add-task-button:hover {
+    background-color: #fcc9d2;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), inset 0 3px 6px rgba(255, 255, 255, 0.7);
+  }
+  
+  /* Button heart decoration */
+  .add-task-button::before {
+    content: "💖";
+    margin-right: 6px;
+  }
+  

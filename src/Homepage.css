@@ -1,0 +1,38 @@
+/* Homepage.css */
+.homepage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-image: url('background-image-url.png');
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .homepage-link {
+    position: relative;
+    display: inline-block;
+    padding: 20px 40px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    color: #cc6060;
+    font-size: 24px;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+  }
+  
+  .homepage-link:hover {
+    transform: scale(1.1);
+  }
+  
+  .homepage-link::after {
+    content: "💖";
+    display: block;
+    font-size: 16px;
+    color: #cc6060;
+    margin-top: 8px;
+    text-align: center;
+  }
+  

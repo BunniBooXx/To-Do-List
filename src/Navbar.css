@@ -1,0 +1,48 @@
+/* Navbar.css */
+@import url('https://fonts.googleapis.com/css2?family=Ballet&display=swap');
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    background-color: #f4c7ca;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-title {
+    font-size: 24px;
+    font-weight: bolder;
+    color: #db8489;;
+    font-family: 'Ballet', cursive;
+    margin-left: 10px;
+    text-decoration: none;
+  }
+  
+  .navbar-center-button {
+    position: relative;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 25px;
+    color: #d17a7a;
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+  
+  .navbar-center-button:hover {
+    transform: scale(1.1);
+  }
+  
+  .navbar-center-button span::after {
+    content: "🎀";
+    display: block;
+    font-size: 12px;
+    color: #d17272;
+    margin-top: 4px;
+    text-align: center;
+  }
+  

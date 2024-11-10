@@ -1,0 +1,73 @@
+/* TaskItem.css */
+.task-item {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: #fde2e4;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+  font-family: 'Caveat', cursive;
+}
+
+.task-item:hover {
+  transform: scale(1.02);
+}
+
+.heart-checkbox {
+  font-size: 24px;
+  cursor: pointer;
+  margin-right: 10px;
+  transition: color 0.2s ease;
+}
+
+.task-name {
+  flex: 1;
+  color: #ef7070;
+  font-size: 18px;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.task-item.done .task-name span {
+  text-decoration: line-through;
+  color: #cc6060;
+}
+
+.cute-arrow-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #cc6060;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: transform 0.2s ease;
+}
+
+.cute-arrow-button:hover {
+  transform: scale(1.2);
+}
+
+.cute-arrow-button.expanded {
+  color: #ff99cc;
+}
+
+.view-subcategory-link {
+  color: #ff99cc;
+  font-size: 14px;
+  text-decoration: none;
+  margin-top: 8px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+.view-subcategory-link:hover {
+  transform: scale(1.1);
+}
+
+.subtasks {
+  padding-left: 20px;
+  margin-top: 5px;
+  border-left: 2px dashed #fcd5ce;
+}

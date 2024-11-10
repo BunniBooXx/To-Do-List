@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from "react";
+import "./Form.css";
 
 
 export default function Form({onAdd}) {

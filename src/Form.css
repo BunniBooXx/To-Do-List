@@ -1,0 +1,45 @@
+/* Form.css */
+.form {
+    display: flex;
+    align-items: center;
+    background-color: #fde2e4;
+    padding: 10px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .form input[type="text"] {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid #cc6060;
+    font-size: 16px;
+    padding: 5px;
+    color: #6b4f4f;
+    background: transparent;
+  }
+  
+  .form input[type="text"]::placeholder {
+    color: #cc6060;
+  }
+  
+  .form button {
+    background-color: #ffe5ec;
+    border: 2px solid #cc6060;
+    border-radius: 10px;
+    padding: 6px 12px;
+    margin-left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .form button:hover {
+    transform: scale(1.1);
+  }
+  
+  .form button::before {
+    content: "💖";
+    margin-right: 5px;
+  }
+  

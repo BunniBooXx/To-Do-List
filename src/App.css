@@ -1,97 +1,46 @@
-body{
-    background-color: lightpink;
-    color: #ddd;
-}
-*{
-    box-sizing: border-box;
-}
-main{
-    max-width: 300px;
-    margin: 20px auto;
-}
-form{
-    border: 3px solid  rgba(102, 102, 227, 0.826);
-    border-radius: 10px;
-    padding: 5px;
-    display:flex;
-}
-form input[type="text"] {
+.task {
+    background-color: #fbe7e7;
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    transition: transform 0.2s;
+    font-family: 'Quicksand', sans-serif;
+  }
+  
+  .task.done {
+    opacity: 0.6;
+    text-decoration: line-through;
+  }
+  
+  .task:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .task-name {
+    flex: 1;
+    color: #6b4f4f;
+    cursor: pointer;
+  }
+  
+  .trash {
     background: none;
-    color:#fff;
-    border:0;
-    padding: 0 8px;
-    display:block;
-    width: 100%;
-}
-form button{
-    background-color:  rgba(102, 102, 227, 0.826);
-    border:0;
-    border-radius: 6px;
-    cursor:pointer;
-}
-
-div.task{
-    background-color: rgba(102, 102, 227, 0.826);
-    border-radius: 10px;
-    padding: 5px 9px;
-    margin-top: 5px;
-    display:flex;
-    align-items: center;
-    transition: opacity .3s linear;
-}
-div.task svg{
-    height: 20px;
-    margin-right: 6px;
-    fill: #61DAFB;
-}
-div.task.done{
-    opacity: 0.3;
-}
-div.task-name, div.task form{
-    flex-grow:1;
-}
-div.task span{
-    position:relative;
-}
-div.task span:before{
-    content:'';
-    display:block;
-    width:0;
-    height:1px;
-    background-color: #ddd;
-    position:absolute;
-    top: 10px;
-    transition: width .1s linear;
-}
-div.task.done span:before{
-    width: 100%;
-}
-
-h1, h2{
-    text-align: center;
-}
-
-div.checkbox{
-    display:flex;
-    align-items: center;
-}
-
-button.trash{
-    background:none;
-    border:none;
-    display:flex;
-    cursor:pointer;
-}
-button.trash svg{
-    fill: #888;
-    height: 14px;
-}
-div.task input{
-    border: 2px solid #555;
-    border-radius:5px;
-    padding: 2px 4px;
-}
-
-#title {
-    color:  rgba(102, 102, 227, 0.826);
-}
+    border: none;
+    color: #cc6060;
+    cursor: pointer;
+  }
+  
+  .trash svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  form input {
+    border: none;
+    border-bottom: 2px solid #cc6060;
+    background: transparent;
+    font-size: 14px;
+    color: #6b4f4f;
+  }
