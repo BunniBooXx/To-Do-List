@@ -1,7 +1,6 @@
 // App.js
 import './App.css';
 import Navbar from './Navbar';
-import TaskList from './TaskList';
 import Calendar from './Calendar';
 import Homepage from './Homepage';
 import TasksPage from './TasksPage';
