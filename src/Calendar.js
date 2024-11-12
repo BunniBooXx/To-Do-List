@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import TaskItem from "./TaskItem"; // Ensure TaskItem is imported correctly
 import "./Calendar.css"; // Use the updated CSS for styling
 
@@ -28,12 +29,11 @@ export default function Calendar({ tasks = {}, onAddTaskToDate }) {
           />
         ))}
       </div>
-      <button
-        className="add-task-button"
-        onClick={() => onAddTaskToDate(selectedDate, [...(tasks[selectedDate] || []), { name: "New Task", done: false }])}
-      >
+      <Link to="/tasks" className="add-task-button">
         Add Task
-      </button>
+      </Link>
     </div>
   );
 }
+
+
