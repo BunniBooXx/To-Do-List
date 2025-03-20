@@ -41,7 +41,6 @@ const Login = () => {
     }, 6000);
   };
 
-  // ✅ Handle Email & Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!email || !password) return showNotification("⚠️ Email & Password Required!");
@@ -56,9 +55,9 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
       console.log("✅ Firebase Auth Success:", userCredential);
   
-      // ✅ **Get a fresh ID token before sending to backend**
-      const idToken = await userCredential.user.getIdToken(true); // 👈 Forces a fresh token
-  
+      // ✅ **Ensure a fresh ID Token before sending to backend**
+      const idToken = await userCredential.user.getIdToken(true); // 👈 Force refresh
+      
       console.log("🔍 Fresh ID Token:", idToken);
   
       // ✅ Send ID Token to your backend
@@ -83,6 +82,7 @@ const Login = () => {
       }
     }
   };
+  
   
 
   // ✅ Handle Google Sign-In
