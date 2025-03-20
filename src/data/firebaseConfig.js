@@ -1,6 +1,5 @@
-// ✅ Import Firebase modules
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, onIdTokenChanged } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -48,11 +47,26 @@ const firebaseAppPromise = (async () => {
 export const getFirebaseServices = async () => {
   const app = await firebaseAppPromise;
   if (!app) throw new Error("❌ Firebase failed to initialize.");
-  return {
-    auth: getAuth(app),
-    database: getDatabase(app),
-  };
+  
+  const auth = getAuth(app);
+  const database = getDatabase(app);
+
+  // ✅ Automatically Refresh ID Token
+  onIdTokenChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const idToken = await user.getIdToken(true); // 🔄 Refresh token automatically
+        localStorage.setItem("idToken", idToken); // 💾 Save token locally
+        console.log("🔄 ID Token Refreshed:", idToken);
+      } catch (error) {
+        console.error("❌ Error refreshing token:", error);
+      }
+    }
+  });
+
+  return { auth, database };
 };
 
 // ❌ Do NOT export `auth` and `database` directly
 export default firebaseAppPromise;
+

@@ -44,20 +44,28 @@ const Login = () => {
   // ✅ Handle Email & Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    if (!email.trim() || !password.trim()) return showNotification("⚠️ Email & Password Required!");
-
-    if (!authInstance) return showNotification("⚠️ Firebase is still initializing. Please wait...");
-
+    if (!email || !password) return showNotification("⚠️ Email & Password Required!");
+  
+    if (!authInstance) {
+      return showNotification("⚠️ Firebase is still initializing. Please wait...");
+    }
+  
     try {
-      // 🔹 Sign in with Firebase Authentication
+      console.log("📌 Attempting login with Email:", email);
+  
       const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
-      const idToken = await userCredential.user.getIdToken();
-
-      console.log("🔍 Sending ID Token to Backend...");
+      console.log("✅ Firebase Auth Success:", userCredential);
+  
+      // ✅ **Get a fresh ID token before sending to backend**
+      const idToken = await userCredential.user.getIdToken(true); // 👈 Forces a fresh token
+  
+      console.log("🔍 Fresh ID Token:", idToken);
+  
+      // ✅ Send ID Token to your backend
       const response = await axios.post(`${backendUrl}/users/login`, { idToken });
-
+  
       if (response.data.success) {
+        console.log(`✅ User logged in: ${response.data.user.userId}`);
         showNotification(`🎀 Welcome back, ${response.data.user.username}!`, "success");
         setTimeout(() => navigate("/"), 1500);
       } else {
@@ -65,18 +73,17 @@ const Login = () => {
       }
     } catch (error) {
       console.error("❌ Login Failed:", error);
-
+  
       if (error.code === "auth/user-not-found") {
         showNotification("❌ No account found with this email. Please sign up first!");
       } else if (error.code === "auth/wrong-password") {
         showNotification("❌ Incorrect password. Please try again!");
-      } else if (error.code === "auth/invalid-credential") {
-        showNotification("❌ Invalid email or password. Double-check and try again!");
       } else {
         showNotification(`❌ ${error.message}`);
       }
     }
   };
+  
 
   // ✅ Handle Google Sign-In
   const handleGoogleSignIn = async () => {
