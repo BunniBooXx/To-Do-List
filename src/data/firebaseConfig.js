@@ -10,18 +10,19 @@ if (!backendUrl) {
   console.error("❌ Missing REACT_APP_BACKEND_URL! Check your Netlify environment variables.");
 }
 
-// ✅ Fetch Firebase config ONCE and store it
+// ✅ Store Firebase Config in Cache
 let firebaseConfigCache = null;
 
+// ✅ Fetch Firebase Config (Only Once)
 const fetchFirebaseConfig = async () => {
-  if (firebaseConfigCache) return firebaseConfigCache; // Return cached config if available
+  if (firebaseConfigCache) return firebaseConfigCache; // Use cached config if available
   try {
     console.log("🔍 Fetching Firebase Config from:", `${backendUrl}/api/firebase-config`);
     const response = await fetch(`${backendUrl}/api/firebase-config`);
     if (!response.ok) throw new Error("Failed to fetch Firebase config.");
     const firebaseConfig = await response.json();
     console.log("✅ Fetched Firebase Config:", firebaseConfig);
-    firebaseConfigCache = firebaseConfig; // Store config in cache
+    firebaseConfigCache = firebaseConfig; // Store in cache
     return firebaseConfig;
   } catch (error) {
     console.error("❌ Firebase Config Fetch Error:", error);
@@ -29,34 +30,29 @@ const fetchFirebaseConfig = async () => {
   }
 };
 
-// ✅ Ensure Firebase initializes only once
-const initializeFirebase = async () => {
+// ✅ Ensure Firebase initializes immediately when the app starts
+const firebaseAppPromise = (async () => {
   try {
-    const config = await fetchFirebaseConfig(); // Wait for config
     if (!getApps().length) {
-      return initializeApp(config);
+      const config = await fetchFirebaseConfig(); // Fetch config
+      return initializeApp(config); // Initialize Firebase
     }
-    return getApp();
+    return getApp(); // Return existing app
   } catch (error) {
     console.error("❌ Firebase Initialization Failed:", error);
-    return null; // Prevents crashing
+    return null;
   }
-};
+})();
 
-// ✅ Lazy load Firebase instance
-const firebaseAppPromise = initializeFirebase();
-
-// ✅ Function to access Firebase services after initialization
+// ✅ Function to get Firebase Services (No delays)
 export const getFirebaseServices = async () => {
   const app = await firebaseAppPromise;
-  if (!app) {
-    throw new Error("❌ Firebase failed to initialize.");
-  }
+  if (!app) throw new Error("❌ Firebase failed to initialize.");
   return {
     auth: getAuth(app),
     database: getDatabase(app),
   };
 };
 
-// ❌ Do NOT export `auth` and `database` directly because Firebase may not be ready
+// ❌ Do NOT export `auth` and `database` directly
 export default firebaseAppPromise;
