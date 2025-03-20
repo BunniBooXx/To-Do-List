@@ -3,19 +3,21 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000"; // ✅ Ensure backend URL
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 let firebaseConfig = null;
 
-// ✅ Function to fetch Firebase config securely from backend
+// ✅ Function to Fetch Firebase Config
 const fetchFirebaseConfig = async () => {
   try {
+    console.log("🔍 Fetching Firebase Config from:", `${backendUrl}/api/firebase-config`);
     const response = await fetch(`${backendUrl}/api/firebase-config`);
     if (!response.ok) throw new Error("Failed to fetch Firebase config.");
-    
+
     firebaseConfig = await response.json();
-    console.log("✅ Fetched Firebase Config:", firebaseConfig);
-    
+    console.log("✅ Firebase Config Fetched:", firebaseConfig);
+
+    // ✅ Initialize Firebase if not already initialized
     if (!getApps().length) {
       initializeApp(firebaseConfig);
     }
@@ -24,14 +26,16 @@ const fetchFirebaseConfig = async () => {
   }
 };
 
-// ✅ Initialize Firebase once config is fetched
-await fetchFirebaseConfig(); // ⏳ Load before exporting services
+// ✅ Ensure Firebase is initialized before exporting services
+fetchFirebaseConfig().then(() => {
+  console.log("✅ Firebase Initialized");
+}).catch(err => console.error("❌ Firebase Initialization Failed:", err));
 
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app = getApps().length ? getApp() : null;
 
-// ✅ Export Firebase services
-export const auth = getAuth(app);
-export const database = getDatabase(app);
+// ✅ Export Firebase Services
+export const auth = app ? getAuth(app) : null;
+export const database = app ? getDatabase(app) : null;
 export default app;
 
 
