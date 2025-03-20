@@ -3,38 +3,33 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL; // ✅ Ensure backend URL
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+let firebaseConfig = null;
 
-// ✅ Function to fetch Firebase config securely from backend
-const fetchFirebaseConfig = async () => {
+// ✅ Fetch Firebase config (Blocking)
+const fetchFirebaseConfigSync = async () => {
   try {
     const response = await fetch(`${backendUrl}/api/firebase-config`);
     if (!response.ok) throw new Error("Failed to fetch Firebase config.");
-    
-    const firebaseConfig = await response.json();
+    firebaseConfig = await response.json();
     console.log("✅ Fetched Firebase Config:", firebaseConfig);
-
-    if (!getApps().length) {
-      return initializeApp(firebaseConfig);
-    }
-    return getApp();
   } catch (error) {
     console.error("❌ Firebase Config Fetch Error:", error);
     throw error;
   }
 };
 
-// ✅ Initialize Firebase once config is fetched
-const appPromise = fetchFirebaseConfig();
+// ✅ Ensure Firebase initializes only once
+(async () => {
+  await fetchFirebaseConfigSync();
+  if (!getApps().length) {
+    initializeApp(firebaseConfig);
+  }
+})();
 
-// ✅ Export Firebase services (used in async components)
-export const getFirebaseServices = async () => {
-  const app = await appPromise;
-  return {
-    auth: getAuth(app),
-    database: getDatabase(app),
-  };
-};
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export default appPromise;
-
+// ✅ Export Firebase services normally
+export const auth = getAuth(app);
+export const database = getDatabase(app);
+export default app;
