@@ -10,14 +10,18 @@ if (!backendUrl) {
   console.error("❌ Missing REACT_APP_BACKEND_URL! Check your Netlify environment variables.");
 }
 
-// ✅ Fetch Firebase config from the backend before initializing Firebase
+// ✅ Fetch Firebase config ONCE and store it
+let firebaseConfigCache = null;
+
 const fetchFirebaseConfig = async () => {
+  if (firebaseConfigCache) return firebaseConfigCache; // Return cached config if available
   try {
     console.log("🔍 Fetching Firebase Config from:", `${backendUrl}/api/firebase-config`);
     const response = await fetch(`${backendUrl}/api/firebase-config`);
     if (!response.ok) throw new Error("Failed to fetch Firebase config.");
     const firebaseConfig = await response.json();
     console.log("✅ Fetched Firebase Config:", firebaseConfig);
+    firebaseConfigCache = firebaseConfig; // Store config in cache
     return firebaseConfig;
   } catch (error) {
     console.error("❌ Firebase Config Fetch Error:", error);
@@ -27,24 +31,32 @@ const fetchFirebaseConfig = async () => {
 
 // ✅ Ensure Firebase initializes only once
 const initializeFirebase = async () => {
-  if (!getApps().length) {
+  try {
     const config = await fetchFirebaseConfig(); // Wait for config
-    return initializeApp(config);
+    if (!getApps().length) {
+      return initializeApp(config);
+    }
+    return getApp();
+  } catch (error) {
+    console.error("❌ Firebase Initialization Failed:", error);
+    return null; // Prevents crashing
   }
-  return getApp();
 };
 
 // ✅ Lazy load Firebase instance
-const appPromise = initializeFirebase();
+const firebaseAppPromise = initializeFirebase();
 
 // ✅ Function to access Firebase services after initialization
 export const getFirebaseServices = async () => {
-  const app = await appPromise;
+  const app = await firebaseAppPromise;
+  if (!app) {
+    throw new Error("❌ Firebase failed to initialize.");
+  }
   return {
     auth: getAuth(app),
     database: getDatabase(app),
   };
 };
 
-// ❌ Do NOT export `auth` and `database` directly
-export default appPromise;
+// ❌ Do NOT export `auth` and `database` directly because Firebase may not be ready
+export default firebaseAppPromise;
