@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getFirebaseServices } from "./data/firebaseConfig.js";
+import { getFirebaseServices } from "./data/firebaseConfig";
 import { signOut, onAuthStateChanged } from "firebase/auth";
 import "./Navbar.css";
 
@@ -16,7 +16,7 @@ function Navbar() {
 
   useEffect(() => {
     const fetchAuth = async () => {
-      const { auth } = await getFirebaseServices();
+      const { auth } = await getFirebaseServices(); // ✅ Correct way to get auth
       setAuthInstance(auth);
 
       // ✅ Listen for auth state changes (login/logout)
@@ -28,7 +28,7 @@ function Navbar() {
 
             if (res.data.success) {
               console.log(`✅ Navbar: User authenticated as ${res.data.userId}`);
-              setUser(res.data); // ✅ Store full user details
+              setUser(res.data.user); // ✅ Store full user details
             } else {
               console.error("❌ Failed to fetch user:", res.data.error);
               setUser(null);
