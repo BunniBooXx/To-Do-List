@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { auth } from "./data/firebaseConfig.js";
-import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { getFirebaseServices } from "./data/firebaseConfig.js";
+import { signOut, onAuthStateChanged } from "firebase/auth";
 import "./Navbar.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -11,48 +11,56 @@ function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [user, setUser] = useState(null);
+  const [authInstance, setAuthInstance] = useState(null); // Store Firebase Auth instance
   const navigate = useNavigate();
 
   useEffect(() => {
-    const auth = getAuth();
+    const fetchAuth = async () => {
+      const { auth } = await getFirebaseServices();
+      setAuthInstance(auth);
 
-    // ✅ Listen for auth state changes (login/logout)
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      if (currentUser) {
-        try {
-          const idToken = await currentUser.getIdToken();
-          const res = await axios.post(`${backendUrl}/users/get-current-user`, { idToken });
+      // ✅ Listen for auth state changes (login/logout)
+      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        if (currentUser) {
+          try {
+            const idToken = await currentUser.getIdToken();
+            const res = await axios.post(`${backendUrl}/users/get-current-user`, { idToken });
 
-          if (res.data.success) {
-            console.log(`✅ Navbar: User authenticated as ${res.data.userId}`);
-            setUser(res.data); // ✅ Store full user details
-          } else {
-            console.error("❌ Failed to fetch user:", res.data.error);
+            if (res.data.success) {
+              console.log(`✅ Navbar: User authenticated as ${res.data.userId}`);
+              setUser(res.data); // ✅ Store full user details
+            } else {
+              console.error("❌ Failed to fetch user:", res.data.error);
+              setUser(null);
+            }
+          } catch (error) {
+            console.error("❌ Error fetching user:", error);
             setUser(null);
           }
-        } catch (error) {
-          console.error("❌ Error fetching user:", error);
+        } else {
+          console.warn("⚠️ User signed out.");
           setUser(null);
         }
-      } else {
-        console.warn("⚠️ User signed out.");
-        setUser(null);
-      }
-    });
+      });
 
-    return () => unsubscribe(); // ✅ Cleanup on unmount
+      return () => unsubscribe(); // ✅ Cleanup on unmount
+    };
+
+    fetchAuth();
   }, []);
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
-      await axios.post(`${backendUrl}/users/logout`);
-      setShowNotification(true);
+      if (authInstance) {
+        await signOut(authInstance);
+        await axios.post(`${backendUrl}/users/logout`);
+        setShowNotification(true);
 
-      setTimeout(() => {
-        setShowNotification(false);
-        navigate("/login");
-      }, 2000);
+        setTimeout(() => {
+          setShowNotification(false);
+          navigate("/login");
+        }, 2000);
+      }
     } catch (error) {
       console.error("❌ Logout failed:", error);
     }
@@ -116,4 +124,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
