@@ -27,10 +27,10 @@
     "stream-browserify": "^3.0.0"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test"
-  },
+  "start": "craco start",
+  "build": "set CI=false && craco build",
+  "test": "craco test"
+},
   "eslintConfig": {
     "extends": [
       "react-app",

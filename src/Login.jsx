@@ -5,14 +5,13 @@ import { getFirebaseServices } from "./data/firebaseConfig";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import "./Login.css";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const backendUrl = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [notifications, setNotifications] = useState([]);
-  const [authInstance, setAuthInstance] = useState(null); // Store Firebase Auth instance
   const navigate = useNavigate();
+  const [authInstance, setAuthInstance] = useState(null);
 
   useEffect(() => {
     const fetchAuth = async () => {
@@ -22,19 +21,9 @@ const Login = () => {
     fetchAuth();
   }, []);
 
-  // ✅ Show Notification
-  const showNotification = (message, type = "error") => {
-    const id = Date.now();
-    setNotifications((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((notif) => notif.id !== id));
-    }, 6000);
-  };
-
-  // ✅ Handle Email/Password Login
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email || !password) return showNotification("⚠️ Email & Password Required!");
+    if (!email || !password) return alert("⚠️ Email & Password Required!");
 
     try {
       if (!authInstance) {
@@ -48,18 +37,17 @@ const Login = () => {
 
       if (response.data.success) {
         console.log(`✅ User logged in: ${response.data.user.userId}`);
-        showNotification(`🎀 Welcome back, ${response.data.user.username}!`, "success");
+        alert(`🎀 Welcome back, ${response.data.user.username}!`);
         setTimeout(() => navigate("/"), 2000);
       } else {
-        showNotification(`❌ ${response.data.error}`);
+        alert(`❌ ${response.data.error}`);
       }
     } catch (error) {
       console.error("❌ Login Failed:", error);
-      showNotification(`❌ ${error.message}`);
+      alert(`❌ ${error.message}`);
     }
   };
 
-  // ✅ Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
       if (!authInstance) {
@@ -74,15 +62,36 @@ const Login = () => {
 
       if (response.data.success) {
         console.log(`✅ Google User logged in: ${response.data.user.userId}`);
-        showNotification(`🎀 Welcome back, ${response.data.user.username}!`, "success");
+        alert(`🎀 Welcome back, ${response.data.user.username}!`);
         setTimeout(() => navigate("/"), 2000);
       } else {
-        showNotification(`❌ ${response.data.error}`);
+        alert(`❌ ${response.data.error}`);
       }
     } catch (error) {
       console.error("❌ Google Login Failed:", error);
-      showNotification(`❌ ${error.message}`);
+      alert(`❌ ${error.message}`);
     }
   };
+
+  return (
+    <div className="login-container">
+      <h2>💖 Login to Your Account 💖</h2>
+      <form onSubmit={handleLogin}>
+        <input type="email" placeholder="📧 Enter Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="🔒 Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <button type="submit" className="login-btn">Login</button>
+      </form>
+
+      <p>Or sign in with:</p>
+      <button className="google-btn" onClick={handleGoogleSignIn}>
+        🎀 Sign in with Google
+      </button>
+
+      <p>
+        Don't have an account? <a href="/signup" className="signup-link">Sign Up</a>
+      </p>
+    </div>
+  );
 };
+
 export default Login;
