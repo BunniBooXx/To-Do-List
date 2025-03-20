@@ -2,6 +2,7 @@
   "name": "petite-planner",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://petite-planner.netlify.app", 
   "type": "module",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
