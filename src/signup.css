@@ -51,6 +51,7 @@ input:focus {
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .signup-btn:hover, .google-btn:hover {
@@ -59,12 +60,22 @@ input:focus {
   box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
 }
 
-/* 🌟 Notification Styles */
-.notification {
-  position: absolute;
-  top: -70px;
+/* 🌟 Notifications Wrapper */
+.notifications-wrapper {
+  position: fixed;
+  top: 10px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* 🌟 Updated Notification Styles */
+.notification {
   background: #ffd1dc;
   color: #d6336c;
   padding: 12px 20px;
@@ -77,9 +88,9 @@ input:focus {
   max-width: 350px;
   text-align: center;
   font-family: 'Quicksand', sans-serif;
-  opacity: 0;
-  visibility: hidden;
-  animation: fadeIn 0.5s ease-in-out forwards;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s ease-in-out;
 }
 
 /* ✅ Success Notification */
@@ -116,12 +127,49 @@ input:focus {
 }
 
 /* 📱 Responsive Design */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .signup-container {
     width: 90%;
+    margin: 80px auto 30px;
   }
   
+  .notifications-wrapper {
+    width: 95%;
+    max-width: 350px;
+  }
+
   .notification {
+    font-size: 0.9rem;
+    padding: 10px 15px;
     max-width: 90%;
+  }
+
+  input {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
+  .signup-btn, .google-btn {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-container {
+    width: 95%;
+  }
+
+  h2 {
+    font-size: 1.8rem;
+  }
+
+  .notification {
+    font-size: 0.85rem;
+    padding: 8px 12px;
+  }
+
+  .signup-btn, .google-btn {
+    font-size: 0.95rem;
   }
 }

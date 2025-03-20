@@ -19,6 +19,8 @@ const Signup = () => {
     const id = Date.now();
     setNotifications((prev) => [...prev, { id, message, type }]);
 
+    console.log("🔔 Notification Shown:", message); // Debugging
+
     // Auto-remove notification after 5 sec
     setTimeout(() => {
       setNotifications((prev) => prev.filter((notif) => notif.id !== id));
@@ -139,5 +141,4 @@ const Signup = () => {
 };
 
 export default Signup;
-
 
