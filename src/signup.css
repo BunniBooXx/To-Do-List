@@ -1,0 +1,127 @@
+/* 🌸 Signup Styles */
+.signup-container {
+  text-align: center;
+  max-width: 400px;
+  margin: 120px auto 40px;
+  padding: 20px;
+  background: #fff5f8;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(255, 105, 180, 0.2);
+  font-family: 'Dancing Script', cursive;
+  position: relative;
+}
+
+/* 💖 Title */
+h2 {
+  color: #ff69b4;
+  margin-bottom: 15px;
+  font-size: 2rem;
+}
+
+/* 📝 Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+input {
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #ffd1dc;
+  background: #fff;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+input:focus {
+  border-color: #ff69b4;
+  outline: none;
+  box-shadow: 0 0 8px rgba(255, 105, 180, 0.3);
+}
+
+/* ✨ Buttons */
+.signup-btn, .google-btn {
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 50px;
+  background: linear-gradient(45deg, #ff69b4, #ffb6c1);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.signup-btn:hover, .google-btn:hover {
+  background: linear-gradient(45deg, #ff1493, #ff69b4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+}
+
+/* 🌟 Notification Styles */
+.notification {
+  position: absolute;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd1dc;
+  color: #d6336c;
+  padding: 12px 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(255, 105, 180, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1rem;
+  max-width: 350px;
+  text-align: center;
+  font-family: 'Quicksand', sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+/* ✅ Success Notification */
+.notification.success {
+  background: #d4f8d4;
+  color: #2b9e2b;
+}
+
+/* ❌ Error Notification */
+.notification.error {
+  background: #ffe3e3;
+  color: #e60026;
+}
+
+/* 🔘 Close Button */
+.close-btn {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+  margin-left: 8px;
+}
+
+/* 🎭 Animation for Notifications */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -10px); visibility: hidden; }
+  to { opacity: 1; transform: translate(-50%, 0); visibility: visible; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; transform: translate(-50%, 0); visibility: visible; }
+  to { opacity: 0; transform: translate(-50%, -10px); visibility: hidden; }
+}
+
+/* 📱 Responsive Design */
+@media (max-width: 480px) {
+  .signup-container {
+    width: 90%;
+  }
+  
+  .notification {
+    max-width: 90%;
+  }
+}

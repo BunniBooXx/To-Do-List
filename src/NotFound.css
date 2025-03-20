@@ -1,0 +1,148 @@
+.not-found-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff5f7, #ffd6e6);
+  padding: 20px;
+}
+
+.not-found-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 3rem;
+  border-radius: 30px;
+  box-shadow: 0 8px 32px rgba(255, 107, 149, 0.2);
+  position: relative;
+  max-width: 500px;
+  width: 100%;
+}
+
+.bow-decoration {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bow-decoration.left {
+  left: -80px;
+  top: 20%;
+  transform: translateY(-50%);
+  flex-direction: row;
+}
+
+.bow-decoration.right {
+  right: -80px;
+  top: 20%;
+  transform: translateY(-50%);
+  flex-direction: row;
+}
+
+
+
+
+.bow-decoration {
+  position: absolute;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+
+.bow-decoration span {
+  font-size: 2.5rem;
+  animation: float 2s infinite alternate;
+}
+
+
+.error-code {
+  font-size: 5rem;
+  color: #ff8fab;
+  margin-bottom: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  text-shadow: 3px 3px 6px rgba(255, 143, 171, 0.3);
+}
+
+.error-message {
+  font-size: 2rem;
+  color: #ff6b95;
+  margin-bottom: 1rem;
+  font-family: 'Dancing Script', cursive;
+}
+
+.error-description {
+  color: #565656;
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.hearts-decoration {
+  margin: 2rem 0;
+}
+
+.hearts-decoration span {
+  font-size: 2rem;
+  margin: 0 10px;
+  display: inline-block;
+  animation: float 2s infinite alternate;
+}
+
+.hearts-decoration span:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.hearts-decoration span:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.return-home-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #ff8fab, #ffd6e6);
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-family: 'Quicksand', sans-serif;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 149, 0.3);
+}
+
+.return-home-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(255, 107, 149, 0.4);
+}
+
+@keyframes float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .not-found-content {
+    padding: 2rem;
+  }
+
+  .bow-decoration {
+    width: 70px;
+    height: 70px;
+  }
+
+  
+
+  .error-code {
+    font-size: 4rem;
+  }
+
+  .error-message {
+    font-size: 1.5rem;
+  }
+
+  .error-description {
+    font-size: 1rem;
+  }
+}

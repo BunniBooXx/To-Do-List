@@ -1,73 +1,176 @@
-/* TaskItem.css */
+/* 🎀 Task Item Container */
 .task-item {
+  background: white;
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: 0 6px 20px rgba(230, 160, 175, 0.2); /* Soft strawberry shadow */
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
   display: flex;
   align-items: center;
-  padding: 12px;
-  background: #fde2e4;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  margin-bottom: 10px;
-  transition: transform 0.2s ease;
-  font-family: 'Caveat', cursive;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+  border: 2px solid #f6d8df; /* Soft pastel pink border */
 }
 
-.task-item:hover {
-  transform: scale(1.02);
+
+/* 🍓 Soft Strawberry Side Border */
+.task-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, #f7cdd5, #f9e2e5); /* Soft pastel gradient */
+  border-radius: 4px;
 }
 
+/* ✅ Completed Task Styling */
+.task-item.completed {
+  background: #fdf5f7;
+  opacity: 0.9;
+}
+
+/* 🎀 Task Content Layout */
+.task-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1.2rem;
+  justify-content: space-between;
+}
+
+/* 💖 Heart Checkbox */
 .heart-checkbox {
-  font-size: 24px;
-  cursor: pointer;
-  margin-right: 10px;
-  transition: color 0.2s ease;
-}
-
-.task-name {
-  flex: 1;
-  color: #ef7070;
-  font-size: 18px;
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.task-item.done .task-name span {
-  text-decoration: line-through;
-  color: #cc6060;
-}
-
-.cute-arrow-button {
   background: none;
   border: none;
-  font-size: 18px;
-  color: #cc6060;
+  font-size: 1.7rem;
   cursor: pointer;
-  margin-left: 8px;
-  transition: transform 0.2s ease;
+  transition: transform 0.3s ease;
+  color: #e3a4af; /* Soft muted strawberry pastel */
 }
 
-.cute-arrow-button:hover {
+.heart-checkbox:hover {
   transform: scale(1.2);
 }
 
-.cute-arrow-button.expanded {
-  color: #ff99cc;
+/* 📝 Task Name (Lighter Pastel Pink, NOT Hot Pink) */
+/* 📝 Task Name (Lighter Pastel Pink, NOT Hot Pink) */
+.task-name {
+  flex: 1;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.4rem; /* Slightly larger */
+  font-weight: bold;
+  color: #cfa2ab; /* **Lighter strawberry pastel (not hot pink)** */
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, text-decoration 0.3s ease;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.view-subcategory-link {
-  color: #ff99cc;
-  font-size: 14px;
-  text-decoration: none;
-  margin-top: 8px;
+/* Add this new style for completed task names */
+.completed .task-name {
+  text-decoration: line-through;
+  opacity: 0.8;
+  color: #e3b9c1; /* Slightly lighter color for completed tasks */
+}
+
+.task-name:hover {
+  background-color: #fae3e7;
+}
+
+.task-name:hover {
+  background-color: #fae3e7;
+}
+
+/* ✏️ Task Edit Input */
+.task-edit-input {
+  flex: 1;
+  padding: 0.6rem;
+  border: 2px solid #f7ccd6;
+  border-radius: 12px;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.2rem;
+  text-align: center;
+  background: #fdf7f8;
+  color: #cfa2ab; /* Match the soft strawberry pastel */
+}
+
+/* 🎀 Task Actions Layout */
+.task-actions {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* 🍓 "Add Subtasks" Button (Softer, Less Vibrant) */
+.subtask-toggle {
   display: inline-block;
-  transition: transform 0.2s ease;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #f6c8cf, #f9dbe2);
+  border-radius: 18px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-family: "Quicksand", sans-serif;
+  white-space: nowrap;
 }
 
-.view-subcategory-link:hover {
+.subtask-toggle:hover {
+  background: linear-gradient(135deg, #f2b6c1, #f8d0d7);
   transform: scale(1.1);
 }
 
-.subtasks {
-  padding-left: 20px;
-  margin-top: 5px;
-  border-left: 2px dashed #fcd5ce;
+/* 🗑 Delete Button */
+.delete-task {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #c98c98; /* Muted pinkish tone */
+  transition: transform 0.3s ease;
+}
+
+.delete-task:hover {
+  transform: scale(1.2) rotate(-10deg);
+  color: #b97686;
+}
+
+/* 🎀 Mobile Responsive */
+@media (max-width: 768px) {
+  .task-item {
+    flex-wrap: wrap;
+    padding: 1rem;
+  }
+
+  .task-name {
+    font-size: 1.2rem;
+    max-width: 55%;
+  }
+
+  .task-actions {
+    flex-wrap: nowrap;
+    gap: 5px;
+  }
+
+  .subtask-toggle {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .heart-checkbox,
+  .delete-task {
+    font-size: 1.3rem;
+  }
 }

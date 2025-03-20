@@ -44,3 +44,121 @@
     font-size: 14px;
     color: #6b4f4f;
   }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #fff5f7;
+  }
+  
+  .main-content {
+    flex: 1;
+    padding: 80px 20px 40px;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .main-content {
+      padding: 70px 16px 32px;
+    }
+  }
+  
+  @media screen and (min-width: 769px) and (max-width: 1024px) {
+    .main-content {
+      padding: 75px 24px 36px;
+      max-width: 900px;
+    }
+  }
+  
+  @media screen and (min-width: 1025px) {
+    .main-content {
+      padding: 80px 32px 40px;
+    }
+  }
+  
+
+  /* Add these styles to your existing App.css */
+
+.loading-screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #fff5f7, #ffd6e6);
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-bow {
+  width: 120px;
+  height: 120px;
+  background-image: url('./planning-girl.webp');
+  background-size: contain;
+  background-repeat: no-repeat;
+  margin: 0 auto;
+  animation: bounce 1s infinite alternate;
+}
+
+.loading-hearts {
+  margin: 20px 0;
+}
+
+.loading-hearts span {
+  font-size: 2rem;
+  margin: 0 10px;
+  display: inline-block;
+  animation: pulse 1.5s infinite;
+}
+
+.loading-hearts span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-hearts span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.loading-content h2 {
+  color: #ff8fab;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.8rem;
+  margin-top: 20px;
+  animation: fadeIn 1s ease;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .loading-bow {
+    width: 80px;
+    height: 80px;
+  }
+
+  .loading-content h2 {
+    font-size: 1.4rem;
+  }
+
+  .loading-hearts span {
+    font-size: 1.5rem;
+  }
+}

@@ -1,47 +1,273 @@
-/* Subcategory.css */
+/* 🍓 Sweet Strawberry Subcategory Styling */
 .subcategory-page {
-    padding: 20px;
-    text-align: center;
-    background-color: #ffe5ec;
-  }
-  
+  padding: 20px;
+  text-align: center;
+  background: linear-gradient(135deg, #fae6ea, #fff8f9);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  font-family: 'Poppins', sans-serif;
+}
+
+.subcategory-title {
+  font-size: 2.2rem;
+  font-family: 'Dancing Script', cursive;
+  color: #e4b1bb;
+  text-shadow: 2px 2px white;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(228, 177, 187, 0.2);
+  margin-bottom: 25px;
+  transition: transform 0.2s ease;
+}
+
+/* Form styling to match task items */
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(228, 177, 187, 0.15);
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+input {
+  padding: 15px 20px;
+  border: 2px solid #e4b1bb; /* Strawberry pink border */
+  border-radius: 15px;
+  font-size: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  background: white; /* White background to make border visible */
+  color: #e4b1bb;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 3px 10px rgba(228, 177, 187, 0.1);
+  letter-spacing: 0.5px;
+  text-align: center;
+  outline: none; /* Remove default outline */
+}
+
+input::placeholder {
+  color: #f4c7cf;
+  font-style: italic;
+}
+
+input:focus {
+  outline: none;
+  border: 3px solid #e4b1bb; /* Thicker border when focused */
+  background: white;
+  box-shadow: 0 0 12px rgba(228, 177, 187, 0.3);
+}
+
+
+/* Add a cute focus animation */
+@keyframes sparkle {
+  0% { box-shadow: 0 0 5px rgba(228, 177, 187, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(228, 177, 187, 0.5); }
+  100% { box-shadow: 0 0 5px rgba(228, 177, 187, 0.3); }
+}
+
+input:focus {
+  animation: sparkle 1.5s infinite;
+}
+
+button[type="submit"] {
+  background: linear-gradient(45deg, #e4b1bb, #fae6ea);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Quicksand', sans-serif;
+  box-shadow: 0 4px 10px rgba(228, 177, 187, 0.2);
+  border: none;
+  width: 100%;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(228, 177, 187, 0.3);
+  background: linear-gradient(45deg, #f4c7cf, #fae6ea);
+}
+
+.subtask-list {
+  max-width: 600px;
+  width: 100%;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(228, 177, 187, 0.15);
+  margin-top: 25px;
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff8f9;
+  padding: 15px 20px;
+  border-radius: 15px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 10px rgba(228, 177, 187, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.task-item:hover {
+  transform: translateY(-2px);
+}
+
+.task-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.task-name {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #e4b1bb;
+  flex: 1;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+/* This is the key style for line-through when completed */
+.task-name.completed {
+  text-decoration: line-through;
+  color: #f4c7cf;
+  opacity: 0.8;
+}
+
+.heart-checkbox {
+  font-size: 1.6rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s ease;
+  color: #f4c7cf;
+  margin: 0 10px;
+}
+
+.heart-checkbox:hover {
+  transform: scale(1.2);
+}
+
+.heart-checkbox.completed {
+  color: #e4b1bb;
+}
+
+.delete-task {
+  font-size: 1.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s ease;
+  color: #f4c7cf;
+}
+
+.delete-task:hover {
+  transform: scale(1.2);
+}
+
+.no-subtasks-message {
+  background: #fff8f9;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 3px 10px rgba(228, 177, 187, 0.1);
+  font-size: 1.2rem;
+  color: #e4b1bb;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 25px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.loading-message {
+  background: #fff8f9;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 3px 10px rgba(228, 177, 187, 0.1);
+  font-size: 1.2rem;
+  color: #e4b1bb;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 25px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 15px 25px;
+  border-radius: 15px;
+  background: #fff8f9;
+  box-shadow: 0 3px 10px rgba(228, 177, 187, 0.2);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+  border-left: 4px solid #e4b1bb;
+}
+
+.notification.success {
+  background: #fff8f9;
+  color: #388e3c;
+  border-left: 4px solid #4caf50;
+}
+
+.notification.error {
+  background: #fff8f9;
+  color: #d32f2f;
+  border-left: 4px solid #f44336;
+}
+
+@media (max-width: 768px) {
   .subcategory-title {
-    font-size: 24px;
-    color: #cc6060;
-    margin-bottom: 15px;
+    font-size: 1.8rem;
+    padding: 12px 20px;
+  }
+
+  form {
+    padding: 15px 20px;
   }
   
-  .subcategory-list {
-    max-width: 600px;
-    margin: 0 auto;
+  input {
+    font-size: 0.9rem;
+    padding: 12px;
   }
   
-  .subcategory-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fde2e4;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  button[type="submit"] {
+    font-size: 1rem;
+    padding: 12px;
   }
   
-  .subcategory-item span {
-    font-size: 18px;
-    color: #6b4f4f;
-    font-family: 'Caveat', cursive;
+  .task-name {
+    font-size: 1rem;
   }
   
-  .subcategory-item button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    transition: transform 0.2s ease;
+  .heart-checkbox {
+    font-size: 1.4rem;
   }
   
-  .subcategory-item button:hover {
-    transform: scale(1.1);
+  .delete-task {
+    font-size: 1.2rem;
   }
-  
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,38 +1,98 @@
-/* Homepage.css */
+/* Kawaii Homepage Styles */
 .homepage {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-image: url('background-image-url.png');
-    background-size: cover;
-    background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100vh;
+  background: linear-gradient(135deg, #ffd6e7 0%, #ffecf2 100%);
+  font-family: 'Josefin Sans', 'Comic Sans MS', cursive;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.homepage-content {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(255, 77, 141, 0.2);
+  max-width: 500px;
+  animation: fadeIn 1.5s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.homepage-title {
+  font-size: 2.5rem;
+  color: #ff4d8d;
+  font-family: 'Dancing Script', cursive;
+  margin-bottom: 15px;
+  text-shadow: 3px 3px 0px #ffffff, 
+               6px 6px 0px rgba(255, 77, 141, 0.2);
+}
+
+.homepage-description {
+  font-size: 1.2rem;
+  color: #cc6060;
+  margin-bottom: 20px;
+}
+
+.homepage-image {
+  width: 100%;
+  max-width: 250px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(255, 77, 141, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.homepage-image:hover {
+  transform: scale(1.05);
+}
+
+.homepage-button {
+  display: inline-block;
+  background: linear-gradient(45deg, #ff80ab, #ff4d8d);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 50px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+  box-shadow: 0 4px 10px rgba(255, 77, 141, 0.2);
+  text-shadow: 2px 2px 0px #ffb6c1;
+}
+
+.homepage-button:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(45deg, #ff6b9c, #ff3881);
+  box-shadow: 0 6px 20px rgba(255, 77, 141, 0.3);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .homepage-content {
+    max-width: 90%;
   }
-  
-  .homepage-link {
-    position: relative;
-    display: inline-block;
-    padding: 20px 40px;
-    background: rgba(255, 255, 255, 0.8);
-    border-radius: 50px;
-    color: #cc6060;
-    font-size: 24px;
-    text-align: center;
-    text-decoration: none;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s ease;
+
+  .homepage-title {
+    font-size: 2rem;
   }
-  
-  .homepage-link:hover {
-    transform: scale(1.1);
+
+  .homepage-description {
+    font-size: 1.1rem;
   }
-  
-  .homepage-link::after {
-    content: "💖";
-    display: block;
-    font-size: 16px;
-    color: #cc6060;
-    margin-top: 8px;
-    text-align: center;
+
+  .homepage-button {
+    font-size: 1.1rem;
+    padding: 10px 25px;
   }
-  
+}

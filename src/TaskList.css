@@ -1,26 +1,81 @@
-/* TaskList.css */
-.task-list {
-    padding: 20px;
-    background-color: #f6acb1;
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+/* 🍓 Add Task Form */
+.add-task-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white; /* ✅ Pure white for a clean look */
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(235, 140, 155, 0.2); /* 🍓 Soft pink shadow */
+  max-width: 500px;
+  width: 100%;
+}
+
+/* 🍓 Cute Task Input */
+.task-input {
+  flex-grow: 1;
+  padding: 12px;
+  border: 2px solid #f5b6c1; /* 🍓 Soft strawberry border */
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: 'Quicksand', sans-serif;
+  background: #fff7f9; /* ✅ Light pastel pink */
+  color: #e08b9d;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 0 6px rgba(235, 140, 155, 0.15);
+}
+
+.task-input::placeholder {
+  color: #e89aa6; /* 🍓 Softer pastel pink */
+  font-style: italic;
+}
+
+.task-input:focus {
+  outline: none;
+  border-color: #e08b9d;
+  background: white;
+  box-shadow: 0 0 12px rgba(235, 140, 155, 0.4);
+  transform: scale(1.02);
+}
+
+/* 🍓 Soft Strawberry Gradient Button */
+.add-task-button {
+  background: linear-gradient(135deg, #f5b6c1, #ffcfd8); /* 🍓 Soft strawberry gradient */
+  color: white;
+  padding: 12px 18px;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Quicksand', sans-serif;
+  box-shadow: 0 4px 10px rgba(235, 140, 155, 0.3);
+  border: none;
+  font-weight: bold;
+}
+
+.add-task-button:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #e08b9d, #ffbdc9); /* 🍓 Slightly deeper pastel */
+  box-shadow: 0 5px 15px rgba(235, 140, 155, 0.4);
+}
+
+/* 📱 Mobile-Friendly Adjustments */
+@media (max-width: 768px) {
+  .add-task-form {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
   }
-  
+
+  .task-input {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+
   .add-task-button {
-    display: block;
-    margin: 0 auto 20px;
-    padding: 10px 20px;
-    background: #ffe5ec;
-    color: #cc6060;
-    font-size: 18px;
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-    transition: transform 0.2s ease;
+    font-size: 1rem;
+    padding: 10px;
+    width: 100%;
   }
-  
-  .add-task-button:hover {
-    transform: scale(1.05);
-  }
-  
+}

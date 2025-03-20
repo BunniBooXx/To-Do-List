@@ -1,93 +1,100 @@
-/* Importing the Ballet font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Ballet&display=swap');
-
-/* Page Styling */
+/* 🌸 Tasks Page Layout */
 .tasks-page {
-  padding: 20px;
-  text-align: center;
-  background-color: #fdf0f8; /* Soft pink background */
+  padding: 2rem;
   min-height: 100vh;
-}
-
-/* Main Title Styling */
-.tasks-title {
-  font-size: 42px;
-  color: #ffffff;
-  font-family: 'Ballet', cursive;
-  font-style: bolder;
+  background: linear-gradient(135deg, #fff5f8, #ffd6e6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   position: relative;
-  display: inline-block;
-  padding: 20px 50px;
-  background: linear-gradient(145deg, #f6acb1, #f0939e); /* Soft gradient for title background */
-  border: 3px solid #f9ccd8;
-  border-radius: 40px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1), inset 0 4px 8px rgba(255, 255, 255, 0.5);
-  margin-bottom: 30px;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
-  animation: pop-in 0.5s ease-out;
+  overflow: hidden;
 }
 
-/* Heart decorations around the title */
-.tasks-title::before,
-.tasks-title::after {
-  content: "💖 💕 💖";
-  font-size: 24px;
+/* 🎀 Decorative Bows */
+.decorative-bow {
   position: absolute;
-  color: #f3a9b8;
+  width: 70px;
+  height: 70px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none; 
 }
 
-.tasks-title::before {
-  top: -10px;
-  left: -70px;
-  transform: rotate(-10deg);
+.decorative-bow.left {
+  top: 20px;
+  left: 20px;
+  background-image: url('./pink-heart-bow.webp');
+  transform: rotate(-15deg);
 }
 
-.tasks-title::after {
-  top: -10px;
-  right: -70px;
-  transform: rotate(10deg);
+.decorative-bow.right {
+  top: 20px;
+  right: 20px;
+  background-image: url('./pink-heart-bow.webp');
+  transform: rotate(15deg);
 }
 
-/* Subtle Shimmer Animation */
-@keyframes shimmer {
-  0% {
-    transform: translateY(0px);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-8px);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(0px);
-    opacity: 0.8;
-  }
+/* ☁️ Soft Floating Title */
+.tasks-title {
+  text-align: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #f5b6c1, #e08b9d); /* Updated to match TaskList pink shades */
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-family: 'Dancing Script', cursive;
+  box-shadow: 0px 8px 20px rgba(235, 140, 155, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  animation: floatTitle 3s ease-in-out infinite;
 }
 
-/* Pop-in Animation for Entrance */
-@keyframes pop-in {
-  0% {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* ✨ Title Emoji Animation */
+.title-emoji {
+  margin: 0 0.5rem;
+  animation: bounce 1s infinite alternate;
 }
 
-/* Responsive Adjustments */
+/* 🏡 Task List Container */
+.task-list {
+  width: 100%;
+  max-width: 700px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 6px 12px rgba(235, 140, 155, 0.2);
+}
+
+/* 🎀 Soft Floating Effect */
+@keyframes floatTitle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* 💖 Bouncing Emoji Effect */
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+/* 📱 Mobile Responsiveness */
 @media (max-width: 768px) {
-  .tasks-title {
-    font-size: 32px;
-    padding: 15px 30px;
+  .tasks-page {
+    padding: 1.5rem;
   }
 
-  .tasks-title::before,
-  .tasks-title::after {
-    font-size: 20px;
-    left: -40px;
-    right: -40px;
-    top: -10px;
+  .decorative-bow {
+    width: 50px;
+    height: 50px;
+  }
+
+  .tasks-title {
+    font-size: 2rem;
+    min-width: 80%;
+  }
+
+  .task-list {
+    width: 90%;
   }
 }
