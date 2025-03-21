@@ -6,7 +6,7 @@ import "./TaskList.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-export default function TaskList({ userId }) {
+export default function TaskList() {
   const [tasks, setTasks] = useState([]);
   const [newTaskName, setNewTaskName] = useState("");
   const [notification, setNotification] = useState(null);
@@ -19,7 +19,6 @@ export default function TaskList({ userId }) {
 
   // ✅ Fetch Tasks from Backend (with Auth Header)
   const fetchTasks = useCallback(async () => {
-    if (!userId || !backendUrl) return;
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
@@ -27,8 +26,8 @@ export default function TaskList({ userId }) {
 
       const idToken = await currentUser.getIdToken();
 
-      console.log(`📢 Fetching tasks from: ${backendUrl}/tasks/all/${userId}`);
-      const res = await axios.get(`${backendUrl}/tasks/all/${userId}`, {
+      console.log(`📢 Fetching tasks from: ${backendUrl}/tasks/all`);
+      const res = await axios.get(`${backendUrl}/tasks/all`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
@@ -43,7 +42,7 @@ export default function TaskList({ userId }) {
       console.error("❌ API Request Failed:", error);
       showNotification("❌ Error fetching tasks", "error");
     }
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     fetchTasks();
@@ -61,7 +60,7 @@ export default function TaskList({ userId }) {
 
       const res = await axios.post(
         `${backendUrl}/tasks/create`,
-        { userId, name: newTaskName },
+        { name: newTaskName },
         {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -72,7 +71,7 @@ export default function TaskList({ userId }) {
       if (res.data.success) {
         setTasks((prevTasks) => [
           ...prevTasks,
-          { task_id: res.data.taskId, user_id: userId, name: newTaskName, completed: false },
+          { task_id: res.data.taskId, name: newTaskName, completed: false },
         ]);
         setNewTaskName("");
         showNotification("🎀 Task added!", "success");
@@ -92,7 +91,7 @@ export default function TaskList({ userId }) {
 
       const res = await axios.put(
         `${backendUrl}/tasks/update`,
-        { userId, taskId, ...updates },
+        { taskId, ...updates },
         {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -120,9 +119,7 @@ export default function TaskList({ userId }) {
       const currentUser = auth.currentUser;
       const idToken = await currentUser.getIdToken();
 
-      console.log(`📢 Sending DELETE Request: ${backendUrl}/tasks/delete/${userId}/${taskId}`);
-
-      const res = await axios.delete(`${backendUrl}/tasks/delete/${userId}/${taskId}`, {
+      const res = await axios.delete(`${backendUrl}/tasks/delete/${taskId}`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },
@@ -143,7 +140,6 @@ export default function TaskList({ userId }) {
 
   return (
     <div className="task-list-wrapper">
-      {/* ✅ Show Notification */}
       {notification && (
         <div className={`notification ${notification.type}`}>
           {notification.message}
@@ -151,7 +147,6 @@ export default function TaskList({ userId }) {
         </div>
       )}
 
-      {/* ✅ Add Task Form */}
       <form onSubmit={handleAddTask} className="add-task-form">
         <input
           type="text"
@@ -163,13 +158,11 @@ export default function TaskList({ userId }) {
         <button type="submit" className="add-task-button">Add Task 🎀</button>
       </form>
 
-      {/* ✅ Task List */}
       <div className="tasks-wrapper">
         {tasks.map((task) => (
           <TaskItem
             key={task.task_id}
             {...task}
-            user_id={userId}
             onUpdate={handleUpdateTask}
             onDelete={() => handleDeleteTask(task.task_id)}
           />
