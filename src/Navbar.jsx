@@ -11,24 +11,29 @@ function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [user, setUser] = useState(null);
-  const [authInstance, setAuthInstance] = useState(null); // Store Firebase Auth instance
+  const [authInstance, setAuthInstance] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAuth = async () => {
-      const { auth } = await getFirebaseServices(); // ✅ Correct way to get auth
+      const { auth } = await getFirebaseServices();
       setAuthInstance(auth);
 
-      // ✅ Listen for auth state changes (login/logout)
       const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
           try {
             const idToken = await currentUser.getIdToken();
-            const res = await axios.post(`${backendUrl}/users/get-current-user`, { idToken });
+
+            // ✅ Updated: use GET and pass token in headers
+            const res = await axios.get(`${backendUrl}/users/get-current-user`, {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+              },
+            });
 
             if (res.data.success) {
-              console.log(`✅ Navbar: User authenticated as ${res.data.userId}`);
-              setUser(res.data.user); // ✅ Store full user details
+              console.log(`✅ Navbar: User authenticated as ${res.data.user.username}`);
+              setUser(res.data.user);
             } else {
               console.error("❌ Failed to fetch user:", res.data.error);
               setUser(null);
@@ -43,7 +48,7 @@ function Navbar() {
         }
       });
 
-      return () => unsubscribe(); // ✅ Cleanup on unmount
+      return () => unsubscribe();
     };
 
     fetchAuth();
