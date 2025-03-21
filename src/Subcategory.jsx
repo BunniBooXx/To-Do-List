@@ -1,4 +1,4 @@
-// ✅ Updated Subcategory.jsx with Firebase Auth Middleware Support and Backend Sync
+// ✅ Updated Subcategory.jsx with Backend Route Matching
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -31,20 +31,13 @@ export default function Subcategory() {
 
         const idToken = await currentUser.getIdToken();
 
-        const taskRes = await axios.get(`${backendUrl}/tasks/${taskId}`, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-
-        if (taskRes.data.success) {
-          setTaskName(taskRes.data.task.name || "Unnamed Task");
-          setTaskCompleted(taskRes.data.task.completed || false);
-        }
-
         const subtaskRes = await axios.get(`${backendUrl}/subtasks/${taskId}`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
 
         if (subtaskRes.data.success) {
+          setTaskName(subtaskRes.data.task.name || "Unnamed Task");
+          setTaskCompleted(subtaskRes.data.task.completed || false);
           setSubtasks(Object.values(subtaskRes.data.subtasks || {}));
         }
       } catch (error) {
@@ -68,8 +61,8 @@ export default function Subcategory() {
       const idToken = await auth.currentUser.getIdToken();
 
       const res = await axios.post(
-        `${backendUrl}/subtasks/create/${taskId}`,
-        { subtaskName: newSubtaskName },
+        `${backendUrl}/subtasks/create`,
+        { taskId, subtaskName: newSubtaskName },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
