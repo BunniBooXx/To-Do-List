@@ -1,4 +1,4 @@
-// ✅ Updated Subcategory.jsx (with Firebase auth middleware support)
+// ✅ Updated Subcategory.jsx with Firebase Auth Middleware Support and Backend Sync
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
