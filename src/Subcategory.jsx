@@ -1,3 +1,4 @@
+// ✅ Updated Subcategory.jsx (with Firebase auth middleware support)
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
@@ -8,7 +9,6 @@ const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 export default function Subcategory() {
   const { taskId } = useParams();
-  const [userId, setUserId] = useState(null);
   const [subtasks, setSubtasks] = useState([]);
   const [newSubtaskName, setNewSubtaskName] = useState("");
   const [taskName, setTaskName] = useState("Loading...");
@@ -16,107 +16,88 @@ export default function Subcategory() {
   const [loading, setLoading] = useState(true);
   const [notification, setNotification] = useState(null);
 
-  // ✅ Fetch Current User ID
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const auth = getAuth();
-        const user = auth.currentUser;
-
-        if (!user) {
-          console.error("❌ No user signed in.");
-          return;
-        }
-
-        const idToken = await user.getIdToken();
-        const res = await axios.post(`${backendUrl}/users/get-current-user`, { idToken });
-
-        if (res.data.success) {
-          setUserId(res.data.userId);
-        } else {
-          console.error("❌ Failed to fetch user:", res.data.error);
-        }
-      } catch (error) {
-        console.error("❌ Authentication error:", error);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  // ✅ Fetch Task Name, Completion Status & Subtasks
-  useEffect(() => {
-    if (!userId || !taskId) return;
-
-    const fetchTaskAndSubtasks = async () => {
-      setLoading(true);
-      try {
-        const taskRes = await axios.get(`${backendUrl}/tasks/${userId}/${taskId}`);
-        if (taskRes.data.success) {
-          setTaskName(taskRes.data.task.name || "Unknown Task");
-          setTaskCompleted(taskRes.data.task.completed || false);
-        }
-
-        const subtasksRes = await axios.get(`${backendUrl}/subtasks/${userId}/${taskId}`);
-        if (subtasksRes.data.success) {
-          setSubtasks(Object.values(subtasksRes.data.subtasks || {}));
-        }
-      } catch (error) {
-        console.error("❌ Error fetching task/subtasks:", error);
-      }
-      setLoading(false);
-    };
-
-    fetchTaskAndSubtasks();
-  }, [userId, taskId]);
-
-  // ✅ Show Notification
   const showNotification = (message, type) => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // ✅ Add Subtask
+  // ✅ Fetch task and subtasks (with auth)
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const idToken = await currentUser.getIdToken();
+
+        const taskRes = await axios.get(`${backendUrl}/tasks/${taskId}`, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+
+        if (taskRes.data.success) {
+          setTaskName(taskRes.data.task.name || "Unnamed Task");
+          setTaskCompleted(taskRes.data.task.completed || false);
+        }
+
+        const subtaskRes = await axios.get(`${backendUrl}/subtasks/${taskId}`, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+
+        if (subtaskRes.data.success) {
+          setSubtasks(Object.values(subtaskRes.data.subtasks || {}));
+        }
+      } catch (error) {
+        console.error("❌ Error fetching task/subtasks:", error);
+        showNotification("Failed to fetch task data.", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [taskId]);
+
+  // ✅ Add subtask
   const handleAddSubtask = async (e) => {
     e.preventDefault();
     if (!newSubtaskName.trim()) return;
 
     try {
-      const res = await axios.post(`${backendUrl}/subtasks/create`, {
-        userId,
-        taskId,
-        subtaskName: newSubtaskName,
-      });
+      const auth = getAuth();
+      const idToken = await auth.currentUser.getIdToken();
+
+      const res = await axios.post(
+        `${backendUrl}/subtasks/create/${taskId}`,
+        { subtaskName: newSubtaskName },
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
 
       if (res.data.success) {
         setSubtasks((prev) => [
-          ...(prev || []),
+          ...prev,
           { subtask_id: res.data.subtaskId, name: newSubtaskName, completed: false },
         ]);
         setNewSubtaskName("");
         showNotification("🎀 Subtask added successfully!", "success");
       }
     } catch (error) {
-      showNotification("❌ Failed to add subtask", "error");
       console.error("❌ Failed to add subtask:", error);
+      showNotification("❌ Failed to add subtask", "error");
     }
   };
 
-  // ✅ Update Subtask Completion
+  // ✅ Toggle subtask complete
   const handleUpdateSubtask = async (subtaskId, currentCompletedState) => {
     try {
-      if (!userId || !taskId || !subtaskId) {
-        console.error("❌ Missing required fields:", { userId, taskId, subtaskId });
-        showNotification("❌ Missing required fields!", "error");
-        return;
-      }
-
+      const auth = getAuth();
+      const idToken = await auth.currentUser.getIdToken();
       const updatedCompleted = !currentCompletedState;
 
       const res = await axios.put(
-        `${backendUrl}/subtasks/update/${userId}/${taskId}/${subtaskId}`,
+        `${backendUrl}/subtasks/update/${taskId}/${subtaskId}`,
         { completed: updatedCompleted },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
       if (res.data.success) {
@@ -125,55 +106,55 @@ export default function Subcategory() {
         );
         setSubtasks(updatedSubtasks);
 
-        const allCompleted = updatedSubtasks.every((subtask) => subtask.completed);
-
+        const allCompleted = updatedSubtasks.every((s) => s.completed);
         if (allCompleted !== taskCompleted) {
+          await axios.put(
+            `${backendUrl}/tasks/update`,
+            { taskId, completed: allCompleted },
+            { headers: { Authorization: `Bearer ${idToken}` } }
+          );
           setTaskCompleted(allCompleted);
-          await axios.put(`${backendUrl}/tasks/update/${userId}/${taskId}`, {
-            completed: allCompleted,
-          });
         }
 
         showNotification("🎀 Subtask updated!", "success");
       }
     } catch (error) {
+      console.error("❌ Failed to update subtask:", error);
       showNotification("❌ Failed to update subtask", "error");
-      console.error("❌ Failed to update subtask:", error.response?.data || error.message);
     }
   };
 
-  // ✅ Delete Subtask
+  // ✅ Delete subtask
   const handleDeleteSubtask = async (subtaskId) => {
     try {
-      const res = await axios.delete(`${backendUrl}/subtasks/delete/${userId}/${taskId}/${subtaskId}`);
+      const auth = getAuth();
+      const idToken = await auth.currentUser.getIdToken();
+
+      const res = await axios.delete(
+        `${backendUrl}/subtasks/delete/${taskId}/${subtaskId}`,
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
 
       if (res.data.success) {
-        const updatedSubtasks = subtasks.filter((subtask) => subtask.subtask_id !== subtaskId);
-        setSubtasks(updatedSubtasks);
-
-        const allCompleted = updatedSubtasks.every((subtask) => subtask.completed);
-        setTaskCompleted(allCompleted);
-
-        showNotification("🎀 Subtask deleted successfully", "success");
+        const updated = subtasks.filter((s) => s.subtask_id !== subtaskId);
+        setSubtasks(updated);
+        setTaskCompleted(updated.every((s) => s.completed));
+        showNotification("🎀 Subtask deleted!", "success");
       }
     } catch (error) {
-      showNotification("❌ Failed to delete subtask", "error");
       console.error("❌ Failed to delete subtask:", error);
+      showNotification("❌ Failed to delete subtask", "error");
     }
   };
 
   return (
     <div className="subcategory-page">
-      {/* 🎀 Notification */}
       {notification && (
-        <div className={`notification ${notification.type}`}>
-          {notification.message}
-        </div>
+        <div className={`notification ${notification.type}`}>{notification.message}</div>
       )}
 
-      <h1 className="subcategory-title"> ♡ {taskName} ♡</h1>
-      
-      {/* Form with input above button */}
+      <h1 className="subcategory-title">♡ {taskName} ♡</h1>
+
       <form onSubmit={handleAddSubtask}>
         <input
           type="text"
@@ -194,14 +175,12 @@ export default function Subcategory() {
                 <span className={`task-name ${subtask.completed ? "completed" : ""}`}>
                   {subtask.name}
                 </span>
-
                 <button
                   className={`heart-checkbox ${subtask.completed ? "completed" : ""}`}
                   onClick={() => handleUpdateSubtask(subtask.subtask_id, subtask.completed)}
                 >
                   {subtask.completed ? "🩷" : "🤍"}
                 </button>
-
                 <button
                   className="delete-task"
                   onClick={() => handleDeleteSubtask(subtask.subtask_id)}
