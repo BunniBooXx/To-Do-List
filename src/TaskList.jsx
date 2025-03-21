@@ -1,3 +1,4 @@
+// ✅ TaskList.jsx (Frontend)
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import TaskItem from "./TaskItem.jsx";
@@ -11,13 +12,11 @@ export default function TaskList() {
   const [newTaskName, setNewTaskName] = useState("");
   const [notification, setNotification] = useState(null);
 
-  // ✅ Show Notification with Timeout
   const showNotification = (message, type = "error") => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // ✅ Fetch Tasks from Backend (with Auth Header)
   const fetchTasks = useCallback(async () => {
     try {
       const auth = getAuth();
@@ -25,12 +24,8 @@ export default function TaskList() {
       if (!currentUser) return;
 
       const idToken = await currentUser.getIdToken();
-
-      console.log(`📢 Fetching tasks from: ${backendUrl}/tasks/all`);
       const res = await axios.get(`${backendUrl}/tasks/all`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
+        headers: { Authorization: `Bearer ${idToken}` },
       });
 
       if (res.data.success) {
@@ -48,31 +43,23 @@ export default function TaskList() {
     fetchTasks();
   }, [fetchTasks]);
 
-  // ✅ Add New Task
   const handleAddTask = async (e) => {
     e.preventDefault();
     if (!newTaskName.trim()) return showNotification("⚠️ Task name required!", "error");
 
     try {
       const auth = getAuth();
-      const currentUser = auth.currentUser;
-      const idToken = await currentUser.getIdToken();
-
-      const res = await axios.post(
-        `${backendUrl}/tasks/create`,
-        { name: newTaskName },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await axios.post(`${backendUrl}/tasks/create`, { name: newTaskName }, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
       if (res.data.success) {
-        setTasks((prevTasks) => [
-          ...prevTasks,
-          { task_id: res.data.taskId, name: newTaskName, completed: false },
-        ]);
+        setTasks((prev) => [...prev, {
+          task_id: res.data.taskId,
+          name: newTaskName,
+          completed: false
+        }]);
         setNewTaskName("");
         showNotification("🎀 Task added!", "success");
       }
@@ -82,29 +69,16 @@ export default function TaskList() {
     }
   };
 
-  // ✅ Update Task
   const handleUpdateTask = async (taskId, updates) => {
     try {
       const auth = getAuth();
-      const currentUser = auth.currentUser;
-      const idToken = await currentUser.getIdToken();
-
-      const res = await axios.put(
-        `${backendUrl}/tasks/update`,
-        { taskId, ...updates },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await axios.put(`${backendUrl}/tasks/update`, { taskId, ...updates }, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
       if (res.data.success) {
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.task_id === taskId ? { ...task, ...updates } : task
-          )
-        );
+        setTasks((prev) => prev.map(task => task.task_id === taskId ? { ...task, ...updates } : task));
       }
     } catch (error) {
       console.error("❌ Error updating task:", error);
@@ -112,24 +86,18 @@ export default function TaskList() {
     }
   };
 
-  // ✅ Delete Task
   const handleDeleteTask = async (taskId) => {
     try {
       const auth = getAuth();
-      const currentUser = auth.currentUser;
-      const idToken = await currentUser.getIdToken();
-
+      const idToken = await auth.currentUser.getIdToken();
       const res = await axios.delete(`${backendUrl}/tasks/delete/${taskId}`, {
-        headers: {
-          Authorization: `Bearer ${idToken}`,
-        },
+        headers: { Authorization: `Bearer ${idToken}` },
       });
 
       if (res.status === 200 && res.data.success) {
-        setTasks((prevTasks) => prevTasks.filter((task) => task.task_id !== taskId));
+        setTasks((prev) => prev.filter(task => task.task_id !== taskId));
         showNotification("✨ Task deleted!", "success");
       } else {
-        console.error("❌ Delete Failed:", res.data.error);
         showNotification("❌ Failed to delete task", "error");
       }
     } catch (error) {
@@ -167,9 +135,7 @@ export default function TaskList() {
             onDelete={() => handleDeleteTask(task.task_id)}
           />
         ))}
-        {tasks.length === 0 && (
-          <p className="no-tasks">🎀 No tasks yet! Add one above. 🎀</p>
-        )}
+        {tasks.length === 0 && <p className="no-tasks">🎀 No tasks yet! Add one above. 🎀</p>}
       </div>
     </div>
   );
