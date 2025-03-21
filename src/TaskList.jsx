@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import TaskItem from "./TaskItem.jsx";
+import { getAuth } from "firebase/auth";
 import "./TaskList.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -16,12 +17,23 @@ export default function TaskList({ userId }) {
     setTimeout(() => setNotification(null), 4000);
   };
 
-  // ✅ Fetch Tasks from Backend
+  // ✅ Fetch Tasks from Backend (with Auth Header)
   const fetchTasks = useCallback(async () => {
     if (!userId || !backendUrl) return;
     try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const idToken = await currentUser.getIdToken();
+
       console.log(`📢 Fetching tasks from: ${backendUrl}/tasks/all/${userId}`);
-      const res = await axios.get(`${backendUrl}/tasks/all/${userId}`);
+      const res = await axios.get(`${backendUrl}/tasks/all/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
       if (res.data.success) {
         setTasks(Object.values(res.data.tasks || {}));
       } else {
@@ -43,7 +55,20 @@ export default function TaskList({ userId }) {
     if (!newTaskName.trim()) return showNotification("⚠️ Task name required!", "error");
 
     try {
-      const res = await axios.post(`${backendUrl}/tasks/create`, { userId, name: newTaskName });
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const idToken = await currentUser.getIdToken();
+
+      const res = await axios.post(
+        `${backendUrl}/tasks/create`,
+        { userId, name: newTaskName },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+
       if (res.data.success) {
         setTasks((prevTasks) => [
           ...prevTasks,
@@ -61,7 +86,20 @@ export default function TaskList({ userId }) {
   // ✅ Update Task
   const handleUpdateTask = async (taskId, updates) => {
     try {
-      const res = await axios.put(`${backendUrl}/tasks/update`, { userId, taskId, ...updates });
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const idToken = await currentUser.getIdToken();
+
+      const res = await axios.put(
+        `${backendUrl}/tasks/update`,
+        { userId, taskId, ...updates },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+
       if (res.data.success) {
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
@@ -75,12 +113,20 @@ export default function TaskList({ userId }) {
     }
   };
 
-  // ✅ Delete Task (Fixed API Call)
+  // ✅ Delete Task
   const handleDeleteTask = async (taskId) => {
     try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      const idToken = await currentUser.getIdToken();
+
       console.log(`📢 Sending DELETE Request: ${backendUrl}/tasks/delete/${userId}/${taskId}`);
 
-      const res = await axios.delete(`${backendUrl}/tasks/delete/${userId}/${taskId}`);
+      const res = await axios.delete(`${backendUrl}/tasks/delete/${userId}/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
 
       if (res.status === 200 && res.data.success) {
         setTasks((prevTasks) => prevTasks.filter((task) => task.task_id !== taskId));
@@ -124,8 +170,8 @@ export default function TaskList({ userId }) {
             key={task.task_id}
             {...task}
             user_id={userId}
-            onUpdate={handleUpdateTask}  // ✅ Pass the update function directly
-            onDelete={() => handleDeleteTask(task.task_id)}  // ✅ Ensure proper delete handling
+            onUpdate={handleUpdateTask}
+            onDelete={() => handleDeleteTask(task.task_id)}
           />
         ))}
         {tasks.length === 0 && (
