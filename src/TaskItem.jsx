@@ -11,19 +11,18 @@ export default function TaskItem({ task_id, name, completed, onUpdate, onDelete 
   const [taskName, setTaskName] = useState(name);
   const [isCompleted, setIsCompleted] = useState(completed);
 
-  // ✅ Handle Task Update (with Auth)
+  // ✅ Handle Task Update
   const handleUpdateTask = async (updates) => {
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
       const idToken = await currentUser.getIdToken();
 
+      console.log(`📢 Updating Task: ${task_id}`, updates);
+
       const res = await axios.put(
         `${backendUrl}/tasks/update`,
-        {
-          taskId: task_id,
-          ...updates,
-        },
+        { taskId: task_id, ...updates },
         {
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -44,12 +43,14 @@ export default function TaskItem({ task_id, name, completed, onUpdate, onDelete 
     }
   };
 
-  // ✅ Handle Task Deletion (with Auth)
+  // ✅ Handle Task Delete
   const handleDeleteTask = async () => {
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
       const idToken = await currentUser.getIdToken();
+
+      console.log(`📢 Deleting Task: ${task_id}`);
 
       const res = await axios.delete(`${backendUrl}/tasks/delete/${task_id}`, {
         headers: {
@@ -71,14 +72,16 @@ export default function TaskItem({ task_id, name, completed, onUpdate, onDelete 
   return (
     <div className={`task-item ${isCompleted ? "completed" : ""}`}>
       <div className="task-content">
+        {/* ✅ Toggle Completion */}
         <button
           className="heart-checkbox"
           onClick={() => handleUpdateTask({ completed: !isCompleted })}
           aria-label="Mark task as completed"
         >
-          {isCompleted ? "💖" : "🧥"}
+          {isCompleted ? "💖" : "🤍"}
         </button>
 
+        {/* ✅ Edit Task Name */}
         {isEditing ? (
           <input
             type="text"
@@ -98,15 +101,12 @@ export default function TaskItem({ task_id, name, completed, onUpdate, onDelete 
           </span>
         )}
 
+        {/* ✅ Actions */}
         <div className="task-actions">
           <Link to={`/subtasks/${task_id}`} className="subtask-toggle">
             Add Subtasks
           </Link>
-          <button
-            className="delete-task"
-            onClick={handleDeleteTask}
-            aria-label="Delete task"
-          >
+          <button className="delete-task" onClick={handleDeleteTask} aria-label="Delete task">
             🗑️
           </button>
         </div>
