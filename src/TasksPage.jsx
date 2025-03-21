@@ -15,19 +15,23 @@ function TasksPage() {
       try {
         const auth = getAuth();
         const user = auth.currentUser;
-
+  
         if (!user) {
           console.error("❌ No authenticated user found.");
           setLoading(false);
           return;
         }
-
-        const idToken = await user.getIdToken(); // ✅ Get ID token from Firebase Auth
-
-        const res = await axios.post(`${backendUrl}/users/get-current-user`, { idToken });
-
+  
+        const idToken = await user.getIdToken(); // ✅ Get ID token
+  
+        const res = await axios.get(`${backendUrl}/users/get-current-user`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`, // ✅ Send token as Bearer header
+          },
+        });
+  
         if (res.data.success) {
-          setUserId(res.data.userId);
+          setUserId(res.data.user.userId); // ✅ It's nested under .user
         } else {
           console.error("❌ Error fetching user:", res.data.error);
         }
@@ -36,9 +40,10 @@ function TasksPage() {
       }
       setLoading(false);
     };
-
+  
     fetchUser();
   }, []);
+  
 
   return (
     <div className="tasks-page">
