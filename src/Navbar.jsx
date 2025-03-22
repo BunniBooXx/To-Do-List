@@ -57,10 +57,10 @@ function Navbar() {
   const handleLogout = async () => {
     try {
       if (authInstance) {
-        await signOut(authInstance);
-        await axios.post(`${backendUrl}/users/logout`);
+        await signOut(authInstance); // ✅ Firebase logout
         setShowNotification(true);
-
+        setUser(null); // Reset user in navbar
+  
         setTimeout(() => {
           setShowNotification(false);
           navigate("/login");
@@ -70,6 +70,7 @@ function Navbar() {
       console.error("❌ Logout failed:", error);
     }
   };
+  
 
   return (
     <nav className="kawaii-navbar">
