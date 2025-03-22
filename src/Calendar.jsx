@@ -67,10 +67,11 @@ export default function Calendar() {
   };
 
   const handleDateClick = async (date) => {
+    if (selectedDate === date && showTaskModal) return; // Prevent infinite loop
     setSelectedDate(date);
     setShowTaskModal(true);
     setShowTaskForm(false);
-    fetchTasksForDate(date);
+    await fetchTasksForDate(date);
   };
 
   const handleAddTask = async () => {
