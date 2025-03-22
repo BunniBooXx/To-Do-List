@@ -65,19 +65,17 @@ const Signup = () => {
     }
   };
 
-  // ✅ Handle Google Sign-In
   const handleGoogleSignIn = async () => {
     try {
       const auth = getAuth();
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
-      const idToken = await result.user.getIdToken();
+      const idToken = await result.user.getIdToken(); // Required by backend
   
-      // 🔹 Check if the user exists or register them
       const response = await axios.post(`${backendUrl}/users/register-google`, {
-        username: result.user.displayName || "GoogleUser",
+        idToken, // ✅ Must be named exactly "idToken" for backend match
         email: result.user.email,
-        idToken, 
+        username: result.user.displayName || "GoogleUser",
       });
   
       if (response.data.success) {
@@ -87,9 +85,11 @@ const Signup = () => {
         showNotification(`❌ ${response.data.error}`);
       }
     } catch (error) {
+      console.error("❌ Google Login Failed:", error);
       showNotification(`❌ ${error.response?.data?.error || error.message}`);
     }
   };
+  
 
   return (
     <div className="signup-container">
