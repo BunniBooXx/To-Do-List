@@ -36,7 +36,7 @@ export default function Calendar() {
   const fetchCalendarTasks = useCallback(async () => {
     if (!idToken) return;
     try {
-      const response = await axios.get(`${BACKEND_URL}/calendar_tasks`, {
+      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/all`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
       setTasks(response.data.tasks || {});
