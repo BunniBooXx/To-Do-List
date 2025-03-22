@@ -1,4 +1,3 @@
-// ✅ Updated CalendarSubtasksPage.jsx with Firebase Auth Middleware Support
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -15,7 +14,6 @@ export default function CalendarSubtasksPage() {
   const [newSubtask, setNewSubtask] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // ✅ Get user ID from Firebase Auth
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -26,7 +24,6 @@ export default function CalendarSubtasksPage() {
     return () => unsubscribe();
   }, []);
 
-  // ✅ Fetch subtasks (with ID token)
   const fetchSubtasks = useCallback(async () => {
     if (!calendarTaskId) return;
     try {
@@ -45,14 +42,13 @@ export default function CalendarSubtasksPage() {
     }
   }, [calendarTaskId]);
 
-  // ✅ Fetch calendar task
   const fetchCalendarTask = useCallback(async () => {
-    if (!userId || !calendarTaskId) return;
+    if (!calendarTaskId) return;
     try {
       const auth = getAuth();
       const idToken = await auth.currentUser.getIdToken();
 
-      const response = await axios.get(`${API_BASE_URL}/calendar_tasks/${userId}/calendar-task/${calendarTaskId}`, {
+      const response = await axios.get(`${API_BASE_URL}/calendar_tasks/task/${calendarTaskId}`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
 
@@ -60,7 +56,7 @@ export default function CalendarSubtasksPage() {
     } catch (error) {
       console.error("Error fetching calendar task:", error);
     }
-  }, [userId, calendarTaskId]);
+  }, [calendarTaskId]);
 
   useEffect(() => {
     if (userId) {
@@ -69,7 +65,6 @@ export default function CalendarSubtasksPage() {
     }
   }, [userId, fetchSubtasks, fetchCalendarTask]);
 
-  // ✅ Add new subtask
   const addSubtask = async () => {
     if (!newSubtask.trim()) return;
     try {
@@ -94,7 +89,6 @@ export default function CalendarSubtasksPage() {
     }
   };
 
-  // ✅ Toggle subtask completion
   const toggleSubtaskCompletion = async (subtaskId, completed) => {
     try {
       const auth = getAuth();
@@ -116,7 +110,6 @@ export default function CalendarSubtasksPage() {
     }
   };
 
-  // ✅ Delete subtask
   const deleteSubtask = async (subtaskId) => {
     try {
       const auth = getAuth();
