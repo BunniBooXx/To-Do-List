@@ -129,7 +129,6 @@ export default function CalendarSubtasksPage() {
       <div className="subtasks-header">
         <Link to="/calendar" className="back-button">← Back to Calendar</Link>
         <h1 className="title">❀ {calendarTask.name || "Task"} ❀</h1>
-        <p className="task-date">{calendarTask.date && new Date(calendarTask.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
       </div>
 
       <button onClick={() => setShowSubtaskForm(true)} className="add-task-button">
