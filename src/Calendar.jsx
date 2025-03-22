@@ -208,7 +208,7 @@ export default function Calendar() {
                   <span>{task.name}</span>
                   <div className="task-buttons">
                     <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
-                    <Link to={`/calendar-subtasks/${task.calendar_id}`} className="subtask-button">
+                    <Link to={`/subtasks/${task.calendar_id}`} className="subtask-button">
                       Add Subtasks ✨
                     </Link>
                     <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
