@@ -1,3 +1,4 @@
+/* Container */
 .calendar-subtasks-container {
   padding: 30px;
   background: linear-gradient(135deg, #ffe8ec, #fff5f7);
@@ -7,15 +8,67 @@
   align-items: center;
 }
 
+/* Back Button */
+.back-button {
+  font-size: 1rem;
+  color: #ffb5c0;
+  background: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(255, 181, 192, 0.2);
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+  border: 2px solid #ffb5c0;
+  display: inline-block;
+}
+
+.back-button:hover {
+  background: #ffe8ec;
+  color: white;
+  border-color: #ffb5c0;
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(255, 181, 192, 0.4);
+}
+
+/* Title */
 .title {
   font-size: 3rem;
   color: #ffb5c0;
   text-shadow: 2px 2px white;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   font-family: 'Dancing Script', cursive;
+  text-align: center;
 }
 
-.subtask-input-container {
+/* Task Date */
+.task-date {
+  font-size: 1.1rem;
+  color: #ff7d9c;
+  margin-bottom: 30px;
+}
+
+/* Add Button */
+.add-task-button {
+  background: linear-gradient(45deg, #ffb5c0, #ffd1d7);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.add-task-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 181, 192, 0.3);
+}
+
+/* Subtask Form */
+.task-form-container {
   background: white;
   padding: 20px;
   border-radius: 20px;
@@ -25,24 +78,24 @@
   margin-bottom: 30px;
 }
 
-.subtask-input {
+.task-input {
   width: 100%;
   padding: 15px;
   border: 2px solid #ffd1d7;
   border-radius: 15px;
   font-size: 1.1rem;
-  margin-bottom: 15px;
   background: #fff5f7;
-  color: #ffb5c0;
+  color: #ff7d9c;
+  margin-bottom: 15px;
 }
 
-.subtask-input:focus {
+.task-input:focus {
   outline: none;
   border-color: #ffb5c0;
   box-shadow: 0 0 10px rgba(255, 181, 192, 0.3);
 }
 
-.add-button {
+.submit-task-button {
   background: linear-gradient(45deg, #ffb5c0, #ffd1d7);
   color: white;
   border: none;
@@ -50,15 +103,15 @@
   border-radius: 25px;
   font-size: 1.1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
   width: 100%;
 }
 
-.add-button:hover {
+.submit-task-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(255, 181, 192, 0.3);
 }
 
+/* Subtasks List */
 .subtasks-list {
   width: 90%;
   max-width: 600px;
@@ -83,19 +136,23 @@
 
 .subtask-name {
   font-size: 1.1rem;
-  color: #ffb5c0;
+  color: #ff7d9c;
+  transition: opacity 0.3s ease;
 }
 
-.subtask-name.completed {
+/* Completed Style */
+.subtask-item.completed .subtask-name {
   text-decoration: line-through;
-  opacity: 0.7;
+  opacity: 0.6;
+  font-style: italic;
+  color: #c97a8c;
 }
 
+/* Buttons */
 .subtask-buttons {
   display: flex;
   gap: 10px;
 }
-
 
 .complete-button,
 .delete-button {
@@ -112,6 +169,36 @@
   transform: scale(1.2);
 }
 
+/* Heart Animation */
+.complete-button {
+  position: relative;
+}
+
+.complete-button:active::after {
+  content: "💖";
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  animation: sparkle 0.6s ease forwards;
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.4);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-20px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* States */
 .loading-text,
 .no-tasks {
   text-align: center;
@@ -124,6 +211,7 @@
   box-shadow: 0 5px 15px rgba(255, 181, 192, 0.1);
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .calendar-subtasks-container {
     padding: 20px;
@@ -133,7 +221,12 @@
     font-size: 2rem;
   }
 
-  .subtask-input {
+  .task-input,
+  .submit-task-button {
+    font-size: 1rem;
+  }
+
+  .add-task-button {
     font-size: 1rem;
   }
 }
