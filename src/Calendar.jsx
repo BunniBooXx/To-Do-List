@@ -14,6 +14,7 @@ export default function Calendar() {
   const [newTaskName, setNewTaskName] = useState("");
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [idToken, setIdToken] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   const year = monthView.getFullYear();
   const month = monthView.getMonth();
@@ -26,6 +27,7 @@ export default function Calendar() {
       if (user) {
         const token = await user.getIdToken();
         setIdToken(token);
+        setUserId(user.uid);
       }
     });
     return () => unsubscribe();
@@ -208,7 +210,7 @@ export default function Calendar() {
                   <span>{task.name}</span>
                   <div className="task-buttons">
                     <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
-                    <Link to={`/subtasks/${task.calendar_id}`} className="subtask-button">
+                    <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} className="subtask-button">
                       Add Subtasks ✨
                     </Link>
                     <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
