@@ -85,29 +85,35 @@ const Login = () => {
   
   
 
+
   // ✅ Handle Google Sign-In
-  const handleGoogleSignIn = async () => {
-    if (!authInstance) return showNotification("⚠️ Firebase is still initializing. Please wait...");
+const handleGoogleSignIn = async () => {
+  if (!authInstance) return showNotification("⚠️ Firebase is still initializing. Please wait...");
 
-    try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(authInstance, provider);
-      const idToken = await result.user.getIdToken();
+  try {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(authInstance, provider);
+    const idToken = await result.user.getIdToken();
 
-      console.log("🔍 Sending Google ID Token to Backend...");
-      const response = await axios.post(`${backendUrl}/users/login-google`, { idToken });
+    // ✨ Match Signup Route: Use the register-google route for login too
+    const response = await axios.post(`${backendUrl}/users/register-google`, {
+      username: result.user.displayName || "GoogleUser",
+      email: result.user.email,
+      idToken,
+    });
 
-      if (response.data.success) {
-        showNotification(`🎀 Welcome back, ${response.data.user.username}!`, "success");
-        setTimeout(() => navigate("/"), 1500);
-      } else {
-        showNotification(`❌ ${response.data.error}`);
-      }
-    } catch (error) {
-      console.error("❌ Google Login Failed:", error);
-      showNotification(`❌ ${error.message}`);
+    if (response.data.success) {
+      showNotification(`🎀 Welcome back, ${response.data.user.username}!`, "success");
+      setTimeout(() => navigate("/"), 1500);
+    } else {
+      showNotification(`❌ ${response.data.error}`);
     }
-  };
+  } catch (error) {
+    console.error("❌ Google Login Failed:", error);
+    showNotification(`❌ ${error.response?.data?.error || error.message}`);
+  }
+};
+
 
   return (
     <div className="login-container">
