@@ -7,54 +7,52 @@ import "./Calendar.css";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function Calendar() {
-  const [userId, setUserId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [monthView, setMonthView] = useState(new Date());
   const [tasks, setTasks] = useState({});
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [showTaskForm, setShowTaskForm] = useState(false);
+  const [idToken, setIdToken] = useState(null);
 
   const year = monthView.getFullYear();
   const month = monthView.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayIndex = new Date(year, month, 1).getDay();
 
-  // ✅ Fetch User ID
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const idToken = await user.getIdToken();
-        const res = await axios.post(`${BACKEND_URL}/users/get-current-user`, { idToken });
-        if (res.data.success) {
-          setUserId(res.data.userId);
-        }
+        const token = await user.getIdToken();
+        setIdToken(token);
       }
     });
     return () => unsubscribe();
   }, []);
 
-  // ✅ Fetch All Calendar Tasks
   const fetchCalendarTasks = useCallback(async () => {
-    if (!userId) return;
+    if (!idToken) return;
     try {
-      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/${userId}`);
+      const response = await axios.get(`${BACKEND_URL}/calendar_tasks`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
       setTasks(response.data.tasks || {});
     } catch (error) {
       console.error("❌ Error fetching calendar tasks:", error);
     }
-  }, [userId]);
+  }, [idToken]);
 
   useEffect(() => {
     fetchCalendarTasks();
   }, [fetchCalendarTasks]);
 
-  // ✅ Fetch Tasks for Selected Date
   const fetchTasksForDate = async (date) => {
-    if (!userId || !date) return;
+    if (!idToken || !date) return;
     try {
-      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/${userId}/date/${date}`);
+      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/date/${date}`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
       if (response.data.success) {
         setTasks((prevTasks) => ({
           ...prevTasks,
@@ -66,7 +64,6 @@ export default function Calendar() {
     }
   };
 
-  // ✅ Handle Date Click
   const handleDateClick = async (date) => {
     setSelectedDate(date);
     setShowTaskModal(true);
@@ -74,19 +71,26 @@ export default function Calendar() {
     fetchTasksForDate(date);
   };
 
-  // ✅ Handle Add Task
   const handleAddTask = async () => {
     if (!newTaskName.trim() || !selectedDate) return;
     try {
-      const response = await axios.post(`${BACKEND_URL}/tasks/create`, { userId, name: newTaskName });
-      if (response.data.success && response.data.taskId) {
-        const taskId = response.data.taskId;
-        await axios.post(`${BACKEND_URL}/calendar_tasks/add`, {
-          userId,
-          taskId,
-          date: selectedDate,
-          name: newTaskName,
-        });
+      const createRes = await axios.post(
+        `${BACKEND_URL}/tasks/create`,
+        { name: newTaskName },
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
+
+      if (createRes.data.success && createRes.data.taskId) {
+        const taskId = createRes.data.taskId;
+        await axios.post(
+          `${BACKEND_URL}/calendar_tasks/add`,
+          {
+            taskId,
+            date: selectedDate,
+            name: newTaskName,
+          },
+          { headers: { Authorization: `Bearer ${idToken}` } }
+        );
         setNewTaskName("");
         fetchTasksForDate(selectedDate);
       }
@@ -95,77 +99,59 @@ export default function Calendar() {
     }
   };
 
-  // ✅ Handle Delete Calendar Task (Fixed to Use `calendar_id`)
   const handleDeleteCalendarTask = async (calendarId) => {
-    if (!calendarId) {
-      console.error("❌ Attempted to delete a task with an undefined calendarId!");
-      return;
-    }
-
+    if (!calendarId) return;
     try {
-      const response = await axios.delete(`${BACKEND_URL}/calendar_tasks/remove/${userId}/${calendarId}`);
+      const response = await axios.delete(
+        `${BACKEND_URL}/calendar_tasks/remove/${calendarId}`,
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
 
       if (response.data.success) {
-        console.log(`✅ Calendar Task ${calendarId} deleted successfully!`);
-
-        // ✅ Optimistically update UI
         setTasks((prevTasks) => ({
           ...prevTasks,
-          [selectedDate]: prevTasks[selectedDate].filter((task) => task.calendar_id !== calendarId),
+          [selectedDate]: prevTasks[selectedDate].filter(
+            (task) => task.calendar_id !== calendarId
+          ),
         }));
-
         fetchTasksForDate(selectedDate);
-      } else {
-        console.error("❌ Error deleting calendar task:", response.data.error);
       }
     } catch (error) {
-      console.error("❌ API Error deleting calendar task:", error.message);
+      console.error("❌ API Error deleting calendar task:", error);
     }
   };
 
-  // ✅ Handle Complete Task (Fixed to Use `calendar_id`)
   const handleCompleteCalendarTask = async (calendarId, completed) => {
     if (!calendarId) return;
-
     try {
-      const response = await axios.put(`${BACKEND_URL}/calendar_tasks/update/${userId}/${calendarId}`, {
-        completed: !completed, // Toggle completion status
-      });
+      const response = await axios.put(
+        `${BACKEND_URL}/calendar_tasks/update/${calendarId}`,
+        { completed: !completed },
+        { headers: { Authorization: `Bearer ${idToken}` } }
+      );
 
       if (response.data.success) {
-        console.log(`✅ Task ${calendarId} marked as ${response.data.updatedTask.completed ? "completed" : "incomplete"}!`);
-
-        // ✅ Optimistically update UI
         setTasks((prevTasks) => ({
           ...prevTasks,
           [selectedDate]: prevTasks[selectedDate].map((task) =>
-            task.calendar_id === calendarId ? { ...task, completed: response.data.updatedTask.completed } : task
+            task.calendar_id === calendarId
+              ? { ...task, completed: response.data.updatedTask.completed }
+              : task
           ),
         }));
-
         fetchTasksForDate(selectedDate);
-      } else {
-        console.error("❌ Error updating task:", response.data.error);
       }
     } catch (error) {
-      console.error("❌ API Error updating task:", error.message);
+      console.error("❌ API Error updating task:", error);
     }
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
-    
     const [year, month, day] = dateString.split('-');
     const date = new Date(year, parseInt(month) - 1, parseInt(day));
-    
-    // Format as "November 15, 2023"
-    return date.toLocaleDateString('en-US', { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   };
-  
 
   return (
     <div className="calendar-container">
@@ -191,14 +177,11 @@ export default function Calendar() {
           })}
         </div>
       </div>
-      
 
-      {/* ✅ Task Modal */}
       {showTaskModal && (
         <div className="task-modal">
           <div className="modal-content">
-          <h2>Tasks For {formatDate(selectedDate)}</h2>
-
+            <h2>Tasks For {formatDate(selectedDate)}</h2>
             <button onClick={() => setShowTaskForm(true)} className="add-task-button">+ Add New Task</button>
 
             {showTaskForm && (
@@ -219,30 +202,24 @@ export default function Calendar() {
               </div>
             )}
 
-
-{tasks[selectedDate]?.length > 0 ? (
-  tasks[selectedDate].map((task) => (
-    <div key={task.calendar_id} className={`task-item ${task.completed ? "completed" : ""}`}>
-      <span>{task.name}</span>
-      <div className="task-buttons">
-        <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
-        <Link 
-          to={`/calendar-subtasks/${userId}/${task.calendar_id}`} 
-          className="subtask-button"
-        >
-          Add Subtasks ✨
-        </Link>
-        <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
-          {task.completed ? '💖' : '🤍'}
-        </button>
-      </div>
-    </div>
-  ))
-) : (
-  <p>No tasks yet! 🎀</p>
-)}
-
-
+            {tasks[selectedDate]?.length > 0 ? (
+              tasks[selectedDate].map((task) => (
+                <div key={task.calendar_id} className={`task-item ${task.completed ? "completed" : ""}`}>
+                  <span>{task.name}</span>
+                  <div className="task-buttons">
+                    <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
+                    <Link to={`/calendar-subtasks/${task.calendar_id}`} className="subtask-button">
+                      Add Subtasks ✨
+                    </Link>
+                    <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
+                      {task.completed ? '💖' : '🤍'}
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p>No tasks yet! 🎀</p>
+            )}
 
             <button onClick={() => setShowTaskModal(false)}>❌</button>
           </div>
