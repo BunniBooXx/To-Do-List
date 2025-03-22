@@ -127,7 +127,7 @@ export default function CalendarSubtasksPage() {
   return (
     <div className="calendar-subtasks-container">
       <div className="subtasks-header">
-        <Link to="/calendar" className="back-button">← Back to Calendar</Link>
+        <Link to="/planner" className="back-button">← Back to Calendar</Link>
         <h1 className="title">❀ {calendarTask.name || "Task"} ❀</h1>
       </div>
 
