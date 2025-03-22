@@ -7,7 +7,7 @@ import "./CalendarSubTasks.css";
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 export default function CalendarSubtasksPage() {
-  const { calendarTaskId } = useParams();
+  const { userId, calendarTaskId } = useParams();
   const [idToken, setIdToken] = useState(null);
   const [subtasks, setSubtasks] = useState([]);
   const [calendarTask, setCalendarTask] = useState({});
@@ -21,12 +21,18 @@ export default function CalendarSubtasksPage() {
       if (user) {
         const token = await user.getIdToken();
         setIdToken(token);
+        // Verify the userId from params matches the authenticated user
+        if (user.uid !== userId) {
+          console.error("User ID mismatch");
+          // Handle unauthorized access
+        }
       } else {
+        // Redirect to login if not authenticated
         window.location.href = "/login";
       }
     });
     return () => unsubscribe();
-  }, []);
+  }, [userId]);
 
   const fetchCalendarTask = useCallback(async () => {
     if (!idToken || !calendarTaskId) return;
@@ -43,8 +49,9 @@ export default function CalendarSubtasksPage() {
     }
   }, [idToken, calendarTaskId]);
 
+
   const fetchSubtasks = useCallback(async () => {
-    if (!idToken || !calendarTaskId) return;
+    if (!idToken || !calendarTaskId || !userId) return;
     try {
       setLoading(true);
       const response = await axios.get(`${API_BASE_URL}/subtasks/calendar/${calendarTaskId}`, {
@@ -59,7 +66,7 @@ export default function CalendarSubtasksPage() {
       console.error("❌ Error fetching calendar subtasks:", error);
       setLoading(false);
     }
-  }, [idToken, calendarTaskId]);
+  }, [idToken, calendarTaskId, userId]);
 
   useEffect(() => {
     if (idToken) {
@@ -69,18 +76,22 @@ export default function CalendarSubtasksPage() {
   }, [idToken, fetchCalendarTask, fetchSubtasks]);
 
   const handleAddSubtask = async () => {
-    if (!newSubtask.trim() || !calendarTaskId) return;
+    if (!newSubtask.trim() || !calendarTaskId || !userId) return;
     try {
       const response = await axios.post(
         `${API_BASE_URL}/subtasks/calendar/create`,
-        { calendarTaskId, subtaskName: newSubtask },
+        { 
+          calendarTaskId, 
+          subtaskName: newSubtask,
+          userId // Include userId in the request
+        },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
       if (response.data.success) {
         setNewSubtask("");
         setShowSubtaskForm(false);
-        fetchSubtasks();
+        fetchSubtasks(); // Refresh the subtasks list
       }
     } catch (error) {
       console.error("❌ Error adding subtask:", error);
@@ -88,11 +99,14 @@ export default function CalendarSubtasksPage() {
   };
 
   const handleToggleSubtaskCompletion = async (subtaskId, completed) => {
-    if (!subtaskId || !calendarTaskId) return;
+    if (!subtaskId || !userId || !calendarTaskId) return;
     try {
       const response = await axios.put(
         `${API_BASE_URL}/subtasks/calendar/update/${calendarTaskId}/${subtaskId}`,
-        { completed: !completed },
+        { 
+          completed: !completed,
+          userId // Include userId in the request
+        },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 
@@ -109,11 +123,14 @@ export default function CalendarSubtasksPage() {
   };
 
   const handleDeleteSubtask = async (subtaskId) => {
-    if (!subtaskId || !calendarTaskId) return;
+    if (!subtaskId || !userId || !calendarTaskId) return;
     try {
       const response = await axios.delete(
         `${API_BASE_URL}/subtasks/calendar/delete/${calendarTaskId}/${subtaskId}`,
-        { headers: { Authorization: `Bearer ${idToken}` } }
+        { 
+          headers: { Authorization: `Bearer ${idToken}` },
+          data: { userId } // Include userId in the request body for DELETE
+        }
       );
 
       if (response.data.success) {
