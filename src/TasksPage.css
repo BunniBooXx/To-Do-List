@@ -19,7 +19,8 @@
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  pointer-events: none; 
+  pointer-events: none;
+  z-index: 1;
 }
 
 .decorative-bow.left {
@@ -40,7 +41,7 @@
 .tasks-title {
   text-align: center;
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #f5b6c1, #e08b9d); /* Updated to match TaskList pink shades */
+  background: linear-gradient(135deg, #f5b6c1, #e08b9d);
   color: white;
   padding: 1rem 2rem;
   border-radius: 25px;
@@ -48,6 +49,8 @@
   box-shadow: 0px 8px 20px rgba(235, 140, 155, 0.3);
   border: 2px solid rgba(255, 255, 255, 0.5);
   animation: floatTitle 3s ease-in-out infinite;
+  z-index: 2;
+  margin-bottom: 2rem;
 }
 
 /* ✨ Title Emoji Animation */
@@ -64,6 +67,7 @@
   background: rgba(255, 255, 255, 0.95);
   border-radius: 20px;
   box-shadow: 0 6px 12px rgba(235, 140, 155, 0.2);
+  z-index: 2;
 }
 
 /* 🎀 Soft Floating Effect */
@@ -81,7 +85,8 @@
 /* 📱 Mobile Responsiveness */
 @media (max-width: 768px) {
   .tasks-page {
-    padding: 1.5rem;
+    padding: 1.25rem;
+    justify-content: flex-start;
   }
 
   .decorative-bow {
@@ -91,10 +96,32 @@
 
   .tasks-title {
     font-size: 2rem;
-    min-width: 80%;
+    width: 90%;
+    padding: 0.75rem 1rem;
   }
 
   .task-list {
-    width: 90%;
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .loading-message,
+  .login-prompt {
+    font-size: 1rem;
+    text-align: center;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .tasks-title {
+    font-size: 1.75rem;
+    width: 95%;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .task-list {
+    width: 100%;
+    padding: 1rem;
   }
 }

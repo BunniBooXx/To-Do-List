@@ -15,6 +15,7 @@ export default function Calendar() {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [idToken, setIdToken] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [notification, setNotification] = useState("");
 
   const year = monthView.getFullYear();
   const month = monthView.getMonth();
@@ -67,7 +68,7 @@ export default function Calendar() {
   };
 
   const handleDateClick = async (date) => {
-    if (selectedDate === date && showTaskModal) return; // Prevent infinite loop
+    if (selectedDate === date && showTaskModal) return;
     setSelectedDate(date);
     setShowTaskModal(true);
     setShowTaskForm(false);
@@ -75,6 +76,10 @@ export default function Calendar() {
   };
 
   const handleAddTask = async () => {
+    if (!idToken) {
+      setNotification("🚫 You must be logged in to create a task!");
+      return;
+    }
     if (!newTaskName.trim() || !selectedDate) return;
     try {
       const createRes = await axios.post(
@@ -185,6 +190,13 @@ export default function Calendar() {
         <div className="task-modal">
           <div className="modal-content">
             <h2>Tasks For {formatDate(selectedDate)}</h2>
+            {notification && (
+              <div className="notification">
+                <span>{notification}</span>
+                <button onClick={() => setNotification("")}>✖</button>
+              </div>
+            )}
+
             <button onClick={() => setShowTaskForm(true)} className="add-task-button">+ Add New Task</button>
 
             {showTaskForm && (
