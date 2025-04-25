@@ -23,27 +23,19 @@ function Navbar() {
         if (currentUser) {
           try {
             const idToken = await currentUser.getIdToken();
-
-            // ✅ Updated: use GET and pass token in headers
             const res = await axios.get(`${backendUrl}/users/get-current-user`, {
-              headers: {
-                Authorization: `Bearer ${idToken}`,
-              },
+              headers: { Authorization: `Bearer ${idToken}` },
             });
 
             if (res.data.success) {
-              console.log(`✅ Navbar: User authenticated as ${res.data.user.username}`);
               setUser(res.data.user);
             } else {
-              console.error("❌ Failed to fetch user:", res.data.error);
               setUser(null);
             }
           } catch (error) {
-            console.error("❌ Error fetching user:", error);
             setUser(null);
           }
         } else {
-          console.warn("⚠️ User signed out.");
           setUser(null);
         }
       });
@@ -57,10 +49,10 @@ function Navbar() {
   const handleLogout = async () => {
     try {
       if (authInstance) {
-        await signOut(authInstance); // ✅ Firebase logout
+        await signOut(authInstance);
         setShowNotification(true);
-        setUser(null); // Reset user in navbar
-  
+        setUser(null);
+
         setTimeout(() => {
           setShowNotification(false);
           navigate("/login");
@@ -70,54 +62,67 @@ function Navbar() {
       console.error("❌ Logout failed:", error);
     }
   };
-  
+
+  const handleNavClick = () => {
+    if (showMenu) setShowMenu(false);
+  };
+
+  const renderLinks = () => (
+    <>
+      <Link to="/tasks" className="nav-item" onClick={handleNavClick}>
+        <span className="nav-icon">📝</span>
+        <span>Tasks</span>
+      </Link>
+
+      <Link to="/planner" className="nav-item" onClick={handleNavClick}>
+        <span className="nav-icon">🗓️</span>
+        <span>Calendar</span>
+      </Link>
+
+      <div className="nav-divider">•°•°•°•°•</div>
+
+      {user ? (
+        <button onClick={handleLogout} className="nav-item special logout-btn">
+          <span className="nav-icon">🌸</span>
+          <span>Logout</span>
+        </button>
+      ) : (
+        <>
+          <Link to="/login" className="nav-item special" onClick={handleNavClick}>
+            <span className="nav-icon">🌸</span>
+            <span>Login</span>
+          </Link>
+
+          <Link to="/signup" className="nav-item special" onClick={handleNavClick}>
+            <span className="nav-icon">✨</span>
+            <span>Sign Up</span>
+          </Link>
+        </>
+      )}
+    </>
+  );
 
   return (
     <nav className="kawaii-navbar">
       <div className="navbar-wrapper">
-        <Link to="/" className="brand">
+        <Link to="/" className="brand" onClick={handleNavClick}>
           <span className="brand-icon">🩷</span>
           <h1 className="brand-text">Petite Planner</h1>
           <span className="brand-icon">🩷</span>
         </Link>
 
-        <button className="menu-toggle" onClick={() => setShowMenu(!showMenu)}>
+        <div className="desktop-nav-links">{renderLinks()}</div>
+
+        <button className="menu-toggle" onClick={() => setShowMenu((prev) => !prev)}>
           {showMenu ? "✖️" : "🍡"}
         </button>
-
-        <div className={`nav-links ${showMenu ? "active" : ""}`}>
-          <Link to="/tasks" className="nav-item">
-            <span className="nav-icon">📝</span>
-            <span>Tasks</span>
-          </Link>
-
-          <Link to="/planner" className="nav-item">
-            <span className="nav-icon">🗓️</span>
-            <span>Calendar</span>
-          </Link>
-
-          <div className="nav-divider">•°•°•°•°•</div>
-
-          {user ? (
-            <button onClick={handleLogout} className="nav-item special logout-btn">
-              <span className="nav-icon">🌸</span>
-              <span>Logout</span>
-            </button>
-          ) : (
-            <>
-              <Link to="/login" className="nav-item special">
-                <span className="nav-icon">🌸</span>
-                <span>Login</span>
-              </Link>
-
-              <Link to="/signup" className="nav-item special">
-                <span className="nav-icon">✨</span>
-                <span>Sign Up</span>
-              </Link>
-            </>
-          )}
-        </div>
       </div>
+
+      {showMenu && (
+        <div className="mobile-nav-links">
+          {renderLinks()}
+        </div>
+      )}
 
       {showNotification && (
         <div className="logout-notification">

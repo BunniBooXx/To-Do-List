@@ -164,11 +164,24 @@ export default function Calendar() {
   return (
     <div className="calendar-container">
       <div className="calendar">
-        <div className="calendar-header">
-          <button onClick={() => setMonthView(new Date(year, month - 1, 1))}>◀</button>
-          <span>{monthView.toLocaleString("default", { month: "long" })} {year}</span>
-          <button onClick={() => setMonthView(new Date(year, month + 1, 1))}>▶</button>
-        </div>
+      <div className="calendar-header">
+  <button
+    className="month-arrow left"
+    onClick={() => setMonthView(new Date(year, month - 1, 1))}
+  >
+    ❮
+  </button>
+  <span className="month-label">
+    {monthView.toLocaleString("default", { month: "long" })} {year}
+  </span>
+  <button
+    className="month-arrow right"
+    onClick={() => setMonthView(new Date(year, month + 1, 1))}
+  >
+    ❯
+  </button>
+</div>
+
 
         <div className="calendar-grid">
           {Array.from({ length: firstDayIndex }).map((_, index) => (

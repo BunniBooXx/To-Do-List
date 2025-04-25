@@ -20,16 +20,62 @@
   max-width: 800px;
   transition: all 0.3s ease;
 }
-
 .calendar-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  gap: 2rem;
+  position: relative;
   padding: 1rem;
   margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
+  flex-wrap: nowrap;
 }
+
+.month-label {
+  font-family: "Dancing Script", cursive;
+  font-size: 2rem;
+  color: #ff8fab;
+  text-shadow: 1px 1px 0 #fff5f6;
+  white-space: nowrap;
+}
+
+.month-arrow {
+  background: linear-gradient(135deg, #ffb6c1, #ffd6e0);
+  border: none;
+  color: white;
+  font-size: 1.8rem;
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  box-shadow: 0 5px 15px rgba(255, 192, 203, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-arrow:hover {
+  background: linear-gradient(135deg, #ff8fab, #ffb6c1);
+  transform: scale(1.1);
+}
+
+@media (max-width: 480px) {
+  .calendar-header {
+    gap: 1rem;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .month-label {
+    font-size: 1.6rem;
+  }
+
+  .month-arrow {
+    font-size: 1.5rem;
+    padding: 0.5rem;
+  }
+}
+
 
 .calendar-header span {
   font-family: "Dancing Script", cursive;
