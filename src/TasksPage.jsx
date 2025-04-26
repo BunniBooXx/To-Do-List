@@ -51,9 +51,9 @@ function TasksPage() {
       <div className="decorative-bow left"></div>
       <div className="decorative-bow right"></div>
       <h1 className="tasks-title">
-        <span className="title-emoji">✧༺♥༻∞</span>
+        <span className="title-emoji">✧</span>
         Petite Checklist
-        <span className="title-emoji">✧༺♥༻∞</span>
+        <span className="title-emoji">✧</span>
       </h1>
 
       {loading ? (
