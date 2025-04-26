@@ -87,17 +87,15 @@ function Navbar() {
           <span>Logout</span>
         </button>
       ) : (
-        <>
-          <Link to="/login" className="nav-item special" onClick={handleNavClick}>
-            <span className="nav-icon">🌸</span>
-            <span>Login</span>
-          </Link>
-
-          <Link to="/signup" className="nav-item special" onClick={handleNavClick}>
-            <span className="nav-icon">✨</span>
-            <span>Sign Up</span>
-          </Link>
-        </>
+        <div className="desktop-login-dropdown">
+          <button className="nav-item special">
+            <span className="nav-icon">🍡 Menu</span> 
+          </button>
+          <div className="login-signup-menu">
+            <Link to="/login" onClick={handleNavClick}>🌸 Login</Link>
+            <Link to="/signup" onClick={handleNavClick}>✨ Sign Up</Link>
+          </div>
+        </div>
       )}
     </>
   );
@@ -116,7 +114,6 @@ function Navbar() {
         <button className="menu-toggle" onClick={() => setShowMenu((prev) => !prev)}>
           {showMenu ? "✖️ Close" : "🍡 Menu"}
         </button>
-
       </div>
 
       {showMenu && (
