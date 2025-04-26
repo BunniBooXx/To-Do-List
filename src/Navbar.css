@@ -26,14 +26,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
   flex-wrap: nowrap;
 }
 
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   text-decoration: none;
   transition: transform 0.3s ease;
   flex-shrink: 0;
@@ -45,7 +44,7 @@
 
 .brand-text {
   font-family: 'Dancing Script', cursive;
-  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-size: clamp(1.3rem, 5.5vw, 1.9rem);
   color: var(--accent);
   font-weight: 700;
   text-shadow: 2px 2px 4px var(--shadow);
@@ -53,7 +52,7 @@
 }
 
 .brand-icon {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 }
 
 .menu-toggle {
@@ -70,6 +69,7 @@
   box-shadow: 0 4px 12px var(--shadow);
   transition: all 0.25s ease-in-out;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .menu-toggle:hover {
@@ -121,6 +121,15 @@
   color: var(--accent);
   font-size: 0.9rem;
   letter-spacing: 1.5px;
+  margin: 0 auto;
+  text-align: center;
+  align-items: center;
+  padding: 0.8rem 1.2rem;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
@@ -172,18 +181,23 @@
   }
 
   .navbar-wrapper {
-    justify-content: space-between;
-    padding: 0 1rem;
-    gap: 0.5rem;
     flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.6rem;
   }
 
   .brand-text {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
   }
 
   .brand-icon {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
+  }
+
+  .menu-toggle {
+    font-size: 0.95rem;
+    padding: 0.4rem 0.7rem;
   }
 }
 

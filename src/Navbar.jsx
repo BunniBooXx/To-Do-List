@@ -79,7 +79,7 @@ function Navbar() {
         <span>Calendar</span>
       </Link>
 
-      <div className="nav-divider">•°•°•°•°•</div>
+      <div className="nav-divider">✧༺♥༻∞</div>
 
       {user ? (
         <button onClick={handleLogout} className="nav-item special logout-btn">
