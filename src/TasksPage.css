@@ -21,8 +21,8 @@
 /* 🎀 Decorative Corner Bows */
 .decorative-bow {
   position: absolute;
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   background-image: url('./pink-heart-bow.webp');
   background-size: contain;
   background-repeat: no-repeat;
@@ -45,24 +45,23 @@
 
 /* 💖 Title Banner */
 .tasks-title {
-  text-align: center;
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #f5b6c1, #e08b9d);
+  display: inline-block;
+  font-size: 2.2rem;
+  background: var(--title-gradient);
   color: white;
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 25px;
   font-family: 'Dancing Script', cursive;
-  box-shadow: 0px 8px 20px rgba(235, 140, 155, 0.3);
+  box-shadow: 0px 8px 20px var(--shadow);
   border: 2px solid rgba(255, 255, 255, 0.5);
   animation: floatTitle 3s ease-in-out infinite;
-  z-index: 2;
-  margin-bottom: 2rem;
-  white-space: nowrap;         /* 👈 Prevents wrapping */
-  overflow: hidden;            /* 👈 Optional if it's really long */
-  text-overflow: ellipsis;     /* 👈 Adds ... if needed */
-  max-width: 100%;
+  margin: 2rem auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90vw;
+  text-align: center;
 }
-
 
 /* ✨ Emojis in Title */
 .title-emoji {
@@ -70,7 +69,7 @@
   animation: bounce 1.2s infinite alternate;
 }
 
-/* 📝 Task Card */
+/* 🗘️ Task Card */
 .task-list {
   width: 100%;
   max-width: 700px;
@@ -82,7 +81,7 @@
   transition: all 0.3s ease;
 }
 
-/* 📣 Messages */
+/* 🛳 Messages */
 .loading-message,
 .login-prompt {
   font-size: 1.2rem;
@@ -111,19 +110,19 @@
 /* 📱 Mobile & Tablet */
 @media (max-width: 768px) {
   .tasks-page {
-    padding: 1rem;
+    padding: 1.25rem;
   }
 
   .decorative-bow {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
   }
 
   .tasks-title {
-    font-size: 2rem;
-    padding: 0.75rem 1.5rem;
-    margin-top: 4rem;
-    width: 90%;
+    font-size: 1.6rem;
+    padding: 0.6rem 1rem;
+    margin-top: 3.5rem;
+    max-width: 90vw;
   }
 
   .task-list {
@@ -137,24 +136,25 @@
     padding: 1rem;
     width: 90%;
   }
+
+  .title-emoji {
+    font-size: 1rem;
+  }
 }
 
 /* 📱 Small Phones */
 @media (max-width: 480px) {
-  .decorative-bow {
-    width: 48px;
-    height: 48px;
+  .tasks-title {
+    font-size: 1.4rem;
+    padding: 0.5rem 1rem;
+    max-width: 95vw;
+    white-space: nowrap;
   }
 
-  @media (max-width: 480px) {
-    .tasks-title {
-      font-size: 1.4rem;
-      width: auto;
-      padding: 0.6rem 1rem;
-      white-space: nowrap;
-    }
+  .decorative-bow {
+    width: 44px;
+    height: 44px;
   }
-  
 
   .task-list {
     padding: 1rem;
@@ -164,5 +164,6 @@
   .loading-message,
   .login-prompt {
     font-size: 0.95rem;
+    padding: 0.9rem;
   }
 }

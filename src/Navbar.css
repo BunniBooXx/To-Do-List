@@ -8,7 +8,6 @@
   --gradient: linear-gradient(135deg, #ffd6e6, #ffecf1);
 }
 
-/* 🌸 Base Navbar */
 .kawaii-navbar {
   background: var(--gradient);
   padding: 1rem 1.5rem;
@@ -23,7 +22,7 @@
 .navbar-wrapper {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,7 +31,7 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   text-decoration: none;
   transition: transform 0.3s ease;
 }
@@ -43,7 +42,7 @@
 
 .brand-text {
   font-family: 'Dancing Script', cursive;
-  font-size: 2rem;
+  font-size: 1.9rem;
   color: var(--accent);
   font-weight: 700;
   text-shadow: 2px 2px 4px var(--shadow);
@@ -53,7 +52,6 @@
   font-size: 1.7rem;
 }
 
-/* 🍡 Menu toggle button */
 .menu-toggle {
   display: none;
   background: none;
@@ -68,14 +66,12 @@
   transform: scale(1.1);
 }
 
-/* 👩‍💻 Desktop nav always visible */
 .desktop-nav-links {
   display: flex;
   gap: 1.8rem;
   align-items: center;
 }
 
-/* 🌸 Nav item shared base */
 .nav-item {
   display: flex;
   align-items: center;
@@ -109,14 +105,12 @@
   background: #ff9dbd;
 }
 
-/* 🌸 Divider */
 .nav-divider {
   color: var(--accent);
   font-size: 0.9rem;
   letter-spacing: 1.5px;
 }
 
-/* 📱 Mobile Styles */
 @media (max-width: 768px) {
   .menu-toggle {
     display: block;
@@ -171,12 +165,21 @@
     display: block;
   }
 
+  .navbar-wrapper {
+    justify-content: space-between;
+    padding: 0 1rem;
+  }
+
   .brand-text {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
+    white-space: nowrap;
+  }
+
+  .brand-icon {
+    font-size: 1.5rem;
   }
 }
 
-/* 💻 Tablet tweaks */
 @media (min-width: 769px) and (max-width: 1024px) {
   .navbar-wrapper {
     padding: 0 1.5rem;
@@ -187,7 +190,6 @@
   }
 }
 
-/* ✨ Animations */
 @keyframes slideInFromTop {
   from {
     opacity: 0;
@@ -210,7 +212,6 @@
   }
 }
 
-/* 🌸 Logout Notification */
 .logout-btn {
   background: linear-gradient(135deg, #ff8fab, #ffd6e6);
   border: none;
