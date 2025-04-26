@@ -162,7 +162,7 @@
 .special {
   background: var(--secondary);
   color: var(--white);
-  background: none;
+   background: none;
   border: none;
   font-size: 1rem;
   cursor: pointer;
@@ -346,4 +346,14 @@
 
 .logout-notification button:hover {
   transform: scale(1.1);
+}
+
+.mobile-nav-links .nav-item.special {
+  background-color: var(--accent);
+  color: var(--white);
+  justify-content: center;
+}
+
+.mobile-nav-links .nav-item.special:hover {
+  background-color: #ff7096;
 }

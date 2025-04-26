@@ -73,32 +73,34 @@ function Navbar() {
         <span className="nav-icon">📝</span>
         <span>Tasks</span>
       </Link>
-
+  
       <Link to="/planner" className="nav-item" onClick={handleNavClick}>
         <span className="nav-icon">🗓️</span>
         <span>Calendar</span>
       </Link>
-
+  
       <div className="nav-divider">✧༺♥༻∞</div>
-
+  
       {user ? (
         <button onClick={handleLogout} className="nav-item special logout-btn">
           <span className="nav-icon">🌸</span>
           <span>Logout</span>
         </button>
       ) : (
-        <div className="desktop-login-dropdown">
-          <button className="nav-item special">
-            <span className="nav-icon">🍡 Menu</span> 
-          </button>
-          <div className="login-signup-menu">
-            <Link to="/login" onClick={handleNavClick}>🌸 Login</Link>
-            <Link to="/signup" onClick={handleNavClick}>✨ Sign Up</Link>
-          </div>
-        </div>
+        <>
+          <Link to="/login" className="nav-item special" onClick={handleNavClick}>
+            <span className="nav-icon">🌸</span>
+            <span>Login</span>
+          </Link>
+          <Link to="/signup" className="nav-item special" onClick={handleNavClick}>
+            <span className="nav-icon">✨</span>
+            <span>Sign Up</span>
+          </Link>
+        </>
       )}
     </>
   );
+  
 
   return (
     <nav className="kawaii-navbar">
