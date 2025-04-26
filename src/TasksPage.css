@@ -1,127 +1,160 @@
-/* 🌸 Tasks Page Layout */
+:root {
+  --pink-gradient: linear-gradient(135deg, #fff5f8, #ffd6e6);
+  --title-gradient: linear-gradient(135deg, #f5b6c1, #e08b9d);
+  --shadow: rgba(235, 140, 155, 0.2);
+  --card-bg: rgba(255, 255, 255, 0.95);
+  --text-dark: #4a4a4a;
+}
+
+/* 🌸 Page Wrapper */
 .tasks-page {
   padding: 2rem;
   min-height: 100vh;
-  background: linear-gradient(135deg, #fff5f8, #ffd6e6);
+  background: var(--pink-gradient);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-/* 🎀 Decorative Bows */
+/* 🎀 Decorative Corner Bows */
 .decorative-bow {
   position: absolute;
-  width: 70px;
-  height: 70px;
+  width: 72px;
+  height: 72px;
+  background-image: url('./pink-heart-bow.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  z-index: 0;
   pointer-events: none;
-  z-index: 1;
 }
 
 .decorative-bow.left {
-  top: 20px;
-  left: 20px;
-  background-image: url('./pink-heart-bow.webp');
-  transform: rotate(-15deg);
+  top: 1rem;
+  left: 1rem;
+  transform: rotate(-12deg);
 }
 
 .decorative-bow.right {
-  top: 20px;
-  right: 20px;
-  background-image: url('./pink-heart-bow.webp');
-  transform: rotate(15deg);
+  top: 1rem;
+  right: 1rem;
+  transform: rotate(12deg);
 }
 
-/* ☁️ Soft Floating Title */
+/* 💖 Title Banner */
 .tasks-title {
-  text-align: center;
-  font-size: 2.5rem;
-  background: linear-gradient(135deg, #f5b6c1, #e08b9d);
-  color: white;
-  padding: 1rem 2rem;
-  border-radius: 25px;
   font-family: 'Dancing Script', cursive;
-  box-shadow: 0px 8px 20px rgba(235, 140, 155, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  animation: floatTitle 3s ease-in-out infinite;
+  font-size: 2.7rem;
+  color: white;
+  background: var(--title-gradient);
+  padding: 1rem 2.5rem;
+  border-radius: 2rem;
+  box-shadow: 0 8px 20px var(--shadow);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  text-align: center;
   z-index: 2;
+  margin-top: 5rem;
   margin-bottom: 2rem;
+  animation: floatTitle 3s ease-in-out infinite;
+  position: relative;
 }
 
-/* ✨ Title Emoji Animation */
+/* ✨ Emojis in Title */
 .title-emoji {
   margin: 0 0.5rem;
-  animation: bounce 1s infinite alternate;
+  animation: bounce 1.2s infinite alternate;
 }
 
-/* 🏡 Task List Container */
+/* 📝 Task Card */
 .task-list {
   width: 100%;
   max-width: 700px;
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  background: var(--card-bg);
   border-radius: 20px;
-  box-shadow: 0 6px 12px rgba(235, 140, 155, 0.2);
-  z-index: 2;
+  box-shadow: 0 6px 14px var(--shadow);
+  z-index: 1;
+  transition: all 0.3s ease;
 }
 
-/* 🎀 Soft Floating Effect */
+/* 📣 Messages */
+.loading-message,
+.login-prompt {
+  font-size: 1.2rem;
+  color: var(--text-dark);
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px var(--shadow);
+  margin-top: 2rem;
+  text-align: center;
+  max-width: 90%;
+  font-family: 'Nunito', sans-serif;
+}
+
+/* 🪄 Animations */
 @keyframes floatTitle {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-5px); }
 }
 
-/* 💖 Bouncing Emoji Effect */
 @keyframes bounce {
   from { transform: translateY(0); }
   to { transform: translateY(-10px); }
 }
 
-/* 📱 Mobile Responsiveness */
+/* 📱 Mobile & Tablet */
 @media (max-width: 768px) {
   .tasks-page {
-    padding: 1.25rem;
-    justify-content: flex-start;
+    padding: 1rem;
   }
 
   .decorative-bow {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
   }
 
   .tasks-title {
     font-size: 2rem;
+    padding: 0.75rem 1.5rem;
+    margin-top: 4rem;
     width: 90%;
-    padding: 0.75rem 1rem;
   }
 
   .task-list {
+    padding: 1.25rem;
     width: 95%;
-    padding: 1rem;
   }
 
   .loading-message,
   .login-prompt {
     font-size: 1rem;
-    text-align: center;
     padding: 1rem;
+    width: 90%;
   }
 }
 
+/* 📱 Small Phones */
 @media (max-width: 480px) {
+  .decorative-bow {
+    width: 48px;
+    height: 48px;
+  }
+
   .tasks-title {
-    font-size: 1.75rem;
-    width: 95%;
-    padding: 0.5rem 0.75rem;
+    font-size: 1.65rem;
+    padding: 0.5rem 1rem;
   }
 
   .task-list {
-    width: 100%;
     padding: 1rem;
+    width: 100%;
+  }
+
+  .loading-message,
+  .login-prompt {
+    font-size: 0.95rem;
   }
 }
