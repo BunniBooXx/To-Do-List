@@ -61,7 +61,8 @@ function TasksPage() {
       ) : userId ? (
         <TaskList userId={userId} />
       ) : (
-        <p className="login-prompt">🚪 Please log in to view your tasks! 🎀</p>
+        <p className="login-prompt">Login to unlock your planner magic! 🪄📓🎀
+</p>
       )}
     </div>
   );

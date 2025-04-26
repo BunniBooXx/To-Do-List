@@ -162,3 +162,42 @@
     padding: 0.9rem;
   }
 }
+
+@media (max-width: 480px) {
+  .navbar-wrapper {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .brand {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .menu-toggle {
+    align-self: flex-start;
+    margin-left: auto;
+  }
+}
+.login-prompt {
+  background: #fff0f7;
+  border: 2px solid #ffd9e6;
+  color: #c15078;
+  padding: 1.25rem 1.75rem;
+  border-radius: 1.5rem;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 1.05rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(255, 143, 171, 0.15);
+  transition: all 0.3s ease;
+  max-width: 85%;
+  animation: pop 0.4s ease-in-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.95); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+

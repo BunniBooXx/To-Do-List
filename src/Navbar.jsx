@@ -114,8 +114,9 @@ function Navbar() {
         <div className="desktop-nav-links">{renderLinks()}</div>
 
         <button className="menu-toggle" onClick={() => setShowMenu((prev) => !prev)}>
-          {showMenu ? "✖️" : "🍡"}
+          {showMenu ? "✖️ Close" : "🍡 Menu"}
         </button>
+
       </div>
 
       {showMenu && (

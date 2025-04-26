@@ -56,19 +56,26 @@
 }
 
 .menu-toggle {
-  display: none;
+  display: block;
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1.1rem;
   cursor: pointer;
-  padding: 0.5rem;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
+  padding: 0.6rem 1rem;
+  color: var(--accent);
+  font-family: 'Quicksand', sans-serif;
+  border-radius: 20px;
+  background-color: var(--white);
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: all 0.25s ease-in-out;
 }
 
 .menu-toggle:hover {
-  transform: scale(1.1);
+  background-color: var(--secondary);
+  color: var(--white);
+  transform: scale(1.05);
 }
+
 
 .desktop-nav-links {
   display: flex;
@@ -267,3 +274,4 @@
 .logout-notification button:hover {
   transform: scale(1.1);
 }
+
