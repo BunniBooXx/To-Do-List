@@ -45,21 +45,24 @@
 
 /* 💖 Title Banner */
 .tasks-title {
-  font-family: 'Dancing Script', cursive;
-  font-size: 2.7rem;
-  color: white;
-  background: var(--title-gradient);
-  padding: 1rem 2.5rem;
-  border-radius: 2rem;
-  box-shadow: 0 8px 20px var(--shadow);
-  border: 2px solid rgba(255, 255, 255, 0.4);
   text-align: center;
-  z-index: 2;
-  margin-top: 5rem;
-  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #f5b6c1, #e08b9d);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 25px;
+  font-family: 'Dancing Script', cursive;
+  box-shadow: 0px 8px 20px rgba(235, 140, 155, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.5);
   animation: floatTitle 3s ease-in-out infinite;
-  position: relative;
+  z-index: 2;
+  margin-bottom: 2rem;
+  white-space: nowrap;         /* 👈 Prevents wrapping */
+  overflow: hidden;            /* 👈 Optional if it's really long */
+  text-overflow: ellipsis;     /* 👈 Adds ... if needed */
+  max-width: 100%;
 }
+
 
 /* ✨ Emojis in Title */
 .title-emoji {
@@ -143,10 +146,15 @@
     height: 48px;
   }
 
-  .tasks-title {
-    font-size: 1.65rem;
-    padding: 0.5rem 1rem;
+  @media (max-width: 480px) {
+    .tasks-title {
+      font-size: 1.4rem;
+      width: auto;
+      padding: 0.6rem 1rem;
+      white-space: nowrap;
+    }
   }
+  
 
   .task-list {
     padding: 1rem;
