@@ -360,3 +360,50 @@ form {
   transform: scale(1.2);
 }
 
+/* 🌸 Mobile Arrow Styling (bottom corners) */
+@media (max-width: 768px) {
+  .calendar-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .month-label {
+    order: 1;
+    font-size: 1.8rem;
+  }
+
+  .month-arrow.left,
+  .month-arrow.right {
+    position: absolute;
+    bottom: -20px;
+    background: linear-gradient(135deg, #ffb6c1, #ffd6e0);
+    border: none;
+    color: white;
+    font-size: 1.6rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    box-shadow: 0 5px 15px rgba(255, 192, 203, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+  }
+
+  .month-arrow.left {
+    left: 10px;
+  }
+
+  .month-arrow.right {
+    right: 10px;
+  }
+
+  .month-arrow:hover {
+    background: linear-gradient(135deg, #ff8fab, #ffb6c1);
+    transform: scale(1.1);
+  }
+}
