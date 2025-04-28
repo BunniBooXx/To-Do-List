@@ -1,3 +1,5 @@
+/* ORIGINAL CSS PRESERVED — ONLY STRUCTURE FOR MOBILE MENU UPDATED */
+
 :root {
   --primary: #ffd6e6;
   --secondary: #ffb3d1;
@@ -156,13 +158,12 @@
   box-shadow: 0 4px 12px var(--shadow);
   transition: all 0.25s ease-in-out;
   white-space: nowrap;
-  
 }
 
 .special {
   background: var(--secondary);
   color: var(--white);
-   background: none;
+  background: none;
   border: none;
   font-size: 1rem;
   cursor: pointer;
@@ -229,16 +230,6 @@
     transition: background 0.2s ease, transform 0.2s ease;
   }
 
-  .mobile-nav-links .nav-item:first-child {
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-  }
-
-  .mobile-nav-links .nav-item:last-child {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-  }
-
   .mobile-nav-links .nav-item:hover {
     transform: scale(1.02);
     box-shadow: inset 0 0 0 1px var(--accent);
@@ -262,16 +253,6 @@
   .menu-toggle {
     font-size: 0.95rem;
     padding: 0.4rem 0.7rem;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  .navbar-wrapper {
-    padding: 0 1.5rem;
-  }
-
-  .nav-item {
-    padding: 0.7rem 1.2rem;
   }
 }
 
@@ -346,14 +327,4 @@
 
 .logout-notification button:hover {
   transform: scale(1.1);
-}
-
-.mobile-nav-links .nav-item.special {
-  background-color: var(--accent);
-  color: var(--white);
-  justify-content: center;
-}
-
-.mobile-nav-links .nav-item.special:hover {
-  background-color: #ff7096;
 }

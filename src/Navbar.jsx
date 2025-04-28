@@ -73,14 +73,14 @@ function Navbar() {
         <span className="nav-icon">📝</span>
         <span>Tasks</span>
       </Link>
-  
+
       <Link to="/planner" className="nav-item" onClick={handleNavClick}>
         <span className="nav-icon">🗓️</span>
         <span>Calendar</span>
       </Link>
-  
+
       <div className="nav-divider">✧༺♥༻∞</div>
-  
+
       {user ? (
         <button onClick={handleLogout} className="nav-item special logout-btn">
           <span className="nav-icon">🌸</span>
@@ -100,30 +100,37 @@ function Navbar() {
       )}
     </>
   );
-  
 
   return (
     <nav className="kawaii-navbar">
       <div className="navbar-wrapper">
+        {/* Brand on the left */}
         <Link to="/" className="brand" onClick={handleNavClick}>
           <span className="brand-icon">🩷</span>
           <h1 className="brand-text">Petite Planner</h1>
           <span className="brand-icon">🩷</span>
         </Link>
 
+        {/* Nav links for desktop */}
         <div className="desktop-nav-links">{renderLinks()}</div>
 
-        <button className="menu-toggle" onClick={() => setShowMenu((prev) => !prev)}>
+        {/* Dango menu toggle always on right */}
+        <button
+          className="menu-toggle mobile-dango"
+          onClick={() => setShowMenu((prev) => !prev)}
+        >
           {showMenu ? "✖️ Close" : "🍡 Menu"}
         </button>
       </div>
 
+      {/* Mobile nav links shown below navbar when toggled */}
       {showMenu && (
         <div className="mobile-nav-links">
           {renderLinks()}
         </div>
       )}
 
+      {/* Logout alert popup */}
       {showNotification && (
         <div className="logout-notification">
           <span>✨ Successfully logged out! See you soon! 🌸</span>
