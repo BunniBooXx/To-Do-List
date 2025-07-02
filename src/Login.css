@@ -11,11 +11,13 @@
   padding: 20px;
 }
 
+/* ✅ Heading */
 h2 {
   color: #ff4d8d;
   font-family: 'Dancing Script', cursive;
   font-size: 2.5rem;
   text-shadow: 2px 2px 0px white, 4px 4px 0px rgba(255, 77, 141, 0.2);
+  margin-bottom: 1rem;
 }
 
 /* ✅ Form */
@@ -27,13 +29,13 @@ form {
   padding: 20px;
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(255, 77, 141, 0.2);
-  max-width: 350px;
+  max-width: 300px; /* make the form narrower */
   width: 100%;
 }
 
 /* ✅ Inputs */
 input {
-  padding: 12px;
+  padding: 10px;
   border: 2px solid #ff80ab;
   border-radius: 10px;
   font-size: 1rem;
@@ -50,11 +52,13 @@ input:focus {
 .login-btn, .google-btn {
   background: linear-gradient(45deg, #ff80ab, #ff4d8d);
   color: white;
-  padding: 12px;
+  padding: 10px 20px;  /* slimmer button padding */
   border-radius: 50px;
-  font-size: 1.1rem;
+  font-size: 1rem; /* slightly smaller text */
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 80%;  /* make button narrower */
+  align-self: center; /* center the button in the form */
 }
 
 .login-btn:hover, .google-btn:hover {
@@ -84,19 +88,17 @@ input:focus {
   align-items: center;
   justify-content: space-between;
   font-size: 1rem;
-  max-width: 350px;
+  max-width: 300px;
   text-align: center;
   font-family: 'Quicksand', sans-serif;
   animation: fadeIn 0.5s ease-in-out;
 }
 
-/* ✅ Success Notification */
 .notification.success {
   background: #d4f8d4;
   color: #2b9e2b;
 }
 
-/* ✅ Close Button */
 .close-btn {
   background: transparent;
   border: none;
@@ -113,6 +115,10 @@ input:focus {
 
 @media (max-width: 480px) {
   form {
-      max-width: 300px;
+    max-width: 90%;
+  }
+
+  .login-btn, .google-btn {
+    width: 100%; /* full width on small screens */
   }
 }
