@@ -3,13 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getFirebaseServices } from "./data/firebaseConfig";
 import { signOut, onAuthStateChanged } from "firebase/auth";
-import "./Navbar.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
 function Navbar() {
   const [showMenu, setShowMenu] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
   const [user, setUser] = useState(null);
   const [authInstance, setAuthInstance] = useState(null);
   const navigate = useNavigate();
@@ -26,13 +24,8 @@ function Navbar() {
             const res = await axios.get(`${backendUrl}/users/get-current-user`, {
               headers: { Authorization: `Bearer ${idToken}` },
             });
-
-            if (res.data.success) {
-              setUser(res.data.user);
-            } else {
-              setUser(null);
-            }
-          } catch (error) {
+            setUser(res.data.success ? res.data.user : null);
+          } catch {
             setUser(null);
           }
         } else {
@@ -47,96 +40,136 @@ function Navbar() {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      if (authInstance) {
+    if (authInstance) {
+      try {
         await signOut(authInstance);
-        setShowNotification(true);
         setUser(null);
-
-        setTimeout(() => {
-          setShowNotification(false);
-          navigate("/login");
-        }, 2000);
+        navigate("/login");
+      } catch (error) {
+        console.error("Logout failed", error);
       }
-    } catch (error) {
-      console.error("❌ Logout failed:", error);
     }
   };
 
-  const handleNavClick = () => {
-    if (showMenu) setShowMenu(false);
+  const navbarStyle = {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    background: "linear-gradient(135deg, #ffd6e6, #ffecf1)",
+    padding: "1rem 2rem",
+    boxShadow: "0 2px 10px rgba(255, 143, 171, 0.2)",
+    zIndex: 1000,
   };
 
-  const renderLinks = () => (
-    <>
-      <Link to="/tasks" className="nav-item" onClick={handleNavClick}>
-        <span className="nav-icon">📝</span>
-        <span>Tasks</span>
-      </Link>
+  const contentStyle = {
+    maxWidth: "1400px",
+    margin: "0 auto",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  };
 
-      <Link to="/planner" className="nav-item" onClick={handleNavClick}>
-        <span className="nav-icon">🗓️</span>
-        <span>Calendar</span>
-      </Link>
+  const brandStyle = {
+    fontFamily: "'Dancing Script', cursive",
+    fontSize: "2rem",
+    fontWeight: "bold",
+    color: "#ff8fab",
+    textDecoration: "none",
+  };
 
-      <div className="nav-divider">✧༺♥༻∞</div>
+  const hamburgerStyle = {
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    display: "flex",
+    flexDirection: "column",
+    gap: "5px",
+    padding: "0.4rem",
+  };
 
-      {user ? (
-        <button onClick={handleLogout} className="nav-item special logout-btn">
-          <span className="nav-icon">🌸</span>
-          <span>Logout</span>
-        </button>
-      ) : (
-        <>
-          <Link to="/login" className="nav-item special" onClick={handleNavClick}>
-            <span className="nav-icon">🌸</span>
-            <span>Login</span>
-          </Link>
-          <Link to="/signup" className="nav-item special" onClick={handleNavClick}>
-            <span className="nav-icon">✨</span>
-            <span>Sign Up</span>
-          </Link>
-        </>
-      )}
-    </>
-  );
+  const barStyle = {
+    width: "30px",
+    height: "3px",
+    backgroundColor: "#ff8fab",
+    borderRadius: "2px",
+    transition: "all 0.3s ease",
+  };
+
+  const dropdownStyle = {
+    position: "absolute",
+    top: "100%",
+    right: 0,
+    background: "#fff",
+    borderRadius: "8px",
+    boxShadow: "0 4px 12px rgba(255, 143, 171, 0.2)",
+    minWidth: "220px",
+    padding: "0.5rem 0",
+    display: "flex",
+    flexDirection: "column",
+  };
+
+  const itemStyle = {
+    padding: "0.75rem 1rem",
+    textDecoration: "none",
+    color: "#333",
+    fontFamily: "'Nunito', sans-serif",
+    fontSize: "1rem",
+    textAlign: "left",
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+  };
 
   return (
-    <nav className="kawaii-navbar">
-      <div className="navbar-wrapper">
-        {/* Brand on the left */}
-        <Link to="/" className="brand" onClick={handleNavClick}>
-          <span className="brand-icon">🩷</span>
-          <h1 className="brand-text">Petite Planner</h1>
-          <span className="brand-icon">🩷</span>
+    <nav style={navbarStyle}>
+      <div style={contentStyle}>
+        <Link to="/" style={brandStyle} onClick={() => setShowMenu(false)}>
+          💖 Petite Planner
         </Link>
 
-        {/* Nav links for desktop */}
-        <div className="desktop-nav-links">{renderLinks()}</div>
+        <div style={{ position: "relative" }}>
+          <button
+            style={hamburgerStyle}
+            onClick={() => setShowMenu(prev => !prev)}
+            aria-label="Menu"
+          >
+            <span
+              style={{
+                ...barStyle,
+                transform: showMenu ? "translateY(8px) rotate(45deg)" : "none",
+              }}
+            />
+            <span
+              style={{
+                ...barStyle,
+                opacity: showMenu ? 0 : 1,
+              }}
+            />
+            <span
+              style={{
+                ...barStyle,
+                transform: showMenu ? "translateY(-8px) rotate(-45deg)" : "none",
+              }}
+            />
+          </button>
 
-        {/* Dango menu toggle always on right */}
-        <button
-          className="menu-toggle mobile-dango"
-          onClick={() => setShowMenu((prev) => !prev)}
-        >
-          {showMenu ? "✖️ Close" : "🍡 Menu"}
-        </button>
+          {showMenu && (
+            <div style={dropdownStyle}>
+              <Link to="/tasks" style={itemStyle} onClick={() => setShowMenu(false)}>📝 Tasks</Link>
+              <Link to="/planner" style={itemStyle} onClick={() => setShowMenu(false)}>🗓️ Calendar</Link>
+              {user ? (
+                <button style={itemStyle} onClick={handleLogout}>🌸 Logout</button>
+              ) : (
+                <>
+                  <Link to="/login" style={itemStyle} onClick={() => setShowMenu(false)}>🌸 Login</Link>
+                  <Link to="/signup" style={itemStyle} onClick={() => setShowMenu(false)}>✨ Sign Up</Link>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Mobile nav links shown below navbar when toggled */}
-      {showMenu && (
-        <div className="mobile-nav-links">
-          {renderLinks()}
-        </div>
-      )}
-
-      {/* Logout alert popup */}
-      {showNotification && (
-        <div className="logout-notification">
-          <span>✨ Successfully logged out! See you soon! 🌸</span>
-          <button onClick={() => setShowNotification(false)}>✖️</button>
-        </div>
-      )}
     </nav>
   );
 }

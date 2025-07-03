@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { Link } from 'react-router-dom';
+import { onAuthStateChanged } from "firebase/auth";
+import { Link } from "react-router-dom";
 import axios from "axios";
+import { initFirebase } from "./firebase";
 import "./Calendar.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -23,14 +24,23 @@ export default function Calendar() {
   const firstDayIndex = new Date(year, month, 1).getDay();
 
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const token = await user.getIdToken();
-        setIdToken(token);
-        setUserId(user.uid);
-      }
-    });
+    let unsubscribe = () => {};
+
+    (async () => {
+      const { auth } = await initFirebase();
+
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const token = await user.getIdToken();
+          setIdToken(token);
+          setUserId(user.uid);
+        } else {
+          setIdToken(null);
+          setUserId(null);
+        }
+      });
+    })();
+
     return () => unsubscribe();
   }, []);
 
@@ -57,8 +67,8 @@ export default function Calendar() {
         headers: { Authorization: `Bearer ${idToken}` },
       });
       if (response.data.success) {
-        setTasks((prevTasks) => ({
-          ...prevTasks,
+        setTasks((prev) => ({
+          ...prev,
           [date]: response.data.tasks || [],
         }));
       }
@@ -92,11 +102,7 @@ export default function Calendar() {
         const taskId = createRes.data.taskId;
         await axios.post(
           `${BACKEND_URL}/calendar_tasks/add`,
-          {
-            taskId,
-            date: selectedDate,
-            name: newTaskName,
-          },
+          { taskId, date: selectedDate, name: newTaskName },
           { headers: { Authorization: `Bearer ${idToken}` } }
         );
         setNewTaskName("");
@@ -116,16 +122,16 @@ export default function Calendar() {
       );
 
       if (response.data.success) {
-        setTasks((prevTasks) => ({
-          ...prevTasks,
-          [selectedDate]: prevTasks[selectedDate].filter(
+        setTasks((prev) => ({
+          ...prev,
+          [selectedDate]: prev[selectedDate].filter(
             (task) => task.calendar_id !== calendarId
           ),
         }));
         fetchTasksForDate(selectedDate);
       }
     } catch (error) {
-      console.error("❌ API Error deleting calendar task:", error);
+      console.error("❌ Error deleting calendar task:", error);
     }
   };
 
@@ -139,9 +145,9 @@ export default function Calendar() {
       );
 
       if (response.data.success) {
-        setTasks((prevTasks) => ({
-          ...prevTasks,
-          [selectedDate]: prevTasks[selectedDate].map((task) =>
+        setTasks((prev) => ({
+          ...prev,
+          [selectedDate]: prev[selectedDate].map((task) =>
             task.calendar_id === calendarId
               ? { ...task, completed: response.data.updatedTask.completed }
               : task
@@ -150,49 +156,60 @@ export default function Calendar() {
         fetchTasksForDate(selectedDate);
       }
     } catch (error) {
-      console.error("❌ API Error updating task:", error);
+      console.error("❌ Error updating task:", error);
     }
   };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = dateString.split("-");
     const date = new Date(year, parseInt(month) - 1, parseInt(day));
-    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
   };
 
   return (
     <div className="calendar-container">
       <div className="calendar">
-      <div className="calendar-header">
-  <button
-    className="month-arrow left"
-    onClick={() => setMonthView(new Date(year, month - 1, 1))}
-  >
-    ❮
-  </button>
-  <span className="month-label">
-    {monthView.toLocaleString("default", { month: "long" })} {year}
-  </span>
-  <button
-    className="month-arrow right"
-    onClick={() => setMonthView(new Date(year, month + 1, 1))}
-  >
-    ❯
-  </button>
-</div>
-
+        <div className="calendar-header">
+          <button
+            className="month-arrow left"
+            onClick={() => setMonthView(new Date(year, month - 1, 1))}
+          >
+            ❮
+          </button>
+          <span className="month-label">
+            {monthView.toLocaleString("default", { month: "long" })} {year}
+          </span>
+          <button
+            className="month-arrow right"
+            onClick={() => setMonthView(new Date(year, month + 1, 1))}
+          >
+            ❯
+          </button>
+        </div>
 
         <div className="calendar-grid">
           {Array.from({ length: firstDayIndex }).map((_, index) => (
             <div key={index} className="empty-day"></div>
           ))}
           {Array.from({ length: daysInMonth }).map((_, day) => {
-            const dateKey = `${year}-${(month + 1).toString().padStart(2, '0')}-${(day + 1).toString().padStart(2, '0')}`;
+            const dateKey = `${year}-${(month + 1).toString().padStart(2, "0")}-${(day + 1)
+              .toString()
+              .padStart(2, "0")}`;
             return (
-              <div key={day} className="calendar-day" onClick={() => handleDateClick(dateKey)}>
+              <div
+                key={day}
+                className="calendar-day"
+                onClick={() => handleDateClick(dateKey)}
+              >
                 {day + 1}
-                {tasks[dateKey]?.length > 0 && <span className="task-indicator">🎀</span>}
+                {tasks[dateKey]?.length > 0 && (
+                  <span className="task-indicator">🎀</span>
+                )}
               </div>
             );
           })}
@@ -210,14 +227,21 @@ export default function Calendar() {
               </div>
             )}
 
-            <button onClick={() => setShowTaskForm(true)} className="add-task-button">+ Add New Task</button>
+            <button
+              onClick={() => setShowTaskForm(true)}
+              className="add-task-button"
+            >
+              + Add New Task
+            </button>
 
             {showTaskForm && (
               <div className="task-form-container">
-                <form onSubmit={(e) => {
-                  e.preventDefault();
-                  handleAddTask();
-                }}>
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleAddTask();
+                  }}
+                >
                   <input
                     type="text"
                     placeholder="Enter task name..."
@@ -225,22 +249,43 @@ export default function Calendar() {
                     onChange={(e) => setNewTaskName(e.target.value)}
                     className="task-input"
                   />
-                  <button type="submit" className="submit-task-button">Add Task 🎀</button>
+                  <button type="submit" className="submit-task-button">
+                    Add Task 🎀
+                  </button>
                 </form>
               </div>
             )}
 
             {tasks[selectedDate]?.length > 0 ? (
               tasks[selectedDate].map((task) => (
-                <div key={task.calendar_id} className={`task-item ${task.completed ? "completed" : ""}`}>
+                <div
+                  key={task.calendar_id}
+                  className={`task-item ${
+                    task.completed ? "completed" : ""
+                  }`}
+                >
                   <span>{task.name}</span>
                   <div className="task-buttons">
-                    <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
-                    <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} className="subtask-button">
+                    <button
+                      onClick={() => handleDeleteCalendarTask(task.calendar_id)}
+                    >
+                      🗑️
+                    </button>
+                    <Link
+                      to={`/calendar-subtasks/${userId}/${task.calendar_id}`}
+                      className="subtask-button"
+                    >
                       Add Subtasks ✨
                     </Link>
-                    <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
-                      {task.completed ? '💖' : '🤍'}
+                    <button
+                      onClick={() =>
+                        handleCompleteCalendarTask(
+                          task.calendar_id,
+                          task.completed
+                        )
+                      }
+                    >
+                      {task.completed ? "💖" : "🤍"}
                     </button>
                   </div>
                 </div>
