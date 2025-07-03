@@ -178,7 +178,7 @@ const Login = () => {
         ))}
       </div>
 
-      <h2 style={headingStyle}>💖 Login to Your Account 💖</h2>
+      <h2 style={headingStyle}>💖 Login 💖</h2>
 
       {isLoading ? (
         <p>⏳ Loading Firebase Auth...</p>

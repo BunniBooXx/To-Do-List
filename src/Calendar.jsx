@@ -3,7 +3,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { initFirebase } from "./firebase";
-import "./Calendar.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -25,10 +24,8 @@ export default function Calendar() {
 
   useEffect(() => {
     let unsubscribe = () => {};
-
     (async () => {
       const { auth } = await initFirebase();
-
       unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user) {
           const token = await user.getIdToken();
@@ -40,19 +37,18 @@ export default function Calendar() {
         }
       });
     })();
-
     return () => unsubscribe();
   }, []);
 
   const fetchCalendarTasks = useCallback(async () => {
     if (!idToken) return;
     try {
-      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/all`, {
+      const res = await axios.get(`${BACKEND_URL}/calendar_tasks/all`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
-      setTasks(response.data.tasks || {});
-    } catch (error) {
-      console.error("❌ Error fetching calendar tasks:", error);
+      setTasks(res.data.tasks || {});
+    } catch (e) {
+      console.error("❌ Error fetching calendar tasks:", e);
     }
   }, [idToken]);
 
@@ -61,24 +57,23 @@ export default function Calendar() {
   }, [fetchCalendarTasks]);
 
   const fetchTasksForDate = async (date) => {
-    if (!idToken || !date) return;
+    if (!idToken) return;
     try {
-      const response = await axios.get(`${BACKEND_URL}/calendar_tasks/date/${date}`, {
+      const res = await axios.get(`${BACKEND_URL}/calendar_tasks/date/${date}`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
-      if (response.data.success) {
+      if (res.data.success) {
         setTasks((prev) => ({
           ...prev,
-          [date]: response.data.tasks || [],
+          [date]: res.data.tasks || [],
         }));
       }
-    } catch (error) {
-      console.error("❌ Error fetching tasks for date:", error);
+    } catch (e) {
+      console.error("❌ Error fetching tasks for date:", e);
     }
   };
 
   const handleDateClick = async (date) => {
-    if (selectedDate === date && showTaskModal) return;
     setSelectedDate(date);
     setShowTaskModal(true);
     setShowTaskForm(false);
@@ -87,84 +82,58 @@ export default function Calendar() {
 
   const handleAddTask = async () => {
     if (!idToken) {
-      setNotification("🚫 You must be logged in to create a task!");
+      setNotification("🚫 Please log in to add a task.");
       return;
     }
-    if (!newTaskName.trim() || !selectedDate) return;
+    if (!newTaskName.trim()) return;
     try {
       const createRes = await axios.post(
         `${BACKEND_URL}/tasks/create`,
         { name: newTaskName },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
       if (createRes.data.success && createRes.data.taskId) {
-        const taskId = createRes.data.taskId;
         await axios.post(
           `${BACKEND_URL}/calendar_tasks/add`,
-          { taskId, date: selectedDate, name: newTaskName },
+          { taskId: createRes.data.taskId, date: selectedDate },
           { headers: { Authorization: `Bearer ${idToken}` } }
         );
         setNewTaskName("");
         fetchTasksForDate(selectedDate);
       }
-    } catch (error) {
-      console.error("❌ Error adding task:", error);
+    } catch (e) {
+      console.error("❌ Error adding task:", e);
     }
   };
 
   const handleDeleteCalendarTask = async (calendarId) => {
-    if (!calendarId) return;
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/calendar_tasks/remove/${calendarId}`,
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
-
-      if (response.data.success) {
-        setTasks((prev) => ({
-          ...prev,
-          [selectedDate]: prev[selectedDate].filter(
-            (task) => task.calendar_id !== calendarId
-          ),
-        }));
-        fetchTasksForDate(selectedDate);
-      }
-    } catch (error) {
-      console.error("❌ Error deleting calendar task:", error);
+      await axios.delete(`${BACKEND_URL}/calendar_tasks/remove/${calendarId}`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      fetchTasksForDate(selectedDate);
+    } catch (e) {
+      console.error("❌ Error deleting task:", e);
     }
   };
 
   const handleCompleteCalendarTask = async (calendarId, completed) => {
-    if (!calendarId) return;
     try {
-      const response = await axios.put(
+      await axios.put(
         `${BACKEND_URL}/calendar_tasks/update/${calendarId}`,
         { completed: !completed },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
-      if (response.data.success) {
-        setTasks((prev) => ({
-          ...prev,
-          [selectedDate]: prev[selectedDate].map((task) =>
-            task.calendar_id === calendarId
-              ? { ...task, completed: response.data.updatedTask.completed }
-              : task
-          ),
-        }));
-        fetchTasksForDate(selectedDate);
-      }
-    } catch (error) {
-      console.error("❌ Error updating task:", error);
+      fetchTasksForDate(selectedDate);
+    } catch (e) {
+      console.error("❌ Error updating task:", e);
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const [year, month, day] = dateString.split("-");
-    const date = new Date(year, parseInt(month) - 1, parseInt(day));
-    return date.toLocaleDateString("en-US", {
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const [y, m, d] = dateStr.split("-");
+    return new Date(y, m - 1, d).toLocaleDateString("en-US", {
       month: "long",
       day: "numeric",
       year: "numeric",
@@ -172,132 +141,228 @@ export default function Calendar() {
   };
 
   return (
-    <div className="calendar-container">
-      <div className="calendar">
-        <div className="calendar-header">
-          <button
-            className="month-arrow left"
-            onClick={() => setMonthView(new Date(year, month - 1, 1))}
-          >
-            ❮
-          </button>
-          <span className="month-label">
-            {monthView.toLocaleString("default", { month: "long" })} {year}
-          </span>
-          <button
-            className="month-arrow right"
-            onClick={() => setMonthView(new Date(year, month + 1, 1))}
-          >
-            ❯
-          </button>
-        </div>
+    <>
+      <style>{`
+        .calendar-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          background: linear-gradient(135deg, #fff5f6, #ffffff);
+          padding: 2rem;
+        }
+        .calendar {
+          background: #fff;
+          border-radius: 1rem;
+          padding: 1rem;
+          box-shadow: 0 4px 20px rgba(255, 182, 193, 0.2);
+          width: 100%;
+          max-width: 800px;
+        }
+        .calendar-header {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin-bottom: 1rem;
+        }
+        .month-label {
+          font-family: "Dancing Script", cursive;
+          font-size: 2rem;
+          color: #ffb6c1;
+        }
+        .month-arrow {
+          background: #ffb6c1;
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          color: #fff;
+          font-size: 1.2rem;
+          cursor: pointer;
+        }
+        .calendar-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 0.5rem;
+        }
+        .calendar-day {
+          background: #fff;
+          border: 2px solid #ffc0cb;
+          border-radius: 0.5rem;
+          aspect-ratio: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          position: relative;
+          cursor: pointer;
+        }
+        .calendar-day:hover {
+          background: #ffe4e1;
+        }
+        .task-modal {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          backdrop-filter: blur(8px);
+          background: rgba(255, 255, 255, 0.9);
+          z-index: 1000;
+          padding: 1rem;
+        }
+        .modal-content {
+          background: #fff;
+          border-radius: 1rem;
+          padding: 1.5rem;
+          max-width: 500px;
+          width: 100%;
+          box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2);
+          position: relative;
+        }
+        .modal-content h2 {
+          text-align: center;
+          color: #ffb6c1;
+          font-family: "Dancing Script", cursive;
+        }
+        .close-button {
+          background: #ffb6c1;
+          border: none;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          color: #fff;
+          font-size: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        .close-button:hover {
+          background: #ff8fab;
+        }
+        .close-button:focus, .close-button:active {
+          outline: none;
+          color: #fff;
+        }
+        .notification {
+          position: fixed;
+          top: 1rem;
+          right: 1rem;
+          background: #ffcad4;
+          color: #912f56;
+          padding: 0.75rem 1rem;
+          border-radius: 0.75rem;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          z-index: 1100;
+        }
+        .notification button {
+          background: #ffb6c1;
+          border: none;
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          color: #fff;
+          font-size: 0.8rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+        }
+        .add-task-button, .submit-task-button {
+          background: #ffc0cb;
+          color: #fff;
+          border: none;
+          padding: 0.75rem;
+          border-radius: 0.5rem;
+          margin: 0.5rem 0;
+          width: 100%;
+          cursor: pointer;
+        }
+        .task-input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #ffc0cb;
+          border-radius: 0.5rem;
+          margin: 0.5rem 0;
+        }
+        .task-item {
+          border: 1px solid #ffc0cb;
+          border-radius: 0.5rem;
+          padding: 0.5rem;
+          margin: 0.5rem 0;
+          text-align: center;
+        }
+        @media (max-width: 600px) {
+          .month-label { font-size: 1.5rem; }
+          .modal-content { padding: 1rem; }
+        }
+      `}</style>
 
-        <div className="calendar-grid">
-          {Array.from({ length: firstDayIndex }).map((_, index) => (
-            <div key={index} className="empty-day"></div>
-          ))}
-          {Array.from({ length: daysInMonth }).map((_, day) => {
-            const dateKey = `${year}-${(month + 1).toString().padStart(2, "0")}-${(day + 1)
-              .toString()
-              .padStart(2, "0")}`;
-            return (
-              <div
-                key={day}
-                className="calendar-day"
-                onClick={() => handleDateClick(dateKey)}
-              >
-                {day + 1}
-                {tasks[dateKey]?.length > 0 && (
-                  <span className="task-indicator">🎀</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {showTaskModal && (
-        <div className="task-modal">
-          <div className="modal-content">
-            <h2>Tasks For {formatDate(selectedDate)}</h2>
-            {notification && (
-              <div className="notification">
-                <span>{notification}</span>
-                <button onClick={() => setNotification("")}>✖</button>
-              </div>
-            )}
-
-            <button
-              onClick={() => setShowTaskForm(true)}
-              className="add-task-button"
-            >
-              + Add New Task
-            </button>
-
-            {showTaskForm && (
-              <div className="task-form-container">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleAddTask();
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Enter task name..."
-                    value={newTaskName}
-                    onChange={(e) => setNewTaskName(e.target.value)}
-                    className="task-input"
-                  />
-                  <button type="submit" className="submit-task-button">
-                    Add Task 🎀
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {tasks[selectedDate]?.length > 0 ? (
-              tasks[selectedDate].map((task) => (
-                <div
-                  key={task.calendar_id}
-                  className={`task-item ${
-                    task.completed ? "completed" : ""
-                  }`}
-                >
-                  <span>{task.name}</span>
-                  <div className="task-buttons">
-                    <button
-                      onClick={() => handleDeleteCalendarTask(task.calendar_id)}
-                    >
-                      🗑️
-                    </button>
-                    <Link
-                      to={`/calendar-subtasks/${userId}/${task.calendar_id}`}
-                      className="subtask-button"
-                    >
-                      Add Subtasks ✨
-                    </Link>
-                    <button
-                      onClick={() =>
-                        handleCompleteCalendarTask(
-                          task.calendar_id,
-                          task.completed
-                        )
-                      }
-                    >
-                      {task.completed ? "💖" : "🤍"}
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p>No tasks yet! 🎀</p>
-            )}
-
-            <button onClick={() => setShowTaskModal(false)}>❌</button>
-          </div>
+      {notification && (
+        <div className="notification">
+          <span>{notification}</span>
+          <button onClick={() => setNotification("")} className="close-button">✖</button>
         </div>
       )}
-    </div>
+
+      <div className="calendar-container">
+        <div className="calendar">
+          <div className="calendar-header">
+            <button className="month-arrow" onClick={() => setMonthView(new Date(year, month - 1, 1))}>❮</button>
+            <span className="month-label">{monthView.toLocaleString("default", { month: "long" })} {year}</span>
+            <button className="month-arrow" onClick={() => setMonthView(new Date(year, month + 1, 1))}>❯</button>
+          </div>
+          <div className="calendar-grid">
+            {Array.from({ length: firstDayIndex }).map((_, i) => <div key={`empty-${i}`} />)}
+            {Array.from({ length: daysInMonth }).map((_, i) => {
+              const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`;
+              return (
+                <div key={i} className="calendar-day" onClick={() => handleDateClick(dateKey)}>
+                  {i + 1}
+                  {tasks[dateKey]?.length > 0 && <span style={{ fontSize: '0.7rem', position: 'absolute', bottom: '2px' }}>🎀</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {showTaskModal && (
+          <div className="task-modal">
+            <div className="modal-content">
+              <button className="close-button" onClick={() => setShowTaskModal(false)}>✖</button>
+              <h2>Tasks For {formatDate(selectedDate)}</h2>
+              <button className="add-task-button" onClick={() => setShowTaskForm(true)}>+ Add New Task</button>
+              {showTaskForm && (
+                <form onSubmit={(e) => { e.preventDefault(); handleAddTask(); }}>
+                  <input className="task-input" value={newTaskName} onChange={(e) => setNewTaskName(e.target.value)} placeholder="Enter task name..." />
+                  <button type="submit" className="submit-task-button">Add Task 🎀</button>
+                </form>
+              )}
+              {tasks[selectedDate]?.length > 0 ? (
+                tasks[selectedDate].map(task => (
+                  <div key={task.calendar_id} className="task-item">
+                    <span>{task.name}</span>
+                    <div>
+                      <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
+                      <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} style={{ margin: '0 0.5rem' }}>✨</Link>
+                      <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
+                        {task.completed ? "💖" : "🤍"}
+                      </button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p style={{ textAlign: "center", color: "#ff69b4" }}>No tasks yet! 🎀</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
