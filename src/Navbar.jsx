@@ -125,7 +125,7 @@ function Navbar() {
     <nav style={navbarStyle}>
       <div style={contentStyle}>
         <Link to="/" style={brandStyle} onClick={() => setShowMenu(false)}>
-          💖 Petite Planner
+          Petite Planner
         </Link>
 
         <div style={{ position: "relative" }}>
