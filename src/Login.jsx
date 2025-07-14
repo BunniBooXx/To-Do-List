@@ -4,7 +4,9 @@ import axios from "axios";
 import { getFirebaseServices } from "./data/firebaseConfig";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
-const backendUrl = process.env.REACT_APP_BACKEND_URL || "https://petite-planner-backend.onrender.com";
+// ✅ Backend URL from environment variable (do not expose hardcoded fallback in prod)
+const backendUrl = process.env.REACT_APP_BACKEND_URL;
+// || "https://petite-planner-backend.onrender.com"; // 🔒 Avoid hardcoding in production
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -45,6 +47,7 @@ const Login = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(authInstance, email, password);
       const idToken = await userCredential.user.getIdToken(true);
+
       const response = await axios.post(`${backendUrl}/users/login`, { idToken });
 
       if (response.data.success) {
@@ -88,7 +91,7 @@ const Login = () => {
     }
   };
 
-  // Styles
+  // 🌸 Styles
   const containerStyle = {
     textAlign: "center",
     background: "linear-gradient(135deg, #ffd6e7, #ffecf2)",
@@ -98,7 +101,7 @@ const Login = () => {
     alignItems: "center",
     justifyContent: "center",
     padding: "20px",
-    fontFamily: "'Josefin Sans', 'Comic Sans MS', cursive"
+    fontFamily: "'Josefin Sans', 'Comic Sans MS', cursive",
   };
 
   const headingStyle = {
@@ -170,8 +173,10 @@ const Login = () => {
         {notifications.map((n) => (
           <div key={n.id} style={notifStyle(n.type)}>
             {n.message}
-            <button style={{ background: "none", border: "none", color: "inherit", cursor: "pointer" }}
-              onClick={() => setNotifications((prev) => prev.filter((x) => x.id !== n.id))}>
+            <button
+              style={{ background: "none", border: "none", color: "inherit", cursor: "pointer" }}
+              onClick={() => setNotifications((prev) => prev.filter((x) => x.id !== n.id))}
+            >
               ✖
             </button>
           </div>
@@ -181,7 +186,7 @@ const Login = () => {
       <h2 style={headingStyle}>💖 Login 💖</h2>
 
       {isLoading ? (
-        <p>⏳ Loading Firebase Auth...</p>
+        <p>⏳ Loading...</p>
       ) : (
         <form onSubmit={handleLogin} style={formStyle}>
           <input

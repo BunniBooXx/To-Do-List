@@ -80,55 +80,114 @@ export default function Calendar() {
     await fetchTasksForDate(date);
   };
 
-  const handleAddTask = async () => {
-    if (!idToken) {
-      setNotification("🚫 Please log in to add a task.");
+const handleAddTask = async () => {
+  if (!idToken) {
+    setNotification("🚫 Please log in to add a task.");
+    return;
+  }
+
+  if (!newTaskName.trim()) {
+    setNotification("⚠️ Task name cannot be empty.");
+    return;
+  }
+
+  if (!selectedDate) {
+    setNotification("⚠️ No date selected.");
+    return;
+  }
+
+  const formattedDate = new Date(selectedDate).toISOString().split("T")[0];
+
+  try {
+    const createRes = await axios.post(
+      `${BACKEND_URL}/tasks/create`,
+      { name: newTaskName },
+      { headers: { Authorization: `Bearer ${idToken}` } }
+    );
+
+    const taskId = createRes?.data?.taskId;
+    if (!taskId) {
+      setNotification("❌ Failed to create task.");
       return;
     }
-    if (!newTaskName.trim()) return;
-    try {
-      const createRes = await axios.post(
-        `${BACKEND_URL}/tasks/create`,
-        { name: newTaskName },
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
-      if (createRes.data.success && createRes.data.taskId) {
-        await axios.post(
-          `${BACKEND_URL}/calendar_tasks/add`,
-          { taskId: createRes.data.taskId, date: selectedDate },
-          { headers: { Authorization: `Bearer ${idToken}` } }
+
+    const calendarPayload = {
+      taskId,
+      date: formattedDate,
+      name: newTaskName
+    };
+
+    const calendarRes = await axios.post(
+      `${BACKEND_URL}/calendar_tasks/add`,
+      calendarPayload,
+      { headers: { Authorization: `Bearer ${idToken}` } }
+    );
+
+    if (!calendarRes.data.success) {
+      setNotification(`❌ Calendar task failed: ${calendarRes.data.message || "unknown error"}`);
+      return;
+    }
+
+    setNewTaskName("");
+    fetchTasksForDate(formattedDate);
+    setNotification("✅ Task added successfully!");
+  } catch (e) {
+    const backendError = e.response?.data || e.message;
+    setNotification(`❌ Error: ${JSON.stringify(backendError)}`);
+  }
+};
+
+
+
+
+
+const handleDeleteCalendarTask = async (calendarId) => {
+  try {
+    if (!calendarId || typeof calendarId !== "string") {
+      setNotification("❌ Invalid task ID.");
+      return;
+    }
+
+    await axios.delete(`${BACKEND_URL}/calendar_tasks/remove/${calendarId}`, {
+      headers: { Authorization: `Bearer ${idToken}` },
+    });
+
+    fetchTasksForDate(selectedDate);
+  } catch (e) {
+    setNotification(`❌ Failed to delete task`);
+    console.error("❌ Error deleting task:", e.response?.data || e.message);
+  }
+};
+
+
+ const handleCompleteCalendarTask = async (calendarId, completed) => {
+  try {
+    await axios.put(
+      `${BACKEND_URL}/calendar_tasks/update/${calendarId}`,
+      { completed: !completed },
+      { headers: { Authorization: `Bearer ${idToken}` } }
+    );
+
+    // Optional: Optimistically update UI without waiting for full fetch
+    setTasks((prev) => {
+      const updated = { ...prev };
+      if (updated[selectedDate]) {
+        updated[selectedDate] = updated[selectedDate].map((task) =>
+          task.calendar_id === calendarId
+            ? { ...task, completed: !completed }
+            : task
         );
-        setNewTaskName("");
-        fetchTasksForDate(selectedDate);
       }
-    } catch (e) {
-      console.error("❌ Error adding task:", e);
-    }
-  };
+      return updated;
+    });
 
-  const handleDeleteCalendarTask = async (calendarId) => {
-    try {
-      await axios.delete(`${BACKEND_URL}/calendar_tasks/remove/${calendarId}`, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-      fetchTasksForDate(selectedDate);
-    } catch (e) {
-      console.error("❌ Error deleting task:", e);
-    }
-  };
+    // Then re-fetch to stay accurate
+    fetchTasksForDate(selectedDate);
+  } catch (e) {
+    console.error("❌ Error updating task:", e);
+  }
+};
 
-  const handleCompleteCalendarTask = async (calendarId, completed) => {
-    try {
-      await axios.put(
-        `${BACKEND_URL}/calendar_tasks/update/${calendarId}`,
-        { completed: !completed },
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
-      fetchTasksForDate(selectedDate);
-    } catch (e) {
-      console.error("❌ Error updating task:", e);
-    }
-  };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -200,6 +259,67 @@ export default function Calendar() {
         .calendar-day:hover {
           background: #ffe4e1;
         }
+          .emoji-button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            border-radius: 50%;
+            transition: transform 0.2s ease;
+          }
+
+          .emoji-button:hover {
+            background-color: #ffe4ec;
+            transform: scale(1.1);
+          }
+
+         
+
+         .task-actions {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+          }
+
+          .task-actions button,
+          .task-actions a {
+            border: none;
+            background: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.2s ease;
+          }
+
+          .task-actions button:hover,
+          .task-actions a:hover {
+            color: #ff69b4;
+          }
+
+          /* ✅ Move this OUTSIDE */
+          .subtask-button {
+            background: #ffe4ec;
+            border: 1px solid #ffb6c1;
+            border-radius: 0.5rem;
+            color: #d6336c;
+            font-size: 0.9rem;
+            padding: 0.4rem 0.75rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+          }
+
+          .subtask-button:hover {
+            background: #ffb6c1;
+            color: white;
+            transform: scale(1.05);
+          }
+
+        
+                  
+         
         .task-modal {
           position: fixed;
           top: 0; left: 0;
@@ -297,9 +417,16 @@ export default function Calendar() {
           margin: 0.5rem 0;
           text-align: center;
         }
+        .completed {
+          text-decoration: line-through;
+          opacity: 0.6;
+          transition: all 0.3s ease;
+        }
+
         @media (max-width: 600px) {
           .month-label { font-size: 1.5rem; }
           .modal-content { padding: 1rem; }
+        
         }
       `}</style>
 
@@ -343,22 +470,31 @@ export default function Calendar() {
                   <button type="submit" className="submit-task-button">Add Task 🎀</button>
                 </form>
               )}
-              {tasks[selectedDate]?.length > 0 ? (
-                tasks[selectedDate].map(task => (
-                  <div key={task.calendar_id} className="task-item">
-                    <span>{task.name}</span>
-                    <div>
-                      <button onClick={() => handleDeleteCalendarTask(task.calendar_id)}>🗑️</button>
-                      <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} style={{ margin: '0 0.5rem' }}>✨</Link>
-                      <button onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}>
-                        {task.completed ? "💖" : "🤍"}
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p style={{ textAlign: "center", color: "#ff69b4" }}>No tasks yet! 🎀</p>
-              )}
+             {tasks[selectedDate]?.length > 0 ? (
+  tasks[selectedDate].map(task => (
+    
+    <div key={task.calendar_id} className="task-item">
+      {/* ✅ Add dynamic className here */}
+      <span className={task.completed ? "completed" : ""}>{task.name}</span>
+
+      <div className="task-actions">
+        <button onClick={() => handleDeleteCalendarTask(task.calendar_id)} className="emoji-button">🗑️</button>
+        <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} className="subtask-button">
+          ✨ Add Subtasks
+        </Link>
+        <button
+          onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}
+          className="emoji-button"
+        >
+          {task.completed ? "💖" : "🤍"}
+        </button>
+      </div>
+    </div>
+  ))
+) : (
+  <p style={{ textAlign: "center", color: "#ff69b4" }}>No tasks yet! 🎀</p>
+)}
+
             </div>
           </div>
         )}

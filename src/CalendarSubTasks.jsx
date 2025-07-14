@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { getAuth, onIdTokenChanged } from "firebase/auth";
 import { useParams, Link } from "react-router-dom";
 import "./CalendarSubTasks.css";
 
@@ -15,68 +15,78 @@ export default function CalendarSubtasksPage() {
   const [loading, setLoading] = useState(true);
   const [showSubtaskForm, setShowSubtaskForm] = useState(false);
 
+  // 🔐 Firebase auth token handling
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
-        const token = await user.getIdToken();
+        const token = await user.getIdToken(true);
+        console.log("🔐 Refreshed Firebase token");
         setIdToken(token);
       } else {
+        console.warn("⛔ No user authenticated, redirecting...");
         window.location.href = "/login";
       }
     });
     return () => unsubscribe();
   }, []);
 
+  // 📥 Fetch the calendar task
   const fetchCalendarTask = useCallback(async () => {
-    if (!idToken || !calendarTaskId) return;
+    if (!calendarTaskId || !idToken) return;
     try {
-      const response = await axios.get(`${API_BASE_URL}/calendar_tasks/task/${calendarTaskId}`, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-
+      const response = await axios.get(
+        `${API_BASE_URL}/calendar_tasks/task/${calendarTaskId}`,
+        {
+          headers: { Authorization: `Bearer ${idToken}` },
+        }
+      );
       if (response.data.success) {
         setCalendarTask(response.data.task || {});
       }
     } catch (error) {
       console.error("❌ Error fetching calendar task:", error);
     }
-  }, [idToken, calendarTaskId]);
+  }, [calendarTaskId, idToken]);
 
+  // 📥 Fetch subtasks for the calendar task
   const fetchSubtasks = useCallback(async () => {
-    if (!idToken || !calendarTaskId) return;
+    if (!calendarTaskId || !idToken) return;
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await axios.get(`${API_BASE_URL}/subtasks/calendar/${calendarTaskId}`, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-
+      const response = await axios.get(
+        `${API_BASE_URL}/subtasks/calendar/${calendarTaskId}`,
+        {
+          headers: { Authorization: `Bearer ${idToken}` },
+        }
+      );
       if (response.data.success) {
         setSubtasks(response.data.subtasks || []);
       }
-      setLoading(false);
     } catch (error) {
       console.error("❌ Error fetching calendar subtasks:", error);
+    } finally {
       setLoading(false);
     }
-  }, [idToken, calendarTaskId]);
+  }, [calendarTaskId, idToken]);
 
+  // 🔁 Trigger fetches once token is ready
   useEffect(() => {
-    if (idToken) {
+    if (idToken && calendarTaskId) {
       fetchCalendarTask();
       fetchSubtasks();
     }
-  }, [idToken, fetchCalendarTask, fetchSubtasks]);
+  }, [idToken, calendarTaskId, fetchCalendarTask, fetchSubtasks]);
 
+  // ➕ Add subtask
   const handleAddSubtask = async () => {
-    if (!newSubtask.trim() || !calendarTaskId) return;
+    if (!newSubtask.trim() || !calendarTaskId || !idToken) return;
     try {
       const response = await axios.post(
         `${API_BASE_URL}/subtasks/calendar/create`,
         { calendarTaskId, subtaskName: newSubtask },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
       if (response.data.success) {
         setNewSubtask("");
         setShowSubtaskForm(false);
@@ -87,15 +97,15 @@ export default function CalendarSubtasksPage() {
     }
   };
 
+  // ✅ Toggle subtask completed/uncompleted
   const handleToggleSubtaskCompletion = async (subtaskId, completed) => {
-    if (!subtaskId || !calendarTaskId) return;
+    if (!subtaskId || !calendarTaskId || !idToken) return;
     try {
       const response = await axios.put(
         `${API_BASE_URL}/subtasks/calendar/update/${calendarTaskId}/${subtaskId}`,
         { completed: !completed },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
       if (response.data.success) {
         setSubtasks((prev) =>
           prev.map((s) =>
@@ -108,14 +118,14 @@ export default function CalendarSubtasksPage() {
     }
   };
 
+  // 🗑️ Delete subtask
   const handleDeleteSubtask = async (subtaskId) => {
-    if (!subtaskId || !calendarTaskId) return;
+    if (!subtaskId || !calendarTaskId || !idToken) return;
     try {
       const response = await axios.delete(
         `${API_BASE_URL}/subtasks/calendar/delete/${calendarTaskId}/${subtaskId}`,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
-
       if (response.data.success) {
         setSubtasks((prev) => prev.filter((s) => s.subtask_id !== subtaskId));
       }
@@ -127,20 +137,26 @@ export default function CalendarSubtasksPage() {
   return (
     <div className="calendar-subtasks-container">
       <div className="subtasks-header">
-        <Link to="/planner" className="back-button">← Back to Calendar</Link>
-        <h1 className="title">❀ {calendarTask.name || "Task"} ❀</h1>
-      </div>
+  <Link to="/planner" className="back-button">← Back to Calendar</Link>
+</div>
+<h1 className="title">❀ {calendarTask.name || "Task"} ❀</h1>
 
-      <button onClick={() => setShowSubtaskForm(true)} className="add-task-button">
+
+      <button
+        onClick={() => setShowSubtaskForm(true)}
+        className="add-task-button"
+      >
         + Add New Subtask
       </button>
 
       {showSubtaskForm && (
         <div className="task-form-container">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            handleAddSubtask();
-          }}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleAddSubtask();
+            }}
+          >
             <input
               type="text"
               placeholder="Enter subtask name..."
@@ -148,7 +164,9 @@ export default function CalendarSubtasksPage() {
               onChange={(e) => setNewSubtask(e.target.value)}
               className="task-input"
             />
-            <button type="submit" className="submit-task-button">Add Subtask 🎀</button>
+            <button type="submit" className="submit-task-button">
+              Add Subtask 🎀
+            </button>
           </form>
         </div>
       )}
@@ -161,7 +179,12 @@ export default function CalendarSubtasksPage() {
         <div className="subtasks-list">
           {subtasks.length > 0 ? (
             subtasks.map((subtask) => (
-              <div key={subtask.subtask_id} className={`subtask-item ${subtask.completed ? "completed" : ""}`}>
+              <div
+                key={subtask.subtask_id}
+                className={`subtask-item ${
+                  subtask.completed ? "completed" : ""
+                }`}
+              >
                 <span className="subtask-name">{subtask.name}</span>
                 <div className="subtask-buttons">
                   <button
@@ -171,7 +194,12 @@ export default function CalendarSubtasksPage() {
                     🗑️
                   </button>
                   <button
-                    onClick={() => handleToggleSubtaskCompletion(subtask.subtask_id, subtask.completed)}
+                    onClick={() =>
+                      handleToggleSubtaskCompletion(
+                        subtask.subtask_id,
+                        subtask.completed
+                      )
+                    }
                     className="complete-button"
                   >
                     {subtask.completed ? "💖" : "🤍"}
