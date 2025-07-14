@@ -20,6 +20,7 @@
     "@babel/preset-react": "^7.26.3",
     "@craco/craco": "^7.1.0",
     "babel-loader": "^10.0.0",
+    "babel-plugin-transform-remove-console": "^6.9.4",
     "crypto-browserify": "^3.12.1",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
@@ -27,10 +28,10 @@
     "stream-browserify": "^3.0.0"
   },
   "scripts": {
-  "start": "craco start",
-  "build": "set CI=false && craco build",
-  "test": "craco test"
-},
+    "start": "craco start",
+    "build": "set CI=false && craco build",
+    "test": "craco test"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
