@@ -1,4 +1,4 @@
-/* src/pages/signup.css */
+/* src/pages/Login.css */
 
 :root {
   --pp-pink: #ff6f9f;
@@ -12,9 +12,10 @@
   --pp-bgA: #ffd8e7;
   --pp-bgB: #ffedf4;
 
-  --pp-card: rgba(255, 255, 255, 0.8);
-  --pp-border: rgba(255, 166, 191, 0.34);
+  --pp-card: rgba(255, 255, 255, 0.78);
+  --pp-card-strong: rgba(255, 255, 255, 0.94);
 
+  --pp-border: rgba(255, 166, 191, 0.45);
   --pp-shadow: 0 18px 42px rgba(255, 182, 193, 0.18);
   --pp-shadow-soft: 0 10px 24px rgba(255, 182, 193, 0.14);
 
@@ -27,7 +28,7 @@
 /* =========================================================
    ROUTE SCOPE
 ========================================================= */
-body.route-signup {
+body.route-login {
   margin: 0 !important;
   background: linear-gradient(135deg, var(--pp-bgA), var(--pp-bgB));
   overflow-x: hidden !important;
@@ -36,7 +37,7 @@ body.route-signup {
 /* =========================================================
    FIX THE PARENT WRAPPER FOR THIS ROUTE
 ========================================================= */
-body.route-signup .main-content {
+body.route-login .main-content {
   flex: 1;
   width: 100%;
   max-width: none;
@@ -51,7 +52,7 @@ body.route-signup .main-content {
 /* =========================================================
    PAGE
 ========================================================= */
-.signup-page {
+.login-page {
   flex: 1;
   min-height: 0;
   width: 100%;
@@ -60,13 +61,13 @@ body.route-signup .main-content {
   box-sizing: border-box;
 }
 
-.signup-stage {
+.login-stage {
   width: 100%;
   display: grid;
   place-items: center;
 }
 
-.signup-shell {
+.login-shell {
   width: min(100%, 1100px);
   padding: 16px;
   box-sizing: border-box;
@@ -77,12 +78,12 @@ body.route-signup .main-content {
 /* =========================================================
    CARD
 ========================================================= */
-.signup-card {
-  width: min(100%, 480px);
+.login-card {
+  width: min(100%, 460px);
   padding: clamp(20px, 3vw, 30px);
   text-align: center;
   background: var(--pp-card);
-  border: 1px solid var(--pp-border);
+  border: 1px solid rgba(255, 192, 203, 0.32);
   border-radius: var(--pp-radius-xl);
   box-shadow: var(--pp-shadow);
   backdrop-filter: blur(10px);
@@ -90,11 +91,11 @@ body.route-signup .main-content {
   box-sizing: border-box;
 }
 
-.signup-header {
+.login-header {
   margin-bottom: 16px;
 }
 
-.signup-title {
+.login-title {
   margin: 0;
   font-family: "Dancing Script", cursive;
   font-size: clamp(2rem, 3.2vw, 2.8rem);
@@ -103,7 +104,7 @@ body.route-signup .main-content {
   text-shadow: 0 1px 0 #fff;
 }
 
-.signup-subtitle {
+.login-subtitle {
   margin: 8px 0 0;
   font-family: "Josefin Sans", "Quicksand", sans-serif;
   font-size: clamp(0.96rem, 1.5vw, 1.02rem);
@@ -111,20 +112,26 @@ body.route-signup .main-content {
   color: #d06d92;
 }
 
+.login-loading {
+  margin: 10px 0 0;
+  color: var(--pp-text);
+  font-weight: 600;
+}
+
 /* =========================================================
    FORM
 ========================================================= */
-.signup-form {
+.login-form {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.signup-label {
+.login-label {
   width: 100%;
 }
 
-.signup-input {
+.login-input {
   width: 100%;
   min-height: 50px;
   padding: 13px 14px;
@@ -139,11 +146,11 @@ body.route-signup .main-content {
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
 
-.signup-input::placeholder {
+.login-input::placeholder {
   color: #d391ac;
 }
 
-.signup-input:focus {
+.login-input:focus {
   border-color: rgba(255, 77, 141, 0.76);
   box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.16);
   background: white;
@@ -152,7 +159,7 @@ body.route-signup .main-content {
 /* =========================================================
    BUTTONS
 ========================================================= */
-.signup-btn {
+.login-btn {
   width: 100%;
   min-height: 50px;
   padding: 13px 16px;
@@ -168,13 +175,13 @@ body.route-signup .main-content {
   transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
 }
 
-.signup-btn:hover {
+.login-btn:hover {
   transform: translateY(-1px);
   filter: brightness(1.02);
   box-shadow: 0 14px 24px rgba(255, 182, 193, 0.22);
 }
 
-.signup-btn:disabled {
+.login-btn:disabled {
   opacity: 0.58;
   cursor: not-allowed;
   transform: none;
@@ -182,7 +189,7 @@ body.route-signup .main-content {
   box-shadow: none;
 }
 
-.google-btn {
+.login-btn.google {
   margin-top: 2px;
   background: rgba(255, 255, 255, 0.96);
   color: #d65b88;
@@ -193,7 +200,7 @@ body.route-signup .main-content {
 /* =========================================================
    DIVIDER
 ========================================================= */
-.signup-divider {
+.login-divider {
   margin: 14px 0;
   display: flex;
   align-items: center;
@@ -203,8 +210,8 @@ body.route-signup .main-content {
   font-weight: 600;
 }
 
-.signup-divider::before,
-.signup-divider::after {
+.login-divider::before,
+.login-divider::after {
   content: "";
   flex: 1;
   height: 1px;
@@ -212,9 +219,29 @@ body.route-signup .main-content {
 }
 
 /* =========================================================
+   FOOTER TEXT
+========================================================= */
+.login-footer-text {
+  margin: 14px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--pp-text);
+}
+
+.login-link {
+  color: var(--pp-pink-deep);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
    NOTIFICATIONS
 ========================================================= */
-.signup-notifs {
+.login-notifs {
   position: fixed;
   top: 14px;
   left: 50%;
@@ -227,7 +254,7 @@ body.route-signup .main-content {
   pointer-events: none;
 }
 
-.signup-notif {
+.login-notif {
   pointer-events: auto;
   padding: 12px 14px;
   border-radius: 16px;
@@ -238,24 +265,24 @@ body.route-signup .main-content {
   gap: 12px;
 }
 
-.signup-notif.error {
+.login-notif.error {
   background: #ffe3ea;
   color: #c63b68;
 }
 
-.signup-notif.success {
+.login-notif.success {
   background: #def8e4;
   color: #2f9850;
 }
 
-.signup-notif-text {
+.login-notif-text {
   font-size: 0.95rem;
   line-height: 1.4;
   text-align: left;
   word-break: break-word;
 }
 
-.signup-notif-x {
+.login-notif-x {
   width: 30px;
   height: 30px;
   border: none;
@@ -285,16 +312,16 @@ body.route-signup .main-content {
    TABLET
 ========================================================= */
 @media (max-width: 900px) {
-  body.route-signup .main-content {
+  body.route-login .main-content {
     padding-top: 76px;
   }
 
-  .signup-shell {
+  .login-shell {
     padding: 14px 16px;
   }
 
-  .signup-card {
-    width: min(100%, 450px);
+  .login-card {
+    width: min(100%, 440px);
   }
 }
 
@@ -302,40 +329,44 @@ body.route-signup .main-content {
    MOBILE
 ========================================================= */
 @media (max-width: 640px) {
-  body.route-signup .main-content {
+  body.route-login .main-content {
     padding-top: 74px;
   }
 
-  .signup-shell {
+  .login-shell {
     padding: 12px 10px 16px;
   }
 
-  .signup-card {
+  .login-card {
     width: 100%;
     border-radius: 22px;
     padding: 18px 14px;
   }
 
-  .signup-title {
+  .login-title {
     font-size: 2rem;
   }
 
-  .signup-subtitle {
+  .login-subtitle {
     font-size: 0.94rem;
   }
 
-  .signup-input,
-  .signup-btn {
+  .login-input,
+  .login-btn {
     min-height: 48px;
     font-size: 0.96rem;
   }
 
-  .signup-notifs {
+  .login-footer-text {
+    font-size: 0.92rem;
+  }
+
+  .login-notifs {
     top: 10px;
     width: min(95vw, 520px);
   }
 
-  .signup-notif {
+  .login-notif {
     padding: 10px 12px;
   }
 }
@@ -344,15 +375,15 @@ body.route-signup .main-content {
    EXTRA SMALL
 ========================================================= */
 @media (max-width: 380px) {
-  .signup-card {
+  .login-card {
     padding: 16px 12px;
   }
 
-  .signup-title {
+  .login-title {
     font-size: 1.82rem;
   }
 
-  .signup-divider {
+  .login-divider {
     gap: 8px;
     font-size: 0.88rem;
   }
@@ -362,7 +393,7 @@ body.route-signup .main-content {
    SHORT SCREENS
 ========================================================= */
 @media (max-height: 700px) {
-  .signup-shell {
+  .login-shell {
     padding-top: 10px;
     padding-bottom: 12px;
   }

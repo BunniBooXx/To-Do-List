@@ -1,77 +1,79 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
-import plannerImage from "./planning-girl.webp";
+import "./Homepage.css";
+import plannerPreview from "./planner-preview.png"; // ← real screenshot
 
-const Homepage = () => {
-  const pageStyle = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    textAlign: "center",
-    minHeight: "100vh",
-    background: "linear-gradient(135deg, #ffd6e7, #ffecf2)",
-    padding: "5vw", // Use vw for fluid padding
-  };
-
-  const cardStyle = {
-    background: "rgba(255, 255, 255, 0.95)",
-    padding: "6vw",
-    borderRadius: "20px",
-    boxShadow: "0 10px 30px rgba(255, 77, 141, 0.2)",
-    width: "100%",
-    maxWidth: "700px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  };
-
-  const titleStyle = {
-    fontSize: "clamp(2rem, 5vw, 2.5rem)", // Responsive font size
-    color: "#ff4d8d",
-    fontFamily: "'Dancing Script', cursive",
-    marginBottom: "1rem",
-  };
-
-  const descStyle = {
-    fontSize: "clamp(1rem, 3.5vw, 1.3rem)",
-    color: "#cc6060",
-    marginBottom: "1.5rem",
-  };
-
-  const imgStyle = {
-    width: "80%", // fluid width
-    maxWidth: "300px",
-    borderRadius: "15px",
-    boxShadow: "0 4px 15px rgba(255, 77, 141, 0.3)",
-    marginBottom: "1.5rem",
-  };
-
-  const buttonStyle = {
-    display: "inline-block",
-    background: "linear-gradient(45deg, #ff80ab, #ff4d8d)",
-    color: "white",
-    padding: "clamp(10px, 3vw, 14px) clamp(20px, 6vw, 35px)",
-    borderRadius: "50px",
-    fontSize: "clamp(1rem, 4vw, 1.3rem)",
-    fontWeight: "bold",
-    textDecoration: "none",
-    boxShadow: "0 4px 10px rgba(255, 77, 141, 0.2)",
-  };
+export default function Homepage() {
+  useEffect(() => {
+    document.body.classList.add("route-petite-home");
+    return () => document.body.classList.remove("route-petite-home");
+  }, []);
 
   return (
-    <div style={pageStyle}>
-      <div style={cardStyle}>
-        <h1 style={titleStyle}>🌸 Petite Planner 🌸</h1>
-        <p style={descStyle}>
-          Organize your tasks, track your progress, and stay on top of your schedule with a touch of cuteness! 🎀✨
-        </p>
-        <img src={plannerImage} alt="Planner Preview" style={imgStyle} />
-        <Link to="/planner" style={buttonStyle}>
-          Enter Planner ✨
-        </Link>
-      </div>
-    </div>
-  );
-};
+    <main className="pp-home">
+      <section className="pp-hero">
+        <div className="pp-hero-inner">
 
-export default Homepage;
+          {/* LEFT */}
+          <div className="pp-hero-text">
+            <span className="pp-badge">
+              Frontend Product Build ✨
+            </span>
+
+            <h1 className="pp-title">
+              Petite Planner
+            </h1>
+
+            <p className="pp-description">
+              A structured task and calendar system built with scalable layout,
+              reusable components, and responsive UI architecture.
+            </p>
+
+            <div className="pp-actions">
+              <Link to="/planner" className="pp-btn-primary">
+                Launch App
+              </Link>
+              <Link to="/tasks" className="pp-btn-secondary">
+                Explore Tasks
+              </Link>
+            </div>
+          </div>
+
+          {/* RIGHT — REAL PRODUCT */}
+          <div className="pp-hero-visual">
+            <div className="pp-browser">
+              <div className="pp-browser-bar">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <img
+                src={plannerPreview}
+                alt="Petite Planner App Preview"
+              />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ENGINEERING STRIP */}
+      <section className="pp-features">
+        <div className="pp-feature">
+          <h3>Component-Based Architecture</h3>
+          <p>Modular UI structure with reusable layout patterns.</p>
+        </div>
+
+        <div className="pp-feature">
+          <h3>Task + Subtask State Flow</h3>
+          <p>Organized interaction patterns and structured state updates.</p>
+        </div>
+
+        <div className="pp-feature">
+          <h3>Responsive Layout System</h3>
+          <p>Adaptive grid structure optimized for mobile and desktop.</p>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -1,202 +1,701 @@
+/* =========================================
+   TOKENS
+========================================= */
 :root {
-  --pink-gradient: linear-gradient(135deg, #ffe5f0, #fff5f8);
-  --title-gradient: linear-gradient(135deg, #ff9fb2, #f8c8dc);
-  --shadow: rgba(255, 170, 195, 0.25);
-  --card-bg: #fff0f7;
-  --text-dark: #4a3a3a;
-  --accent: #ff8fab;
-  --soft-white: #ffffff;
+  --pp-nav-h: 72px;
+
+  --tasks-bg-a: #fff8fc;
+  --tasks-bg-b: #fff0f6;
+  --tasks-bg-c: #fde8f1;
+
+  --tasks-surface: rgba(255, 255, 255, 0.84);
+  --tasks-surface-strong: rgba(255, 255, 255, 0.95);
+
+  --tasks-pink: #ff6ca8;
+  --tasks-pink-2: #f89ec0;
+  --tasks-pink-3: #f4c6d7;
+  --tasks-pink-4: #fde7f0;
+
+  --tasks-text: #b57a92;
+  --tasks-text-dark: #94677b;
+
+  --tasks-border: rgba(236, 179, 201, 0.52);
+  --tasks-border-strong: rgba(228, 163, 190, 0.72);
+
+  --tasks-shadow-soft: 0 10px 24px rgba(236, 130, 175, 0.08);
+  --tasks-shadow-card: 0 20px 46px rgba(236, 130, 175, 0.1);
+
+  --tasks-radius-xl: 30px;
+  --tasks-radius-lg: 22px;
+  --tasks-radius-md: 16px;
+  --tasks-radius-pill: 999px;
+
+  --tasks-shell-max: 1100px;
+  --tasks-panel-max: 760px;
+  --tasks-form-max: 430px;
+
+  --tasks-scroll-h: 300px;
 }
 
-/* 🌸 Main Wrapper */
-.tasks-page {
+/* =========================================
+   ROUTE SCOPE
+========================================= */
+body.route-tasks {
+  margin: 0 !important;
+  background:
+    radial-gradient(circle at top left, rgba(255, 220, 235, 0.55), transparent 24%),
+    radial-gradient(circle at top right, rgba(255, 235, 243, 0.4), transparent 18%),
+    linear-gradient(135deg, var(--tasks-bg-a), var(--tasks-bg-b) 62%, var(--tasks-bg-c));
+  overflow-x: hidden !important;
+}
+
+body.route-tasks #root {
   min-height: 100vh;
-  padding: 6rem 1rem 2rem; /* ⬅️ Added top padding for navbar overlap fix */
-  background: var(--pink-gradient);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  position: relative;
-  gap: 2rem;
 }
 
-/* 🎀 Corner Bows */
-.decorative-bow {
-  position: absolute;
-  width: 64px;
-  height: 64px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.7;
+body.route-tasks .main-content {
+  flex: 1;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: var(--pp-nav-h) 0 0;
+  box-sizing: border-box;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.decorative-bow.left {
-  top: 1.5rem;
-  left: 1rem;
-  transform: rotate(-10deg);
+body.route-tasks footer {
+  flex-shrink: 0;
 }
 
-.decorative-bow.right {
-  top: 1.5rem;
-  right: 1rem;
-  transform: rotate(10deg);
+/* =========================================
+   PAGE LAYOUT
+========================================= */
+.tasks-page {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
 }
 
-/* 💖 Title Banner */
-.tasks-title {
-  font-family: 'Dancing Script', cursive;
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  background: var(--title-gradient);
-  color: white;
-  padding: 0.75rem 1.75rem;
-  border-radius: 2rem;
-  box-shadow: 0 8px 20px var(--shadow);
-  border: 1px solid #ffeef2;
-  animation: floatTitle 3s ease-in-out infinite;
+.tasks-stage {
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.tasks-shell {
+  width: min(100%, var(--tasks-shell-max));
+  padding: 16px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  gap: 18px;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+.tasks-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   text-align: center;
-  max-width: 90vw;
-  z-index: 2;
 }
 
-/* 🌸 Title Emoji */
-.title-emoji {
-  display: inline-block;
-  margin: 0 0.4rem;
-  font-size: 1.2rem;
-  animation: bounce 1.6s infinite ease-in-out alternate;
-}
-
-/* 🧸 Login Prompt */
-.login-prompt,
-.loading-message {
-  background: var(--soft-white);
-  color: var(--text-dark);
-  padding: 1.25rem;
-  border-radius: 20px;
-  font-size: 1rem;
-  text-align: center;
-  box-shadow: 0 4px 12px var(--shadow);
-  font-family: 'Nunito', sans-serif;
-  max-width: 95%;
-}
-
-/* 🧁 Task Card Container */
-.task-list {
+.tasks-header-copy {
   width: 100%;
   max-width: 720px;
-  padding: 2rem;
-  background: var(--card-bg);
-  border-radius: 25px;
-  box-shadow: 0 6px 20px var(--shadow);
-  transition: all 0.3s ease;
 }
 
-/* ✨ Floating Animation */
-@keyframes floatTitle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+.tasks-kicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  margin-bottom: 12px;
+  border-radius: var(--tasks-radius-pill);
+  background: var(--tasks-pink-4);
+  color: var(--tasks-pink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(255, 155, 192, 0.14);
 }
 
-/* 💫 Bouncing Emojis */
-@keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-8px); }
+.tasks-title {
+  margin: 0;
+  color: var(--tasks-pink);
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2.25rem, 4vw, 3.35rem);
+  line-height: 1;
 }
 
-/* 📱 Mobile Responsive */
-@media (max-width: 768px) {
-  .tasks-page {
-    padding: 5rem 1rem 2rem; /* ⬅️ Matches top padding for navbar space */
-    gap: 1.5rem;
-  }
-
-  .decorative-bow {
-    width: 48px;
-    height: 48px;
-  }
-
-  .tasks-title {
-    font-size: 1.5rem;
-    padding: 0.6rem 1.2rem;
-  }
-
-  .task-list {
-    padding: 1.5rem;
-    width: 100%;
-  }
-
-  .login-prompt,
-  .loading-message {
-    font-size: 0.95rem;
-    padding: 1rem;
-  }
-
-  .title-emoji {
-    font-size: 1rem;
-  }
+/* =========================================
+   MAIN CARD / PANEL
+========================================= */
+.tasks-panel {
+  width: min(100%, var(--tasks-panel-max));
+  padding: clamp(16px, 2vw, 22px);
+  border-radius: var(--tasks-radius-xl);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 252, 0.92),
+    rgba(255, 241, 246, 0.98)
+  );
+  border: 1px solid rgba(245, 205, 221, 0.9);
+  box-shadow: var(--tasks-shadow-card);
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
-/* 📱 Smaller Screens */
-@media (max-width: 480px) {
-  .tasks-title {
-    font-size: 1.3rem;
-    padding: 0.5rem 1rem;
-  }
-
-  .decorative-bow {
-    width: 38px;
-    height: 38px;
-  }
-
-  .task-list {
-    padding: 1.2rem;
-  }
-
-  .login-prompt,
-  .loading-message {
-    font-size: 0.9rem;
-    padding: 0.9rem;
-  }
+/* =========================================
+   FEEDBACK
+========================================= */
+.tasks-feedback {
+  width: 100%;
 }
 
-@media (max-width: 480px) {
-  .navbar-wrapper {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem;
-    padding: 1rem;
-  }
-
-  .brand {
-    flex: 1 1 100%;
-    justify-content: center;
-  }
-
-  .menu-toggle {
-    align-self: flex-start;
-    margin-left: auto;
-  }
-}
+.loading-message,
 .login-prompt {
-  background: #fff0f7;
-  border: 2px solid #ffd9e6;
-  color: #c15078;
-  padding: 1.25rem 1.75rem;
-  border-radius: 1.5rem;
-  font-family: 'Quicksand', sans-serif;
-  font-size: 1.05rem;
+  margin: 0;
+  width: 100%;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(255, 143, 171, 0.15);
-  transition: all 0.3s ease;
-  max-width: 85%;
-  animation: pop 0.4s ease-in-out;
+  border-radius: 18px;
+  padding: 1rem 1.15rem;
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  font-size: 1rem;
+  box-sizing: border-box;
 }
 
-@keyframes pop {
-  0% { transform: scale(0.95); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+.loading-message {
+  background: var(--tasks-surface-strong);
+  color: var(--tasks-text-dark);
+  border: 1px solid var(--tasks-border);
 }
 
+.login-prompt {
+  background: #fff7fa;
+  color: #c78599;
+  border: 1px solid #f3d6df;
+}
+
+/* =========================================
+   TASK LIST ROOT
+========================================= */
+.task-list {
+  width: 100%;
+  display: grid;
+  justify-items: center;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* form/top section centered */
+.task-list > :first-child {
+  width: min(100%, 460px);
+  margin: 0 auto;
+}
+
+/* everything below can use full panel width */
+.task-list > :not(:first-child) {
+  width: 100%;
+}
+
+/* =========================================
+   ADD TASK CARD
+========================================= */
+.task-list :is(
+  .task-form-container,
+  .task-input-container,
+  .add-task-container,
+  .new-task-container,
+  .task-form
+) {
+  width: min(100%, 460px);
+  margin: 0 auto;
+  padding: 18px;
+  border-radius: var(--tasks-radius-lg);
+  background: var(--tasks-surface-strong);
+  border: 1px solid rgba(242, 212, 224, 0.95);
+  box-shadow: var(--tasks-shadow-soft);
+  box-sizing: border-box;
+
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+.task-list :is(
+  .task-form-container,
+  .task-input-container,
+  .add-task-container,
+  .new-task-container
+) form {
+  width: 100%;
+  max-width: var(--tasks-form-max);
+  margin: 0 auto;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+
+/* =========================================
+   INPUT
+========================================= */
+.task-list :is(
+  .task-input,
+  .new-task-input,
+  .add-task-input,
+  input[type="text"]
+) {
+  width: 100%;
+  max-width: var(--tasks-form-max);
+  min-height: 54px;
+  margin: 0 auto;
+  display: block;
+  box-sizing: border-box;
+  border: 2px solid #efc1d2;
+  border-radius: 16px;
+  background: #fffdfd;
+  color: var(--tasks-text-dark);
+  font-size: 1rem;
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  padding: 0.95rem 1rem;
+  outline: none;
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.task-list :is(
+  .task-input,
+  .new-task-input,
+  .add-task-input,
+  input[type="text"]
+)::placeholder {
+  color: #d69aae;
+  opacity: 1;
+}
+
+.task-list :is(
+  .task-input,
+  .new-task-input,
+  .add-task-input,
+  input[type="text"]
+):focus {
+  border-color: var(--tasks-pink-2);
+  box-shadow: 0 0 0 4px rgba(248, 158, 192, 0.16);
+  background: #ffffff;
+}
+
+/* =========================================
+   PRIMARY BUTTON
+========================================= */
+.task-list :is(
+  .add-task-btn,
+  .add-task-button,
+  .submit-task-button,
+  .task-submit-button,
+  button[type="submit"]
+) {
+  width: 100%;
+  max-width: var(--tasks-form-max);
+  min-height: 50px;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #efbfd0, #e7c8d3);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  padding: 0.95rem 1rem;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(236, 130, 175, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.task-list :is(
+  .add-task-btn,
+  .add-task-button,
+  .submit-task-button,
+  .task-submit-button,
+  button[type="submit"]
+):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(236, 130, 175, 0.16);
+  filter: brightness(1.02);
+}
+
+/* =========================================
+   SCROLLABLE TASK AREA
+========================================= */
+.task-list > :last-child,
+.task-list > ul,
+.task-list > ol,
+.task-list > .task-items,
+.task-list > .task-list-items,
+.task-list > .tasks-container {
+  width: 100%;
+  max-height: var(--tasks-scroll-h) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 8px 8px 8px 4px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.2);
+  scrollbar-width: thin;
+  scrollbar-color: #e9bfd0 transparent;
+}
+
+.task-list :is(
+  .task-items,
+  .task-list-items,
+  .tasks-container,
+  ul,
+  ol
+) {
+  list-style: none;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+  padding-left: 0;
+}
+
+.task-list > :last-child::-webkit-scrollbar,
+.task-list > ul::-webkit-scrollbar,
+.task-list > ol::-webkit-scrollbar,
+.task-list > .task-items::-webkit-scrollbar,
+.task-list > .task-list-items::-webkit-scrollbar,
+.task-list > .tasks-container::-webkit-scrollbar {
+  width: 10px;
+}
+
+.task-list > :last-child::-webkit-scrollbar-track,
+.task-list > ul::-webkit-scrollbar-track,
+.task-list > ol::-webkit-scrollbar-track,
+.task-list > .task-items::-webkit-scrollbar-track,
+.task-list > .task-list-items::-webkit-scrollbar-track,
+.task-list > .tasks-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.task-list > :last-child::-webkit-scrollbar-thumb,
+.task-list > ul::-webkit-scrollbar-thumb,
+.task-list > ol::-webkit-scrollbar-thumb,
+.task-list > .task-items::-webkit-scrollbar-thumb,
+.task-list > .task-list-items::-webkit-scrollbar-thumb,
+.task-list > .tasks-container::-webkit-scrollbar-thumb {
+  background: #e9bfd0;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* =========================================
+   TASK ITEM
+========================================= */
+.task-list :is(
+  .task-item,
+  .task-card,
+  .task-row,
+  li
+) {
+  width: 100%;
+  margin: 0;
+  background: rgba(255, 252, 254, 0.98);
+  border: 1px solid var(--tasks-border-strong);
+  border-radius: 20px;
+  padding: 15px 16px;
+  min-height: 74px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--tasks-shadow-soft);
+  box-sizing: border-box;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.task-list :is(
+  .task-item,
+  .task-card,
+  .task-row,
+  li
+):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 24px rgba(236, 130, 175, 0.1);
+  border-color: rgba(228, 163, 190, 0.9);
+}
+
+/* =========================================
+   HEART / FAVORITE BUTTON
+========================================= */
+.task-list :is(
+  .favorite-button,
+  .heart-button
+) {
+  min-width: 112px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(240, 230, 250, 0.95);
+  color: #a98abf;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.task-list :is(
+  .favorite-button,
+  .heart-button
+)::after {
+  content: "Favorite";
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.task-list :is(
+  .favorite-button,
+  .heart-button
+):hover {
+  transform: translateY(-1px);
+  background: rgba(235, 224, 247, 1);
+}
+
+/* =========================================
+   TEXT
+========================================= */
+.task-list :is(
+  .task-name,
+  .task-text,
+  .task-title-text,
+  .task-label
+) {
+  min-width: 0;
+  color: #c796aa;
+  font-size: 1rem;
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  font-weight: 600;
+  word-break: break-word;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* =========================================
+   ACTIONS
+========================================= */
+.task-list :is(
+  .task-actions,
+  .task-buttons,
+  .task-controls
+) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.task-list :is(
+  .subtask-button,
+  .add-subtasks-button,
+  .open-subtasks-button
+) {
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #f4c9d9, #f0bfd1);
+  color: #fff;
+  min-height: 40px;
+  padding: 0.72rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 8px 14px rgba(236, 130, 175, 0.12);
+}
+
+.task-list :is(
+  .subtask-button,
+  .add-subtasks-button,
+  .open-subtasks-button
+):hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+
+.task-list .delete-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(249, 241, 246, 0.95);
+  color: #cda7b6;
+  font-size: 1rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.task-list .delete-button:hover {
+  transform: scale(1.05);
+  background: rgba(246, 233, 239, 1);
+}
+
+/* =========================================
+   TABLET
+========================================= */
+@media (max-width: 900px) {
+  body.route-tasks .main-content {
+    padding-top: 76px;
+  }
+
+  .tasks-shell {
+    padding: 14px 16px;
+  }
+
+  .tasks-panel {
+    width: min(100%, 720px);
+  }
+
+  :root {
+    --tasks-scroll-h: 290px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+@media (max-width: 640px) {
+  body.route-tasks .main-content {
+    padding-top: 74px;
+  }
+
+  .tasks-shell {
+    padding: 12px 10px 16px;
+  }
+
+  .tasks-panel {
+    width: 100%;
+    border-radius: 22px;
+    padding: 14px;
+  }
+
+  .tasks-title {
+    font-size: clamp(1.95rem, 10vw, 2.75rem);
+  }
+
+  .task-list > :first-child,
+  .task-list :is(
+    .task-form-container,
+    .task-input-container,
+    .add-task-container,
+    .new-task-container,
+    .task-form
+  ) {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .task-list :is(
+    .task-item,
+    .task-card,
+    .task-row,
+    li
+  ) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .task-list :is(
+    .favorite-button,
+    .heart-button
+  ) {
+    justify-self: start;
+    min-width: 0;
+    width: fit-content;
+  }
+
+  .task-list :is(
+    .task-actions,
+    .task-buttons,
+    .task-controls
+  ) {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .task-list :is(
+    .subtask-button,
+    .add-subtasks-button,
+    .open-subtasks-button
+  ) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  :root {
+    --tasks-scroll-h: 320px;
+  }
+}
+
+/* =========================================
+   EXTRA SMALL
+========================================= */
+@media (max-width: 380px) {
+  .tasks-shell {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .task-list :is(
+    .subtask-button,
+    .add-subtasks-button,
+    .open-subtasks-button
+  ) {
+    font-size: 0.84rem;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+  }
+
+  .task-list :is(
+    .favorite-button,
+    .heart-button
+  )::after {
+    content: "Fav";
+  }
+}
+
+/* =========================================
+   SHORT SCREENS
+========================================= */
+@media (max-height: 700px) {
+  .tasks-shell {
+    padding-top: 10px;
+    padding-bottom: 12px;
+  }
+}

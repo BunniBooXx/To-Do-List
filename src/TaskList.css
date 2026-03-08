@@ -1,81 +1,246 @@
-/* 🍓 Add Task Form */
-.add-task-form {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  background: white; /* ✅ Pure white for a clean look */
-  padding: 15px;
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(235, 140, 155, 0.2); /* 🍓 Soft pink shadow */
-  max-width: 500px;
+.task-list-wrapper {
   width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  box-sizing: border-box;
 }
 
-/* 🍓 Cute Task Input */
+/* notification */
+.notification {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 13px 16px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 700;
+  box-sizing: border-box;
+  box-shadow: 0 10px 22px rgba(235, 140, 155, 0.14);
+}
+
+.notification.success {
+  background: #fff8fb;
+  color: #c98b9f;
+  border: 1px solid #f2d6df;
+}
+
+.notification.error {
+  background: #fff7fa;
+  color: #cc8b98;
+  border: 1px solid #f0d0d8;
+}
+
+.close-btn {
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* add task panel */
+.add-task-form {
+  width: min(100%, 620px);
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 251, 0.96));
+  border: 1px solid #f2d7df;
+  border-radius: 24px;
+  box-shadow: 0 10px 26px rgba(235, 140, 155, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+  box-sizing: border-box;
+}
+
 .task-input {
-  flex-grow: 1;
-  padding: 12px;
-  border: 2px solid #f5b6c1; /* 🍓 Soft strawberry border */
-  border-radius: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 15px 16px;
+  border: 2px solid #f2c1d0;
+  border-radius: 16px;
   font-size: 1rem;
-  font-family: 'Quicksand', sans-serif;
-  background: #fff7f9; /* ✅ Light pastel pink */
-  color: #e08b9d;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 0 6px rgba(235, 140, 155, 0.15);
+  font-family: "Quicksand", sans-serif;
+  background: #fffafb;
+  color: #d091a4;
+  text-align: center;
+  transition: all 0.25s ease;
 }
 
 .task-input::placeholder {
-  color: #e89aa6; /* 🍓 Softer pastel pink */
+  color: #e0a5b4;
   font-style: italic;
 }
 
 .task-input:focus {
   outline: none;
-  border-color: #e08b9d;
-  background: white;
-  box-shadow: 0 0 12px rgba(235, 140, 155, 0.4);
-  transform: scale(1.02);
+  border-color: #e5a8b8;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(235, 140, 155, 0.12);
 }
 
-/* 🍓 Soft Strawberry Gradient Button */
 .add-task-button {
-  background: linear-gradient(135deg, #f5b6c1, #ffcfd8); /* 🍓 Soft strawberry gradient */
-  color: white;
-  padding: 12px 18px;
-  border-radius: 50px;
-  font-size: 1.1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-family: 'Quicksand', sans-serif;
-  box-shadow: 0 4px 10px rgba(235, 140, 155, 0.3);
+  width: 100%;
   border: none;
-  font-weight: bold;
+  border-radius: 18px;
+  padding: 15px 18px;
+  background: linear-gradient(135deg, #e6bcc8, #e4c6cf);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: "Quicksand", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(235, 140, 155, 0.18);
+  transition: all 0.25s ease;
 }
 
 .add-task-button:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(135deg, #e08b9d, #ffbdc9); /* 🍓 Slightly deeper pastel */
-  box-shadow: 0 5px 15px rgba(235, 140, 155, 0.4);
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #ddb1bf, #e6c2cd);
+  box-shadow: 0 10px 22px rgba(235, 140, 155, 0.22);
 }
 
-/* 📱 Mobile-Friendly Adjustments */
-@media (max-width: 768px) {
+/* task list outer shell */
+.tasks-scroll-shell {
+  width: min(100%, 700px);
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 248, 250, 0.55));
+  border: 1px solid rgba(243, 216, 224, 0.9);
+  box-sizing: border-box;
+}
+
+/* scroll box */
+.tasks-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 4px 8px 4px 4px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #e6bcc8 transparent;
+}
+
+/* webkit scrollbar */
+.tasks-wrapper::-webkit-scrollbar {
+  width: 10px;
+}
+
+.tasks-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tasks-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #efc8d4, #ddb1bf);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.tasks-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #e8bfcc, #d8a9b9);
+}
+
+.no-tasks {
+  margin: 0;
+  padding: 22px 16px;
+  text-align: center;
+  color: #cb95a5;
+  font-family: "Quicksand", sans-serif;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid #f3d8e0;
+  border-radius: 18px;
+  box-sizing: border-box;
+}
+
+/* tablet */
+@media (max-width: 900px) {
+  .task-list-wrapper {
+    max-width: 100%;
+  }
+
   .add-task-form {
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px;
+    width: min(100%, 580px);
+  }
+
+  .tasks-scroll-shell {
+    width: min(100%, 660px);
+  }
+
+  .tasks-wrapper {
+    max-height: 320px;
+  }
+}
+
+/* mobile */
+@media (max-width: 768px) {
+  .task-list-wrapper {
+    gap: 18px;
+  }
+
+  .add-task-form {
+    width: 100%;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .task-input,
+  .add-task-button {
+    width: 100%;
   }
 
   .task-input {
-    font-size: 0.9rem;
-    padding: 10px;
+    padding: 14px 14px;
   }
 
   .add-task-button {
-    font-size: 1rem;
-    padding: 10px;
+    padding: 14px 16px;
+  }
+
+  .tasks-scroll-shell {
     width: 100%;
+    padding: 6px;
+    border-radius: 20px;
+  }
+
+  .tasks-wrapper {
+    max-height: 280px;
+    gap: 12px;
+    padding-right: 6px;
+  }
+
+  .notification {
+    width: 100%;
+  }
+}
+
+/* very small */
+@media (max-width: 520px) {
+  .add-task-form {
+    padding: 14px;
+  }
+
+  .tasks-wrapper {
+    max-height: 250px;
+  }
+
+  .notification {
+    padding: 12px 14px;
   }
 }

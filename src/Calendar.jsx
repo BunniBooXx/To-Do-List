@@ -3,8 +3,36 @@ import { onAuthStateChanged } from "firebase/auth";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { initFirebase } from "./firebase";
+import "./Calendar.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+
+function logAxiosError(label, error) {
+  const info = {
+    label,
+    message: error?.message,
+    status: error?.response?.status,
+    data: error?.response?.data,
+    url: error?.config?.url,
+    method: error?.config?.method,
+    payload: error?.config?.data,
+    hasAuthHeader: !!error?.config?.headers?.Authorization,
+    contentType:
+      error?.config?.headers?.["Content-Type"] ||
+      error?.config?.headers?.["content-type"],
+  };
+
+  console.groupCollapsed(`❌ ${label}`);
+  console.table(info);
+  console.log("raw error:", error);
+  console.groupEnd();
+}
+
+function logRequest(label, { method, url, payload, hasToken }) {
+  console.groupCollapsed(`➡️ ${label}`);
+  console.log({ method, url, payload, hasToken });
+  console.groupEnd();
+}
 
 export default function Calendar() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -17,6 +45,19 @@ export default function Calendar() {
   const [userId, setUserId] = useState(null);
   const [notification, setNotification] = useState("");
 
+  useEffect(() => {
+    document.body.classList.add("route-calendar");
+    return () => document.body.classList.remove("route-calendar");
+  }, []);
+
+  useEffect(() => {
+    if (!BACKEND_URL) {
+      console.error(
+        "⛔ REACT_APP_BACKEND_URL is missing (BACKEND_URL is undefined). Check your .env and restart/redeploy."
+      );
+    }
+  }, []);
+
   const year = monthView.getFullYear();
   const month = monthView.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -24,31 +65,66 @@ export default function Calendar() {
 
   useEffect(() => {
     let unsubscribe = () => {};
+
     (async () => {
       const { auth } = await initFirebase();
       unsubscribe = onAuthStateChanged(auth, async (user) => {
         if (user) {
-          const token = await user.getIdToken();
-          setIdToken(token);
-          setUserId(user.uid);
+          try {
+            const token = await user.getIdToken();
+            setIdToken(token);
+            setUserId(user.uid);
+          } catch (e) {
+            console.error("❌ Failed to get ID token:", e);
+            setIdToken(null);
+            setUserId(null);
+          }
         } else {
           setIdToken(null);
           setUserId(null);
         }
       });
     })();
+
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const reqId = axios.interceptors.request.use((config) => config);
+
+    const resId = axios.interceptors.response.use(
+      (res) => res,
+      (err) => {
+        logAxiosError("axios response error", err);
+        return Promise.reject(err);
+      }
+    );
+
+    return () => {
+      axios.interceptors.request.eject(reqId);
+      axios.interceptors.response.eject(resId);
+    };
+  }, []);
+
   const fetchCalendarTasks = useCallback(async () => {
-    if (!idToken) return;
+    if (!idToken || !BACKEND_URL) return;
+
+    const url = `${BACKEND_URL}/calendar_tasks/all`;
+    logRequest("fetchCalendarTasks", {
+      method: "GET",
+      url,
+      payload: null,
+      hasToken: true,
+    });
+
     try {
-      const res = await axios.get(`${BACKEND_URL}/calendar_tasks/all`, {
+      const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
+
       setTasks(res.data.tasks || {});
     } catch (e) {
-      console.error("❌ Error fetching calendar tasks:", e);
+      logAxiosError("Error fetching calendar tasks", e);
     }
   }, [idToken]);
 
@@ -56,138 +132,128 @@ export default function Calendar() {
     fetchCalendarTasks();
   }, [fetchCalendarTasks]);
 
-  const fetchTasksForDate = async (date) => {
-    if (!idToken) return;
-    try {
-      const res = await axios.get(`${BACKEND_URL}/calendar_tasks/date/${date}`, {
-        headers: { Authorization: `Bearer ${idToken}` },
-      });
-      if (res.data.success) {
-        setTasks((prev) => ({
-          ...prev,
-          [date]: res.data.tasks || [],
-        }));
-      }
-    } catch (e) {
-      console.error("❌ Error fetching tasks for date:", e);
-    }
-  };
+  const fetchTasksForDate = useCallback(
+    async (date) => {
+      if (!idToken || !BACKEND_URL) return;
 
-  const handleDateClick = async (date) => {
-    setSelectedDate(date);
+      const url = `${BACKEND_URL}/calendar_tasks/date/${date}`;
+      logRequest("fetchTasksForDate", {
+        method: "GET",
+        url,
+        payload: null,
+        hasToken: true,
+      });
+
+      try {
+        const res = await axios.get(url, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+
+        if (res.data?.success) {
+          setTasks((prev) => ({
+            ...prev,
+            [date]: res.data.tasks || [],
+          }));
+        }
+      } catch (e) {
+        logAxiosError("Error fetching tasks for date", e);
+      }
+    },
+    [idToken]
+  );
+
+  const handleDateClick = async (dateKey) => {
+    setSelectedDate(dateKey);
     setShowTaskModal(true);
     setShowTaskForm(false);
-    await fetchTasksForDate(date);
+    await fetchTasksForDate(dateKey);
   };
 
-const handleAddTask = async () => {
-  if (!idToken) {
-    setNotification("🚫 Please log in to add a task.");
-    return;
-  }
+  const handleAddTask = async () => {
+    if (!idToken) return setNotification("🚫 Please log in to add a task.");
+    if (!newTaskName.trim()) return setNotification("⚠️ Task name cannot be empty.");
+    if (!selectedDate) return setNotification("⚠️ No date selected.");
+    if (!BACKEND_URL) return setNotification("⛔ BACKEND_URL missing.");
 
-  if (!newTaskName.trim()) {
-    setNotification("⚠️ Task name cannot be empty.");
-    return;
-  }
+    const trimmedName = newTaskName.trim();
 
-  if (!selectedDate) {
-    setNotification("⚠️ No date selected.");
-    return;
-  }
+    try {
+      const createUrl = `${BACKEND_URL}/tasks/create`;
+      const createPayload = { name: trimmedName };
 
-  const formattedDate = new Date(selectedDate).toISOString().split("T")[0];
+      const createRes = await axios.post(createUrl, createPayload, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
-  try {
-    const createRes = await axios.post(
-      `${BACKEND_URL}/tasks/create`,
-      { name: newTaskName },
-      { headers: { Authorization: `Bearer ${idToken}` } }
-    );
+      const taskId = createRes?.data?.taskId;
 
-    const taskId = createRes?.data?.taskId;
-    if (!taskId) {
-      setNotification("❌ Failed to create task.");
-      return;
-    }
-
-    const calendarPayload = {
-      taskId,
-      date: formattedDate,
-      name: newTaskName
-    };
-
-    const calendarRes = await axios.post(
-      `${BACKEND_URL}/calendar_tasks/add`,
-      calendarPayload,
-      { headers: { Authorization: `Bearer ${idToken}` } }
-    );
-
-    if (!calendarRes.data.success) {
-      setNotification(`❌ Calendar task failed: ${calendarRes.data.message || "unknown error"}`);
-      return;
-    }
-
-    setNewTaskName("");
-    fetchTasksForDate(formattedDate);
-    setNotification("✅ Task added successfully!");
-  } catch (e) {
-    const backendError = e.response?.data || e.message;
-    setNotification(`❌ Error: ${JSON.stringify(backendError)}`);
-  }
-};
-
-
-
-
-
-const handleDeleteCalendarTask = async (calendarId) => {
-  try {
-    if (!calendarId || typeof calendarId !== "string") {
-      setNotification("❌ Invalid task ID.");
-      return;
-    }
-
-    await axios.delete(`${BACKEND_URL}/calendar_tasks/remove/${calendarId}`, {
-      headers: { Authorization: `Bearer ${idToken}` },
-    });
-
-    fetchTasksForDate(selectedDate);
-  } catch (e) {
-    setNotification(`❌ Failed to delete task`);
-    console.error("❌ Error deleting task:", e.response?.data || e.message);
-  }
-};
-
-
- const handleCompleteCalendarTask = async (calendarId, completed) => {
-  try {
-    await axios.put(
-      `${BACKEND_URL}/calendar_tasks/update/${calendarId}`,
-      { completed: !completed },
-      { headers: { Authorization: `Bearer ${idToken}` } }
-    );
-
-    // Optional: Optimistically update UI without waiting for full fetch
-    setTasks((prev) => {
-      const updated = { ...prev };
-      if (updated[selectedDate]) {
-        updated[selectedDate] = updated[selectedDate].map((task) =>
-          task.calendar_id === calendarId
-            ? { ...task, completed: !completed }
-            : task
-        );
+      if (!taskId) {
+        return setNotification("❌ Failed to create task.");
       }
-      return updated;
-    });
 
-    // Then re-fetch to stay accurate
-    fetchTasksForDate(selectedDate);
-  } catch (e) {
-    console.error("❌ Error updating task:", e);
-  }
-};
+      const calendarUrl = `${BACKEND_URL}/calendar_tasks/add`;
+      const calendarPayload = {
+        taskId,
+        date: selectedDate,
+        name: trimmedName,
+      };
 
+      const calendarRes = await axios.post(calendarUrl, calendarPayload, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      if (!calendarRes.data?.success) {
+        return setNotification("❌ Failed to attach task to calendar.");
+      }
+
+      setNewTaskName("");
+      await fetchTasksForDate(selectedDate);
+      setNotification("✅ Task added successfully!");
+      window.setTimeout(() => setNotification(""), 2200);
+    } catch (e) {
+      logAxiosError("handleAddTask failed", e);
+      setNotification("❌ Failed to add task.");
+    }
+  };
+
+  const handleDeleteCalendarTask = async (calendarId) => {
+    try {
+      if (!calendarId || !idToken || !BACKEND_URL) return;
+
+      const url = `${BACKEND_URL}/calendar_tasks/remove/${calendarId}`;
+
+      await axios.delete(url, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      await fetchTasksForDate(selectedDate);
+      setNotification("🗑️ Task deleted.");
+      window.setTimeout(() => setNotification(""), 1800);
+    } catch (e) {
+      logAxiosError("Error deleting task", e);
+      setNotification("❌ Failed to delete task.");
+    }
+  };
+
+  const handleCompleteCalendarTask = async (calendarId, completed) => {
+    try {
+      if (!idToken || !BACKEND_URL) return;
+
+      const url = `${BACKEND_URL}/calendar_tasks/update/${calendarId}`;
+      const payload = { completed: !completed };
+
+      await axios.put(url, payload, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+
+      await fetchTasksForDate(selectedDate);
+      setNotification(!completed ? "💖 Task completed!" : "🤍 Task marked active.");
+      window.setTimeout(() => setNotification(""), 1800);
+    } catch (e) {
+      logAxiosError("Error updating task", e);
+      setNotification("❌ Failed to update task.");
+    }
+  };
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
@@ -199,306 +265,241 @@ const handleDeleteCalendarTask = async (calendarId) => {
     });
   };
 
+  const goPrevMonth = () => setMonthView(new Date(year, month - 1, 1));
+  const goNextMonth = () => setMonthView(new Date(year, month + 1, 1));
+
   return (
-    <>
-      <style>{`
-        .calendar-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
-          background: linear-gradient(135deg, #fff5f6, #ffffff);
-          padding: 2rem;
-        }
-        .calendar {
-          background: #fff;
-          border-radius: 1rem;
-          padding: 1rem;
-          box-shadow: 0 4px 20px rgba(255, 182, 193, 0.2);
-          width: 100%;
-          max-width: 800px;
-        }
-        .calendar-header {
-          display: flex;
-          justify-content: center;
-          gap: 1rem;
-          flex-wrap: wrap;
-          margin-bottom: 1rem;
-        }
-        .month-label {
-          font-family: "Dancing Script", cursive;
-          font-size: 2rem;
-          color: #ffb6c1;
-        }
-        .month-arrow {
-          background: #ffb6c1;
-          border: none;
-          border-radius: 50%;
-          width: 40px;
-          height: 40px;
-          color: #fff;
-          font-size: 1.2rem;
-          cursor: pointer;
-        }
-        .calendar-grid {
-          display: grid;
-          grid-template-columns: repeat(7, 1fr);
-          gap: 0.5rem;
-        }
-        .calendar-day {
-          background: #fff;
-          border: 2px solid #ffc0cb;
-          border-radius: 0.5rem;
-          aspect-ratio: 1;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          position: relative;
-          cursor: pointer;
-        }
-        .calendar-day:hover {
-          background: #ffe4e1;
-        }
-          .emoji-button {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.2rem;
-            border-radius: 50%;
-            transition: transform 0.2s ease;
-          }
-
-          .emoji-button:hover {
-            background-color: #ffe4ec;
-            transform: scale(1.1);
-          }
-
-         
-
-         .task-actions {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-          }
-
-          .task-actions button,
-          .task-actions a {
-            border: none;
-            background: none;
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 0.25rem 0.5rem;
-            transition: all 0.2s ease;
-          }
-
-          .task-actions button:hover,
-          .task-actions a:hover {
-            color: #ff69b4;
-          }
-
-          /* ✅ Move this OUTSIDE */
-          .subtask-button {
-            background: #ffe4ec;
-            border: 1px solid #ffb6c1;
-            border-radius: 0.5rem;
-            color: #d6336c;
-            font-size: 0.9rem;
-            padding: 0.4rem 0.75rem;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s ease;
-          }
-
-          .subtask-button:hover {
-            background: #ffb6c1;
-            color: white;
-            transform: scale(1.05);
-          }
-
-        
-                  
-         
-        .task-modal {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          backdrop-filter: blur(8px);
-          background: rgba(255, 255, 255, 0.9);
-          z-index: 1000;
-          padding: 1rem;
-        }
-        .modal-content {
-          background: #fff;
-          border-radius: 1rem;
-          padding: 1.5rem;
-          max-width: 500px;
-          width: 100%;
-          box-shadow: 0 10px 30px rgba(255, 182, 193, 0.2);
-          position: relative;
-        }
-        .modal-content h2 {
-          text-align: center;
-          color: #ffb6c1;
-          font-family: "Dancing Script", cursive;
-        }
-        .close-button {
-          background: #ffb6c1;
-          border: none;
-          border-radius: 50%;
-          width: 24px;
-          height: 24px;
-          color: #fff;
-          font-size: 1rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-        .close-button:hover {
-          background: #ff8fab;
-        }
-        .close-button:focus, .close-button:active {
-          outline: none;
-          color: #fff;
-        }
-        .notification {
-          position: fixed;
-          top: 1rem;
-          right: 1rem;
-          background: #ffcad4;
-          color: #912f56;
-          padding: 0.75rem 1rem;
-          border-radius: 0.75rem;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          z-index: 1100;
-        }
-        .notification button {
-          background: #ffb6c1;
-          border: none;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          color: #fff;
-          font-size: 0.8rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-        .add-task-button, .submit-task-button {
-          background: #ffc0cb;
-          color: #fff;
-          border: none;
-          padding: 0.75rem;
-          border-radius: 0.5rem;
-          margin: 0.5rem 0;
-          width: 100%;
-          cursor: pointer;
-        }
-        .task-input {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid #ffc0cb;
-          border-radius: 0.5rem;
-          margin: 0.5rem 0;
-        }
-        .task-item {
-          border: 1px solid #ffc0cb;
-          border-radius: 0.5rem;
-          padding: 0.5rem;
-          margin: 0.5rem 0;
-          text-align: center;
-        }
-        .completed {
-          text-decoration: line-through;
-          opacity: 0.6;
-          transition: all 0.3s ease;
-        }
-
-        @media (max-width: 600px) {
-          .month-label { font-size: 1.5rem; }
-          .modal-content { padding: 1rem; }
-        
-        }
-      `}</style>
-
-      {notification && (
-        <div className="notification">
-          <span>{notification}</span>
-          <button onClick={() => setNotification("")} className="close-button">✖</button>
+    <main className="calendar-page" aria-label="Calendar page">
+      {!showTaskModal && notification && (
+        <div className="cal-notif-wrap cal-notif-global" aria-live="polite" aria-atomic="true">
+          <div className="cal-notif" role="status">
+            <span className="cal-notif-text">{notification}</span>
+            <button
+              type="button"
+              className="cal-notif-x"
+              onClick={() => setNotification("")}
+              aria-label="Dismiss notification"
+            >
+              ✕
+            </button>
+          </div>
         </div>
       )}
 
-      <div className="calendar-container">
-        <div className="calendar">
-          <div className="calendar-header">
-            <button className="month-arrow" onClick={() => setMonthView(new Date(year, month - 1, 1))}>❮</button>
-            <span className="month-label">{monthView.toLocaleString("default", { month: "long" })} {year}</span>
-            <button className="month-arrow" onClick={() => setMonthView(new Date(year, month + 1, 1))}>❯</button>
-          </div>
-          <div className="calendar-grid">
-            {Array.from({ length: firstDayIndex }).map((_, i) => <div key={`empty-${i}`} />)}
-            {Array.from({ length: daysInMonth }).map((_, i) => {
-              const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(i + 1).padStart(2, "0")}`;
-              return (
-                <div key={i} className="calendar-day" onClick={() => handleDateClick(dateKey)}>
-                  {i + 1}
-                  {tasks[dateKey]?.length > 0 && <span style={{ fontSize: '0.7rem', position: 'absolute', bottom: '2px' }}>🎀</span>}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+      <section className="cal-stage">
+        <div className="cal-shell">
+          <div className="cal-card">
+            <header className="cal-header">
+              <button
+                type="button"
+                className="month-arrow"
+                onClick={goPrevMonth}
+                aria-label="Previous month"
+              >
+                ❮
+              </button>
 
-        {showTaskModal && (
-          <div className="task-modal">
-            <div className="modal-content">
-              <button className="close-button" onClick={() => setShowTaskModal(false)}>✖</button>
-              <h2>Tasks For {formatDate(selectedDate)}</h2>
-              <button className="add-task-button" onClick={() => setShowTaskForm(true)}>+ Add New Task</button>
-              {showTaskForm && (
-                <form onSubmit={(e) => { e.preventDefault(); handleAddTask(); }}>
-                  <input className="task-input" value={newTaskName} onChange={(e) => setNewTaskName(e.target.value)} placeholder="Enter task name..." />
-                  <button type="submit" className="submit-task-button">Add Task 🎀</button>
-                </form>
-              )}
-             {tasks[selectedDate]?.length > 0 ? (
-  tasks[selectedDate].map(task => (
-    
-    <div key={task.calendar_id} className="task-item">
-      {/* ✅ Add dynamic className here */}
-      <span className={task.completed ? "completed" : ""}>{task.name}</span>
+              <div className="month-copy">
+                <p className="month-kicker">Monthly planner</p>
+                <h1 className="month-label">
+                  {monthView.toLocaleString("default", { month: "long" })} {year}
+                </h1>
+              </div>
 
-      <div className="task-actions">
-        <button onClick={() => handleDeleteCalendarTask(task.calendar_id)} className="emoji-button">🗑️</button>
-        <Link to={`/calendar-subtasks/${userId}/${task.calendar_id}`} className="subtask-button">
-          ✨ Add Subtasks
-        </Link>
-        <button
-          onClick={() => handleCompleteCalendarTask(task.calendar_id, task.completed)}
-          className="emoji-button"
-        >
-          {task.completed ? "💖" : "🤍"}
-        </button>
-      </div>
-    </div>
-  ))
-) : (
-  <p style={{ textAlign: "center", color: "#ff69b4" }}>No tasks yet! 🎀</p>
-)}
+              <button
+                type="button"
+                className="month-arrow"
+                onClick={goNextMonth}
+                aria-label="Next month"
+              >
+                ❯
+              </button>
+            </header>
 
+            <div className="weekday-row" aria-hidden="true">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+                <span key={day} className="weekday-pill">
+                  {day}
+                </span>
+              ))}
+            </div>
+
+            <div className="calendar-grid" role="grid" aria-label="Month grid">
+              {Array.from({ length: firstDayIndex }).map((_, i) => (
+                <div key={`empty-${i}`} className="empty-day" aria-hidden="true" />
+              ))}
+
+              {Array.from({ length: daysInMonth }).map((_, i) => {
+                const dateKey = `${year}-${String(month + 1).padStart(2, "0")}-${String(
+                  i + 1
+                ).padStart(2, "0")}`;
+
+                const hasTasks = (tasks[dateKey]?.length || 0) > 0;
+                const isSelected = selectedDate === dateKey;
+
+                return (
+                  <button
+                    key={dateKey}
+                    type="button"
+                    className={`calendar-day ${hasTasks ? "has-tasks" : ""} ${
+                      isSelected ? "is-selected" : ""
+                    }`}
+                    onClick={() => handleDateClick(dateKey)}
+                    aria-label={`Open tasks for ${formatDate(dateKey)}`}
+                  >
+                    <span className="day-num">{i + 1}</span>
+                    {hasTasks && <span className="task-indicator">🎀</span>}
+                  </button>
+                );
+              })}
             </div>
           </div>
-        )}
-      </div>
-    </>
+        </div>
+      </section>
+
+      {showTaskModal && (
+        <div
+          className="task-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="task-modal-title"
+          onClick={() => setShowTaskModal(false)}
+        >
+          <div className="task-modal-stack" onClick={(e) => e.stopPropagation()}>
+            {notification && (
+              <div className="cal-notif-wrap cal-notif-inline" aria-live="polite" aria-atomic="true">
+                <div className="cal-notif" role="status">
+                  <span className="cal-notif-text">{notification}</span>
+                  <button
+                    type="button"
+                    className="cal-notif-x"
+                    onClick={() => setNotification("")}
+                    aria-label="Dismiss notification"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="modal-content">
+              <button
+                type="button"
+                className="close-modal-button"
+                onClick={() => setShowTaskModal(false)}
+                aria-label="Close modal"
+              >
+                ✕
+              </button>
+
+              <div className="modal-header">
+                <p className="modal-kicker">Selected date</p>
+
+                <div className="modal-title-wrap">
+                  <h2 id="task-modal-title">{formatDate(selectedDate)}</h2>
+                  <p className="modal-subtitle">
+                    Add, complete, or organize tasks for this day.
+                  </p>
+                </div>
+              </div>
+
+              <div className="modal-toolbar">
+                <button
+                  type="button"
+                  className="toggle-form-button"
+                  onClick={() => setShowTaskForm((v) => !v)}
+                >
+                  {showTaskForm ? "Hide Task Form" : "Add New Task"}
+                </button>
+              </div>
+
+              {showTaskForm && (
+                <form
+                  className="task-form"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleAddTask();
+                  }}
+                >
+                  <label className="sr-only" htmlFor="taskName">
+                    Task name
+                  </label>
+
+                  <div className="task-form-card">
+                    <input
+                      id="taskName"
+                      className="task-input"
+                      value={newTaskName}
+                      onChange={(e) => setNewTaskName(e.target.value)}
+                      placeholder="Enter task name..."
+                    />
+
+                    <button type="submit" className="submit-task-button">
+                      Add Task 🎀
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              <div className="tasks-list">
+                {tasks[selectedDate]?.length > 0 ? (
+                  tasks[selectedDate].map((task) => (
+                    <article key={task.calendar_id} className="task-item">
+                      <div className="task-main">
+                        <span
+                          className={task.completed ? "task-name completed" : "task-name"}
+                        >
+                          {task.name}
+                        </span>
+
+                        <span className="task-status">
+                          {task.completed ? "Completed" : "Active"}
+                        </span>
+                      </div>
+
+                      <div className="task-actions">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleCompleteCalendarTask(task.calendar_id, task.completed)
+                          }
+                          className="task-action complete-btn"
+                          aria-label="Toggle complete"
+                        >
+                          {task.completed ? "💖 Done" : "🤍 Complete"}
+                        </button>
+
+                        <Link
+                          to={`/calendar-subtasks/${userId}/${task.calendar_id}`}
+                          className="task-action subtask-button"
+                        >
+                          ✨ Add Subtasks
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCalendarTask(task.calendar_id)}
+                          className="task-action delete-btn"
+                          aria-label="Delete task"
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </article>
+                  ))
+                ) : (
+                  <div className="empty-state">
+                    <p className="no-tasks">No tasks yet for this day 🎀</p>
+                    <p className="empty-state-sub">
+                      Start by adding your first task and build your schedule from here.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

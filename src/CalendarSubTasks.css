@@ -1,229 +1,377 @@
-/* 🌷 Container */
-.calendar-subtasks-container {
-  padding: 2rem;
-  background: linear-gradient(135deg, #ffe8ec, #fff5f7);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+:root {
+  --pp-pink: #ff4d8d;
+  --pp-pink2: #ff80ab;
+  --pp-bgA: #fff5f6;
+  --pp-bgB: #ffffff;
+
+  --pp-card: rgba(255, 255, 255, 0.95);
+  --pp-shadow: 0 10px 30px rgba(255, 192, 203, 0.16);
+  --pp-radius: 22px;
+
+  --pp-nav-h: 72px;
+  --pp-foot-h: 150px;
 }
 
-/* 🌷 Back Button */
+/* =========================================
+   ROUTE SCOPE
+   same idea as calendar page reference
+========================================= */
+body.route-calendar-subtasks {
+  margin: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+/* =========================================
+   PAGE WRAPPER
+   centered and pushed down from navbar
+========================================= */
+.calendar-subtasks-page {
+  width: 100%;
+  padding: 0 16px;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
+  padding-top: 120px;
+  padding-bottom: 40px;
+}
+
+/* =========================================
+   OUTER SHELL
+========================================= */
+.calendar-subtasks-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* =========================================
+   MAIN CARD
+========================================= */
+.calendar-subtasks-card {
+  width: min(760px, 100%);
+  background: rgba(255, 255, 255, 0.58);
+  border-radius: 18px;
+  padding: clamp(16px, 2vw, 24px);
+  box-shadow: var(--pp-shadow);
+  box-sizing: border-box;
+}
+
+/* =========================================
+   TOP BAR
+========================================= */
+.subtasks-topbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.7rem;
+}
+
 .back-button {
-  font-size: 1rem;
-  color: #ffb5c0;
-  background: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-  font-weight: bold;
-  border: 2px solid #ffb5c0;
-  box-shadow: 0 4px 10px rgba(255, 181, 192, 0.2);
-  transition: all 0.3s ease;
-  margin-bottom: 1rem;
+  text-align: center;
+
+  background: #fffdfd;
+  border: 2px solid #f6bcc7;
+  color: #f3a9b8;
+
+  border-radius: 999px;
+  padding: 0.82rem 1.45rem;
+  min-height: 48px;
+
+  font-size: 1rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  box-shadow: 0 4px 12px rgba(255, 181, 192, 0.2);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .back-button:hover {
-  background: #ffe8ec;
-  color: #fff;
-  transform: scale(1.05);
-  box-shadow: 0 6px 15px rgba(255, 181, 192, 0.3);
-}.subtasks-header {
-  width: 100%;
-  max-width: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  background: #fff3f6;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 16px rgba(255, 181, 192, 0.28);
 }
 
-.back-button {
-  position: absolute;
-  left: 0;
-}
-
+/* =========================================
+   TITLE
+========================================= */
 .title {
-  font-family: 'Dancing Script', cursive;
-  font-size: 2.5rem;
-  color: #ffb5c0;
-  text-shadow: 1px 1px #fff;
-  margin: 0 auto;
+  margin: 0 0 1rem;
   text-align: center;
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  color: #f3a9b8;
+  text-shadow: 1px 1px 0 #fff;
 }
 
-/* 🌷 Add Subtask Button */
+/* =========================================
+   ADD BUTTON
+========================================= */
 .add-task-button {
-  background: linear-gradient(45deg, #ffb5c0, #ffd1d7);
-  color: #fff;
+  width: min(630px, 100%);
+  display: block;
+  margin: 0 auto 1rem;
+
   border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 2rem;
-  font-size: 1.1rem;
+  border-radius: 999px;
+  background: linear-gradient(45deg, #f7b6c3, #f9c9d2);
+  color: #ffffff;
+
+  font-size: 1.02rem;
+  font-weight: 700;
+  padding: 0.95rem 1.2rem;
+  min-height: 52px;
   cursor: pointer;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
+
+  box-shadow: 0 8px 18px rgba(255, 181, 192, 0.18);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .add-task-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 181, 192, 0.3);
+  box-shadow: 0 12px 24px rgba(255, 181, 192, 0.26);
+  filter: brightness(1.01);
 }
 
-/* 🌷 Subtask Form */
+/* =========================================
+   FORM CONTAINER
+========================================= */
 .task-form-container {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(255, 181, 192, 0.15);
+  width: min(630px, 100%);
+  margin: 0 auto 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1.35rem;
+  padding: 1.35rem;
+  box-shadow: 0 10px 22px rgba(255, 181, 192, 0.14);
+  box-sizing: border-box;
+}
+
+.task-form {
   width: 100%;
-  max-width: 500px;
-  margin-bottom: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
 }
 
 .task-input {
   width: 100%;
-  padding: 0.8rem;
+  box-sizing: border-box;
+  display: block;
+
+  border: 2px solid #f4c3cc;
+  border-radius: 14px;
+  background: #fff8fa;
+  color: #ef8fa3;
+
   font-size: 1rem;
-  border: 2px solid #ffd1d7;
-  border-radius: 0.75rem;
-  background: #fff5f7;
-  color: #ff7d9c;
+  padding: 0.98rem 1rem;
+  text-align: center;
+  outline: none;
+
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.task-input::placeholder {
+  color: #e5a9b7;
+  opacity: 1;
+  font-style: italic;
 }
 
 .task-input:focus {
-  outline: none;
-  border-color: #ffb5c0;
-  box-shadow: 0 0 8px rgba(255, 181, 192, 0.3);
+  border-color: #efb1bf;
+  box-shadow: 0 0 0 4px rgba(255, 181, 192, 0.16);
+  background: #fffdfd;
 }
 
 .submit-task-button {
-  background: linear-gradient(45deg, #ffb5c0, #ffd1d7);
-  color: #fff;
-  border: none;
-  padding: 0.8rem;
-  border-radius: 2rem;
-  font-size: 1rem;
   width: 100%;
-  transition: all 0.3s ease;
+  display: block;
+
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(45deg, #dfb1bb, #eac2ca);
+  color: #ffffff;
+
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.95rem 1rem;
+  min-height: 50px;
+  cursor: pointer;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
 }
 
 .submit-task-button:hover {
-  box-shadow: 0 5px 15px rgba(255, 181, 192, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(255, 181, 192, 0.22);
+  filter: brightness(1.01);
 }
 
-/* 🌷 Subtasks List */
-.subtasks-list {
-  width: 100%;
-  max-width: 500px;
+/* =========================================
+   LIST / LOADING WRAPPERS
+========================================= */
+.subtasks-list,
+.loading-container {
+  width: min(630px, 100%);
+  margin: 0 auto;
 }
 
+/* =========================================
+   SUBTASK ITEM
+========================================= */
 .subtask-item {
-  background: #fff;
-  padding: 0.8rem;
-  border-radius: 0.75rem;
-  margin-bottom: 0.75rem;
-  box-shadow: 0 4px 10px rgba(255, 181, 192, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+  background: #fffdfd;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.85rem;
+
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  transition: transform 0.2s ease;
+  justify-content: space-between;
+  gap: 1rem;
+
+  box-shadow: 0 6px 16px rgba(255, 181, 192, 0.12);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .subtask-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(255, 181, 192, 0.2);
+  box-shadow: 0 10px 22px rgba(255, 181, 192, 0.18);
 }
 
 .subtask-name {
+  flex: 1;
+  min-width: 0;
+  color: #ef8fa3;
   font-size: 1rem;
-  color: #ff7d9c;
+  line-height: 1.4;
+  word-break: break-word;
+  text-align: left;
 }
 
 .subtask-item.completed .subtask-name {
+  color: #c5939f;
   text-decoration: line-through;
-  opacity: 0.6;
+  opacity: 0.75;
   font-style: italic;
-  color: #c97a8c;
 }
 
-/* 🌷 Subtask Buttons */
+/* =========================================
+   ACTION BUTTONS
+========================================= */
 .subtask-buttons {
   display: flex;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .complete-button,
 .delete-button {
-  background: none;
   border: none;
-  font-size: 1.3rem;
+  background: transparent;
   cursor: pointer;
+
+  font-size: 1.25rem;
+  line-height: 1;
   padding: 0.4rem;
-  transition: transform 0.2s ease;
+  border-radius: 0.6rem;
+
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .complete-button:hover,
 .delete-button:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
+  background: rgba(255, 236, 241, 0.95);
 }
 
-.complete-button:active::after {
-  content: "💖";
-  position: absolute;
-  top: -1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  animation: sparkle 0.6s ease forwards;
-}
-
-@keyframes sparkle {
-  0% { opacity: 0; transform: translateY(0) scale(1); }
-  50% { opacity: 1; transform: translateY(-5px) scale(1.3); }
-  100% { opacity: 0; transform: translateY(-10px) scale(1); }
-}
-
-/* 🌷 States */
+/* =========================================
+   EMPTY / LOADING
+========================================= */
 .loading-text,
 .no-tasks {
   text-align: center;
-  color: #ffb5c0;
-  font-size: 1.1rem;
-  background: #fff;
-  padding: 1rem;
+  color: #efabc0;
+  font-size: 1.02rem;
+  font-weight: 600;
+
+  background: #fffdfd;
+  padding: 1.05rem 1rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(255, 181, 192, 0.1);
+  box-shadow: 0 6px 16px rgba(255, 181, 192, 0.1);
 }
 
-/* 🌷 Responsive */
-@media (max-width: 600px) {
-  .calendar-subtasks-container {
+/* =========================================
+   RESPONSIVE
+========================================= */
+@media (max-width: 768px) {
+  .calendar-subtasks-page {
+    padding-top: 90px;
+    padding-bottom: 30px;
+  }
+
+  .calendar-subtasks-card {
+    padding: 16px;
+  }
+
+  .task-form-container {
     padding: 1rem;
   }
 
-  .title {
-    font-size: 2rem;
+  .subtask-item {
+    padding: 0.95rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .back-button {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.76rem 1rem;
   }
 
-  .add-task-button,
+  .title {
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+  }
+
+  .add-task-button {
+    font-size: 0.98rem;
+    padding: 0.9rem 1rem;
+  }
+
+  .task-input,
   .submit-task-button {
     font-size: 0.95rem;
   }
 
-  .task-input {
-    font-size: 0.95rem;
+  .subtask-item {
+    gap: 0.75rem;
+    padding: 0.9rem;
   }
 
   .subtask-name {
     font-size: 0.95rem;
   }
 
-  .subtask-buttons {
-    flex-direction: column;
-    align-items: flex-end;
-  }
-
   .complete-button,
   .delete-button {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
   }
 }

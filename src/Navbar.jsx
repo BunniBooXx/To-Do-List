@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getFirebaseServices } from "./data/firebaseConfig";
 import { signOut, onAuthStateChanged } from "firebase/auth";
+import "./Navbar.css";
 
 const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -11,163 +12,232 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [authInstance, setAuthInstance] = useState(null);
   const navigate = useNavigate();
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    const fetchAuth = async () => {
-      const { auth } = await getFirebaseServices();
-      setAuthInstance(auth);
+    let unsubscribe = null;
 
-      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-        if (currentUser) {
+    const setupAuth = async () => {
+      try {
+        const { auth } = await getFirebaseServices();
+        setAuthInstance(auth);
+
+        unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+          if (!currentUser) {
+            setUser(null);
+            return;
+          }
+
           try {
             const idToken = await currentUser.getIdToken();
             const res = await axios.get(`${backendUrl}/users/get-current-user`, {
               headers: { Authorization: `Bearer ${idToken}` },
             });
-            setUser(res.data.success ? res.data.user : null);
-          } catch {
+
+            setUser(res?.data?.success ? res.data.user : null);
+          } catch (error) {
+            console.error("Failed to get current user:", error);
             setUser(null);
           }
-        } else {
-          setUser(null);
-        }
-      });
-
-      return () => unsubscribe();
+        });
+      } catch (error) {
+        console.error("Failed to initialize auth:", error);
+        setUser(null);
+      }
     };
 
-    fetchAuth();
+    setupAuth();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
-  const handleLogout = async () => {
-    if (authInstance) {
-      try {
-        await signOut(authInstance);
-        setUser(null);
-        navigate("/login");
-      } catch (error) {
-        console.error("Logout failed", error);
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 860) {
+        setShowMenu(false);
       }
+    };
+
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setShowMenu(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
+
+  const closeMenu = () => setShowMenu(false);
+
+  const handleLogout = async () => {
+    if (!authInstance) return;
+
+    try {
+      await signOut(authInstance);
+      setUser(null);
+      setShowMenu(false);
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
     }
   };
 
-  const navbarStyle = {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    background: "linear-gradient(135deg, #ffd6e6, #ffecf1)",
-    padding: "1rem 2rem",
-    boxShadow: "0 2px 10px rgba(255, 143, 171, 0.2)",
-    zIndex: 1000,
-  };
-
-  const contentStyle = {
-    maxWidth: "1400px",
-    margin: "0 auto",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
-
-  const brandStyle = {
-    fontFamily: "'Dancing Script', cursive",
-    fontSize: "2rem",
-    fontWeight: "bold",
-    color: "#ff8fab",
-    textDecoration: "none",
-  };
-
-  const hamburgerStyle = {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    display: "flex",
-    flexDirection: "column",
-    gap: "5px",
-    padding: "0.4rem",
-  };
-
-  const barStyle = {
-    width: "30px",
-    height: "3px",
-    backgroundColor: "#ff8fab",
-    borderRadius: "2px",
-    transition: "all 0.3s ease",
-  };
-
-  const dropdownStyle = {
-    position: "absolute",
-    top: "100%",
-    right: 0,
-    background: "#fff",
-    borderRadius: "8px",
-    boxShadow: "0 4px 12px rgba(255, 143, 171, 0.2)",
-    minWidth: "220px",
-    padding: "0.5rem 0",
-    display: "flex",
-    flexDirection: "column",
-  };
-
-  const itemStyle = {
-    padding: "0.75rem 1rem",
-    textDecoration: "none",
-    color: "#333",
-    fontFamily: "'Nunito', sans-serif",
-    fontSize: "1rem",
-    textAlign: "left",
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-  };
-
   return (
-    <nav style={navbarStyle}>
-      <div style={contentStyle}>
-        <Link to="/" style={brandStyle} onClick={() => setShowMenu(false)}>
-          Petite Planner
-        </Link>
+    <nav className="pp-nav" aria-label="Main navigation">
+      <div className="pp-nav__inner">
+        <div className="pp-nav__left">
+          <NavLink to="/" className="pp-nav__brand" onClick={closeMenu}>
+            <span className="pp-nav__brandText">Petite Planner</span>
+            <span className="pp-nav__brandSparkle" aria-hidden="true">
+              ✨
+            </span>
+          </NavLink>
+        </div>
 
-        <div style={{ position: "relative" }}>
-          <button
-            style={hamburgerStyle}
-            onClick={() => setShowMenu(prev => !prev)}
-            aria-label="Menu"
-          >
-            <span
-              style={{
-                ...barStyle,
-                transform: showMenu ? "translateY(8px) rotate(45deg)" : "none",
-              }}
-            />
-            <span
-              style={{
-                ...barStyle,
-                opacity: showMenu ? 0 : 1,
-              }}
-            />
-            <span
-              style={{
-                ...barStyle,
-                transform: showMenu ? "translateY(-8px) rotate(-45deg)" : "none",
-              }}
-            />
-          </button>
+        <div className="pp-nav__center">
+          <div className="pp-nav__desktopLinks">
+            <NavLink
+              to="/tasks"
+              className={({ isActive }) =>
+                `pp-nav__link ${isActive ? "is-active" : ""}`
+              }
+            >
+              📝 Tasks
+            </NavLink>
 
-          {showMenu && (
-            <div style={dropdownStyle}>
-              <Link to="/tasks" style={itemStyle} onClick={() => setShowMenu(false)}>📝 Tasks</Link>
-              <Link to="/planner" style={itemStyle} onClick={() => setShowMenu(false)}>🗓️ Calendar</Link>
+            <NavLink
+              to="/planner"
+              className={({ isActive }) =>
+                `pp-nav__link ${isActive ? "is-active" : ""}`
+              }
+            >
+              🗓️ Calendar
+            </NavLink>
+          </div>
+        </div>
+
+        <div className="pp-nav__right">
+          <div className="pp-nav__desktopActions">
+            {user ? (
+              <button
+                type="button"
+                className="pp-nav__cta pp-nav__cta--soft"
+                onClick={handleLogout}
+              >
+                🌸 Logout
+              </button>
+            ) : (
+              <>
+                <NavLink
+                  to="/login"
+                  className={({ isActive }) =>
+                    `pp-nav__link pp-nav__link--small ${isActive ? "is-active" : ""}`
+                  }
+                >
+                  🌸 Login
+                </NavLink>
+
+                <NavLink to="/signup" className="pp-nav__cta">
+                  ✨ Sign Up
+                </NavLink>
+              </>
+            )}
+          </div>
+
+          <div className="pp-nav__mobileWrap" ref={menuRef}>
+            <button
+              className={`pp-nav__toggle ${showMenu ? "is-open" : ""}`}
+              onClick={() => setShowMenu((prev) => !prev)}
+              aria-label="Toggle menu"
+              aria-expanded={showMenu}
+              aria-controls="pp-nav-mobile-dropdown"
+              type="button"
+            >
+              <span className="pp-nav__bar" />
+              <span className="pp-nav__bar" />
+              <span className="pp-nav__bar" />
+            </button>
+
+            <div
+              id="pp-nav-mobile-dropdown"
+              className={`pp-nav__dropdown ${showMenu ? "is-visible" : ""}`}
+            >
+              <NavLink
+                to="/tasks"
+                className={({ isActive }) =>
+                  `pp-nav__item ${isActive ? "is-active" : ""}`
+                }
+                onClick={closeMenu}
+              >
+                <span className="pp-nav__itemIcon">📝</span>
+                <span>Tasks</span>
+              </NavLink>
+
+              <NavLink
+                to="/planner"
+                className={({ isActive }) =>
+                  `pp-nav__item ${isActive ? "is-active" : ""}`
+                }
+                onClick={closeMenu}
+              >
+                <span className="pp-nav__itemIcon">🗓️</span>
+                <span>Calendar</span>
+              </NavLink>
+
+              <div className="pp-nav__divider" />
+
               {user ? (
-                <button style={itemStyle} onClick={handleLogout}>🌸 Logout</button>
+                <button
+                  type="button"
+                  className="pp-nav__item pp-nav__itemBtn"
+                  onClick={handleLogout}
+                >
+                  <span className="pp-nav__itemIcon">🌸</span>
+                  <span>Logout</span>
+                </button>
               ) : (
                 <>
-                  <Link to="/login" style={itemStyle} onClick={() => setShowMenu(false)}>🌸 Login</Link>
-                  <Link to="/signup" style={itemStyle} onClick={() => setShowMenu(false)}>✨ Sign Up</Link>
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      `pp-nav__item ${isActive ? "is-active" : ""}`
+                    }
+                    onClick={closeMenu}
+                  >
+                    <span className="pp-nav__itemIcon">🌸</span>
+                    <span>Login</span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/signup"
+                    className={({ isActive }) =>
+                      `pp-nav__item ${isActive ? "is-active" : ""}`
+                    }
+                    onClick={closeMenu}
+                  >
+                    <span className="pp-nav__itemIcon">✨</span>
+                    <span>Sign Up</span>
+                  </NavLink>
                 </>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </nav>

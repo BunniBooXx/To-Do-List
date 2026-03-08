@@ -1,6 +1,5 @@
-// ✅ Updated Subcategory.jsx with Backend Route Matching
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 import "./Subcategory.css";
@@ -18,10 +17,14 @@ export default function Subcategory() {
 
   const showNotification = (message, type) => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 4000);
+    window.setTimeout(() => setNotification(null), 2600);
   };
 
-  // ✅ Fetch task and subtasks (with auth)
+  useEffect(() => {
+    document.body.classList.add("route-subcategory");
+    return () => document.body.classList.remove("route-subcategory");
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -51,7 +54,6 @@ export default function Subcategory() {
     fetchData();
   }, [taskId]);
 
-  // ✅ Add subtask
   const handleAddSubtask = async (e) => {
     e.preventDefault();
     if (!newSubtaskName.trim()) return;
@@ -69,7 +71,11 @@ export default function Subcategory() {
       if (res.data.success) {
         setSubtasks((prev) => [
           ...prev,
-          { subtask_id: res.data.subtaskId, name: newSubtaskName, completed: false },
+          {
+            subtask_id: res.data.subtaskId,
+            name: newSubtaskName,
+            completed: false,
+          },
         ]);
         setNewSubtaskName("");
         showNotification("🎀 Subtask added successfully!", "success");
@@ -80,7 +86,6 @@ export default function Subcategory() {
     }
   };
 
-  // ✅ Toggle subtask complete
   const handleUpdateSubtask = async (subtaskId, currentCompletedState) => {
     try {
       const auth = getAuth();
@@ -95,11 +100,16 @@ export default function Subcategory() {
 
       if (res.data.success) {
         const updatedSubtasks = subtasks.map((subtask) =>
-          subtask.subtask_id === subtaskId ? { ...subtask, completed: updatedCompleted } : subtask
+          subtask.subtask_id === subtaskId
+            ? { ...subtask, completed: updatedCompleted }
+            : subtask
         );
+
         setSubtasks(updatedSubtasks);
 
-        const allCompleted = updatedSubtasks.every((s) => s.completed);
+        const allCompleted =
+          updatedSubtasks.length > 0 && updatedSubtasks.every((s) => s.completed);
+
         if (allCompleted !== taskCompleted) {
           await axios.put(
             `${backendUrl}/tasks/update`,
@@ -117,7 +127,6 @@ export default function Subcategory() {
     }
   };
 
-  // ✅ Delete subtask
   const handleDeleteSubtask = async (subtaskId) => {
     try {
       const auth = getAuth();
@@ -131,7 +140,7 @@ export default function Subcategory() {
       if (res.data.success) {
         const updated = subtasks.filter((s) => s.subtask_id !== subtaskId);
         setSubtasks(updated);
-        setTaskCompleted(updated.every((s) => s.completed));
+        setTaskCompleted(updated.length > 0 && updated.every((s) => s.completed));
         showNotification("🎀 Subtask deleted!", "success");
       }
     } catch (error) {
@@ -140,54 +149,157 @@ export default function Subcategory() {
     }
   };
 
+  const totalCount = subtasks.length;
+  const completedCount = subtasks.filter((s) => s.completed).length;
+  const shouldScroll = subtasks.length > 3;
+
   return (
-    <div className="subcategory-page">
+    <main className="subcategory-page">
       {notification && (
-        <div className={`notification ${notification.type}`}>{notification.message}</div>
+        <div
+          className={`subcategory-notification ${notification.type}`}
+          role="status"
+          aria-live="polite"
+        >
+          {notification.message}
+        </div>
       )}
 
-      <h1 className="subcategory-title">♡ {taskName} ♡</h1>
+      <section className="subcategory-stage">
+        <div className="subcategory-shell">
+          <div className="subcategory-topbar">
+            <Link to="/tasks" className="back-to-tasks-btn">
+              ← Back to Tasks
+            </Link>
+          </div>
 
-      <form onSubmit={handleAddSubtask}>
-        <input
-          type="text"
-          value={newSubtaskName}
-          onChange={(e) => setNewSubtaskName(e.target.value)}
-          placeholder="✨ Enter subtask name..."
-        />
-        <button type="submit">Add Subtask 🎀</button>
-      </form>
+          <header className="subcategory-top">
+            <div className="task-summary-card">
+              <p className="summary-kicker">Task details</p>
+              <h1 className="subcategory-title">♡ {taskName} ♡</h1>
+              <p className="summary-text">
+                Break this task into smaller, manageable steps so it feels easier to
+                finish.
+              </p>
 
-      {loading ? (
-        <div className="loading-message">Loading subtasks... ⏳</div>
-      ) : subtasks.length > 0 ? (
-        <div className="subtask-list">
-          {subtasks.map((subtask) => (
-            <div key={subtask.subtask_id} className="task-item">
-              <div className="task-content">
-                <span className={`task-name ${subtask.completed ? "completed" : ""}`}>
-                  {subtask.name}
-                </span>
-                <button
-                  className={`heart-checkbox ${subtask.completed ? "completed" : ""}`}
-                  onClick={() => handleUpdateSubtask(subtask.subtask_id, subtask.completed)}
-                >
-                  {subtask.completed ? "🩷" : "🤍"}
-                </button>
-                <button
-                  className="delete-task"
-                  onClick={() => handleDeleteSubtask(subtask.subtask_id)}
-                >
-                  🗑️
-                </button>
+              <div className="stats-grid">
+                <div className="stat-card">
+                  <span className="stat-label">Total</span>
+                  <span className="stat-number">{totalCount}</span>
+                </div>
+
+                <div className="stat-card">
+                  <span className="stat-label">Completed</span>
+                  <span className="stat-number">{completedCount}</span>
+                </div>
+
+                <div className={`stat-card ${taskCompleted ? "is-complete" : ""}`}>
+                  <span className="stat-label">Task</span>
+                  <span className="stat-number">{taskCompleted ? "Done" : "Active"}</span>
+                </div>
               </div>
             </div>
-          ))}
+          </header>
+
+          <section className="compose-card">
+            <form className="subcategory-form" onSubmit={handleAddSubtask}>
+              <label className="sr-only" htmlFor="subtaskName">
+                Enter subtask name
+              </label>
+
+              <input
+                id="subtaskName"
+                type="text"
+                className="subcategory-input"
+                value={newSubtaskName}
+                onChange={(e) => setNewSubtaskName(e.target.value)}
+                placeholder="✨ Enter subtask name..."
+              />
+
+              <button type="submit" className="subcategory-submit">
+                Add Subtask 🎀
+              </button>
+            </form>
+          </section>
+
+          <section className="list-card">
+            <div className="list-card-header">
+              <div>
+                <p className="list-kicker">Subtasks</p>
+                <h2 className="list-title">Step-by-step breakdown</h2>
+              </div>
+              <span className="list-count">{totalCount} items</span>
+            </div>
+
+            {loading ? (
+              <div className="state-card">
+                <p className="state-title">Loading subtasks... ⏳</p>
+                <p className="state-subtitle">Pulling in the latest task details.</p>
+              </div>
+            ) : subtasks.length > 0 ? (
+              <div className={`subtask-scroll ${shouldScroll ? "is-scrollable" : ""}`}>
+                <div className="subtask-list">
+                  {subtasks.map((subtask, index) => (
+                    <article
+                      key={subtask.subtask_id}
+                      className={`subtask-row ${subtask.completed ? "is-completed" : ""}`}
+                    >
+                      <div className="subtask-left">
+                        <div className="subtask-index">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+
+                        <div className="subtask-copy">
+                          <span
+                            className={`subtask-name ${
+                              subtask.completed ? "completed" : ""
+                            }`}
+                          >
+                            {subtask.name}
+                          </span>
+                          <span className="subtask-status">
+                            {subtask.completed ? "Completed" : "In progress"}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="subtask-actions">
+                        <button
+                          type="button"
+                          className={`subtask-action toggle-btn ${
+                            subtask.completed ? "completed" : ""
+                          }`}
+                          onClick={() =>
+                            handleUpdateSubtask(subtask.subtask_id, subtask.completed)
+                          }
+                        >
+                          {subtask.completed ? "🩷 Done" : "🤍 Complete"}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="subtask-action delete-btn"
+                          onClick={() => handleDeleteSubtask(subtask.subtask_id)}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="state-card empty">
+                <p className="state-title">No subtasks yet! 🌸</p>
+                <p className="state-subtitle">
+                  Add your first subtask to turn this goal into something easier to
+                  finish.
+                </p>
+              </div>
+            )}
+          </section>
         </div>
-      ) : (
-        <div className="no-subtasks-message">No subtasks yet! 🌸</div>
-      )}
-    </div>
+      </section>
+    </main>
   );
 }
-
