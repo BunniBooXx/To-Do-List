@@ -132,11 +132,12 @@ export default function TaskList() {
     <div className="task-list-wrapper">
       {notification && (
         <div className={`notification ${notification.type}`}>
-          <span>{notification.message}</span>
+          <span className="notification-text">{notification.message}</span>
           <button
             className="close-btn"
             onClick={() => setNotification(null)}
             type="button"
+            aria-label="Close notification"
           >
             ✖
           </button>
