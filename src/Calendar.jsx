@@ -443,29 +443,33 @@ export default function Calendar() {
                 </form>
               )}
 
-              <div className="tasks-list">
+              <div className="calendar-modal-list">
                 {tasks[selectedDate]?.length > 0 ? (
                   tasks[selectedDate].map((task) => (
-                    <article key={task.calendar_id} className="task-item">
-                      <div className="task-main">
+                    <article key={task.calendar_id} className="calendar-modal-item">
+                      <div className="calendar-modal-main">
                         <span
-                          className={task.completed ? "task-name completed" : "task-name"}
+                          className={
+                            task.completed
+                              ? "calendar-modal-name is-completed"
+                              : "calendar-modal-name"
+                          }
                         >
                           {task.name}
                         </span>
 
-                        <span className="task-status">
+                        <span className="calendar-modal-status">
                           {task.completed ? "Completed" : "Active"}
                         </span>
                       </div>
 
-                      <div className="task-actions">
+                      <div className="calendar-modal-actions">
                         <button
                           type="button"
                           onClick={() =>
                             handleCompleteCalendarTask(task.calendar_id, task.completed)
                           }
-                          className="task-action complete-btn"
+                          className="calendar-modal-btn calendar-modal-btn-complete"
                           aria-label="Toggle complete"
                         >
                           {task.completed ? "💖 Done" : "🤍 Complete"}
@@ -473,7 +477,7 @@ export default function Calendar() {
 
                         <Link
                           to={`/calendar-subtasks/${userId}/${task.calendar_id}`}
-                          className="task-action subtask-button"
+                          className="calendar-modal-btn calendar-modal-btn-subtasks"
                         >
                           ✨ Add Subtasks
                         </Link>
@@ -481,7 +485,7 @@ export default function Calendar() {
                         <button
                           type="button"
                           onClick={() => handleDeleteCalendarTask(task.calendar_id)}
-                          className="task-action delete-btn"
+                          className="calendar-modal-btn calendar-modal-btn-delete"
                           aria-label="Delete task"
                         >
                           🗑️ Delete

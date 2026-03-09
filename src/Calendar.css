@@ -537,9 +537,9 @@ body.route-calendar .main-content {
 }
 
 /* =========================================================
-   TASK LIST
+   CALENDAR MODAL TASK LIST
 ========================================================= */
-.tasks-list {
+.calendar-modal-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -552,31 +552,31 @@ body.route-calendar .main-content {
   margin-right: -4px;
 }
 
-.tasks-list::-webkit-scrollbar {
+.calendar-modal-list::-webkit-scrollbar {
   width: 10px;
 }
 
-.tasks-list::-webkit-scrollbar-track {
+.calendar-modal-list::-webkit-scrollbar-track {
   background: rgba(255, 241, 246, 0.95);
   border-radius: 999px;
 }
 
-.tasks-list::-webkit-scrollbar-thumb {
+.calendar-modal-list::-webkit-scrollbar-thumb {
   background: linear-gradient(180deg, #ffc6d8, #efa8c0);
   border-radius: 999px;
   border: 2px solid rgba(255, 241, 246, 0.95);
 }
 
-.tasks-list::-webkit-scrollbar-thumb:hover {
+.calendar-modal-list::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(180deg, #ffb7cd, #e792b2);
 }
 
-.tasks-list {
+.calendar-modal-list {
   scrollbar-width: thin;
   scrollbar-color: #e9a3bc rgba(255, 241, 246, 0.95);
 }
 
-.task-item {
+.calendar-modal-item {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
@@ -586,29 +586,29 @@ body.route-calendar .main-content {
   border-radius: 18px;
   background: linear-gradient(180deg, #fffdfd, #fff8fb);
   box-shadow: var(--pp-shadow-sm);
-  flex: 0 0 auto;
-}
-
-.task-main {
   min-width: 0;
 }
 
-.task-name {
+.calendar-modal-main {
+  min-width: 0;
+}
+
+.calendar-modal-name {
   display: block;
   font-size: 0.96rem;
   font-weight: 700;
   color: var(--pp-text-strong);
-  line-height: 1.35;
+  line-height: 1.4;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
 
-.task-name.completed {
+.calendar-modal-name.is-completed {
   text-decoration: line-through;
   opacity: 0.62;
 }
 
-.task-status {
+.calendar-modal-status {
   display: inline-block;
   margin-top: 8px;
   padding: 5px 9px;
@@ -619,7 +619,7 @@ body.route-calendar .main-content {
   font-weight: 700;
 }
 
-.task-actions {
+.calendar-modal-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
@@ -628,7 +628,7 @@ body.route-calendar .main-content {
   min-width: 0;
 }
 
-.task-action {
+.calendar-modal-btn {
   min-height: 36px;
   padding: 8px 11px;
   border-radius: var(--pp-radius-pill);
@@ -644,30 +644,34 @@ body.route-calendar .main-content {
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
   white-space: nowrap;
+  box-sizing: border-box;
 }
 
-.task-action:hover {
+.calendar-modal-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--pp-shadow-sm);
 }
 
-.complete-btn {
+.calendar-modal-btn-complete {
   background: #fff5f8;
 }
 
-.subtask-button {
+.calendar-modal-btn-subtasks {
   background: linear-gradient(180deg, #fff4f8, #ffe8f1);
 }
 
-.subtask-button:hover {
+.calendar-modal-btn-subtasks:hover {
   background: linear-gradient(180deg, #ffd2e1, #ffbed2);
   color: white;
 }
 
-.delete-btn:hover {
+.calendar-modal-btn-delete:hover {
   background: #fff0f5;
 }
 
+/* =========================================================
+   EMPTY
+========================================================= */
 .empty-state {
   border: 1px dashed rgba(238, 175, 198, 0.95);
   border-radius: 18px;
@@ -745,11 +749,12 @@ body.route-calendar .main-content {
     max-height: calc(100vh - 124px);
   }
 
-  .task-item {
+  .calendar-modal-item {
     grid-template-columns: 1fr;
+    align-items: start;
   }
 
-  .task-actions {
+  .calendar-modal-actions {
     justify-content: flex-start;
   }
 }
@@ -959,7 +964,7 @@ body.route-calendar .main-content {
     font-size: 0.86rem;
   }
 
-  .tasks-list {
+  .calendar-modal-list {
     flex: 1 1 auto;
     min-height: 0;
     max-height: none;
@@ -970,28 +975,40 @@ body.route-calendar .main-content {
     padding-bottom: 10px;
   }
 
-  .task-item {
+  .calendar-modal-item {
     grid-template-columns: 1fr;
-    gap: 10px;
+    gap: 12px;
+    align-items: start;
     padding: 13px 12px;
     border-radius: 16px;
   }
 
-  .task-name {
-    font-size: 0.94rem;
-    line-height: 1.4;
+  .calendar-modal-main {
+    width: 100%;
   }
 
-  .task-actions {
+  .calendar-modal-name {
     width: 100%;
-    flex-direction: column;
-    align-items: stretch;
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .calendar-modal-status {
+    margin-top: 10px;
+  }
+
+  .calendar-modal-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 8px;
+    justify-content: stretch;
+    align-items: stretch;
   }
 
-  .task-action {
+  .calendar-modal-btn {
     width: 100%;
-    min-height: 40px;
+    min-height: 42px;
     white-space: normal;
     text-align: center;
   }
@@ -1018,7 +1035,11 @@ body.route-calendar .main-content {
     font-size: 0.8rem;
   }
 
-  .task-action {
+  .calendar-modal-name {
+    font-size: 0.94rem;
+  }
+
+  .calendar-modal-btn {
     font-size: 0.78rem;
     padding: 8px 10px;
   }
