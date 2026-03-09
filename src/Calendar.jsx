@@ -366,22 +366,6 @@ export default function Calendar() {
           onClick={() => setShowTaskModal(false)}
         >
           <div className="task-modal-stack" onClick={(e) => e.stopPropagation()}>
-            {notification && (
-              <div className="cal-notif-wrap cal-notif-inline" aria-live="polite" aria-atomic="true">
-                <div className="cal-notif" role="status">
-                  <span className="cal-notif-text">{notification}</span>
-                  <button
-                    type="button"
-                    className="cal-notif-x"
-                    onClick={() => setNotification("")}
-                    aria-label="Dismiss notification"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            )}
-
             <div className="modal-content">
               <button
                 type="button"
@@ -391,6 +375,24 @@ export default function Calendar() {
               >
                 ✕
               </button>
+
+              <div className="modal-drag-handle" aria-hidden="true" />
+
+              {notification && (
+                <div className="cal-notif-wrap cal-notif-inline" aria-live="polite" aria-atomic="true">
+                  <div className="cal-notif" role="status">
+                    <span className="cal-notif-text">{notification}</span>
+                    <button
+                      type="button"
+                      className="cal-notif-x"
+                      onClick={() => setNotification("")}
+                      aria-label="Dismiss notification"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="modal-header">
                 <p className="modal-kicker">Selected date</p>
