@@ -1,160 +1,199 @@
-/* =========================================
-   TOKENS
-========================================= */
 :root {
-  --pp-nav-h: 72px;
+  --tasks-bg-1: #fff9fc;
+  --tasks-bg-2: #fff2f7;
+  --tasks-bg-3: #ffeaf2;
 
-  --tasks-bg-a: #fff8fc;
-  --tasks-bg-b: #fff0f6;
-  --tasks-bg-c: #fde8f1;
+  --tasks-card: rgba(255, 255, 255, 0.9);
+  --tasks-card-strong: rgba(255, 255, 255, 0.97);
 
-  --tasks-surface: rgba(255, 255, 255, 0.84);
-  --tasks-surface-strong: rgba(255, 255, 255, 0.95);
+  --tasks-pink-1: #ffd8e5;
+  --tasks-pink-2: #ffc5d8;
+  --tasks-pink-3: #eba8c1;
+  --tasks-pink-4: #d985a5;
+  --tasks-pink-5: #bf6789;
 
-  --tasks-pink: #ff6ca8;
-  --tasks-pink-2: #f89ec0;
-  --tasks-pink-3: #f4c6d7;
-  --tasks-pink-4: #fde7f0;
+  --tasks-text: #9f667f;
+  --tasks-text-soft: #c78fa8;
+  --tasks-text-strong: #bf6f8f;
 
-  --tasks-text: #b57a92;
-  --tasks-text-dark: #94677b;
+  --tasks-border: rgba(237, 191, 209, 0.85);
+  --tasks-border-strong: rgba(222, 138, 175, 0.95);
 
-  --tasks-border: rgba(236, 179, 201, 0.52);
-  --tasks-border-strong: rgba(228, 163, 190, 0.72);
+  --tasks-shadow-lg: 0 24px 56px rgba(230, 167, 190, 0.14);
+  --tasks-shadow-md: 0 14px 30px rgba(230, 167, 190, 0.11);
+  --tasks-shadow-sm: 0 8px 18px rgba(230, 167, 190, 0.08);
 
-  --tasks-shadow-soft: 0 10px 24px rgba(236, 130, 175, 0.08);
-  --tasks-shadow-card: 0 20px 46px rgba(236, 130, 175, 0.1);
-
-  --tasks-radius-xl: 30px;
+  --tasks-radius-xl: 28px;
   --tasks-radius-lg: 22px;
   --tasks-radius-md: 16px;
   --tasks-radius-pill: 999px;
 
-  --tasks-shell-max: 1100px;
-  --tasks-panel-max: 760px;
+  --tasks-nav-offset: 88px;
+  --tasks-footer-offset: 150px;
+  --tasks-max: 760px;
 }
 
-/* =========================================
+/* =========================================================
    ROUTE SCOPE
-========================================= */
+========================================================= */
 body.route-tasks {
   margin: 0 !important;
-  background:
-    radial-gradient(circle at top left, rgba(255, 220, 235, 0.55), transparent 24%),
-    radial-gradient(circle at top right, rgba(255, 235, 243, 0.4), transparent 18%),
-    linear-gradient(135deg, var(--tasks-bg-a), var(--tasks-bg-b) 62%, var(--tasks-bg-c));
-  overflow-x: hidden !important;
+  background: transparent;
+  overflow: hidden !important;
 }
 
 body.route-tasks #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 body.route-tasks .main-content {
-  flex: 1;
   width: 100%;
   max-width: none;
   margin: 0;
-  padding: var(--pp-nav-h) 0 0;
+  padding: var(--tasks-nav-offset) 0 0;
   box-sizing: border-box;
-  display: flex;
+  flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 
-body.route-tasks footer {
-  flex-shrink: 0;
-}
-
-/* =========================================
+/* =========================================================
    PAGE LAYOUT
-========================================= */
+========================================================= */
 .tasks-page {
-  flex: 1;
-  min-height: 0;
   width: 100%;
-  display: grid;
-  place-items: center;
+  height: calc(100vh - var(--tasks-nav-offset) - var(--tasks-footer-offset));
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px 18px;
   box-sizing: border-box;
+  background:
+    radial-gradient(circle at top left, rgba(255, 230, 239, 0.75), transparent 26%),
+    radial-gradient(circle at top right, rgba(255, 240, 246, 0.8), transparent 24%),
+    linear-gradient(180deg, var(--tasks-bg-1) 0%, var(--tasks-bg-2) 48%, var(--tasks-bg-3) 100%);
+  color: var(--tasks-text);
+  font-family: "Inter", "Poppins", sans-serif;
+  overflow: hidden;
 }
 
 .tasks-stage {
   width: 100%;
-  display: grid;
-  place-items: center;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tasks-shell {
-  width: min(100%, var(--tasks-shell-max));
-  padding: 16px;
+  width: min(100%, var(--tasks-max));
+  max-height: 100%;
+  padding: 8px;
   box-sizing: border-box;
   display: grid;
-  place-items: center;
-  gap: 18px;
-}
-
-/* =========================================
-   HEADER
-========================================= */
-.tasks-header {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  text-align: center;
-}
-
-.tasks-header-copy {
-  width: 100%;
-  max-width: 720px;
-}
-
-.tasks-kicker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 14px;
-  margin-bottom: 12px;
-  border-radius: var(--tasks-radius-pill);
-  background: var(--tasks-pink-4);
-  color: var(--tasks-pink);
-  font-size: 0.82rem;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: inset 0 0 0 1px rgba(255, 155, 192, 0.14);
-}
-
-.tasks-title {
-  margin: 0;
-  color: var(--tasks-pink);
-  font-family: "Dancing Script", cursive;
-  font-size: clamp(2.25rem, 4vw, 3.35rem);
-  line-height: 1;
-}
-
-/* =========================================
-   PANEL
-========================================= */
-.tasks-panel {
-  width: min(100%, var(--tasks-panel-max));
-  padding: clamp(16px, 2vw, 22px);
-  border-radius: var(--tasks-radius-xl);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 248, 252, 0.92),
-    rgba(255, 241, 246, 0.98)
-  );
-  border: 1px solid rgba(245, 205, 221, 0.9);
-  box-shadow: var(--tasks-shadow-card);
-  box-sizing: border-box;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 16px;
   margin: 0 auto;
 }
 
-/* =========================================
-   FEEDBACK
-========================================= */
+/* =========================================================
+   HERO (CENTERED)
+========================================================= */
+
+.tasks-hero {
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px 32px;
+
+  background: linear-gradient(
+    180deg,
+    var(--tasks-card-strong),
+    rgba(255, 248, 251, 0.96)
+  );
+
+  border: 1px solid var(--tasks-border);
+  border-radius: var(--tasks-radius-xl);
+  box-shadow: var(--tasks-shadow-md);
+
+  /* ✅ Proper centering */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  box-sizing: border-box;
+}
+
+/* Badge */
+.tasks-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 32px;
+  padding: 0 14px;
+
+  border-radius: var(--tasks-radius-pill);
+  background: rgba(255, 110, 167, 0.08);
+  border: 1px solid rgba(240, 164, 194, 0.24);
+
+  color: #ff6ea7;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  margin-bottom: 14px;
+}
+
+/* Hero copy wrapper */
+.tasks-hero-copy {
+  margin: 0;
+  max-width: 560px;
+}
+
+/* Title */
+.tasks-title {
+  margin: 0;
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2.2rem, 3vw, 2.8rem);
+  line-height: 1.1;
+  color: var(--tasks-text-strong);
+}
+
+/* Subtitle */
+.tasks-subtitle {
+  margin: 14px 0 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--tasks-text);
+  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
+  font-weight: 600;
+}
+
+/* =========================================================
+   PANEL
+========================================================= */
+.tasks-panel {
+  width: 100%;
+  min-height: 0;
+  margin: 0 auto;
+  background: linear-gradient(180deg, var(--tasks-card-strong), rgba(255, 248, 251, 0.96));
+  border: 1px solid var(--tasks-border);
+  border-radius: var(--tasks-radius-xl);
+  box-shadow: var(--tasks-shadow-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 .tasks-feedback {
   width: 100%;
 }
@@ -165,109 +204,99 @@ body.route-tasks footer {
   width: 100%;
   text-align: center;
   border-radius: 18px;
-  padding: 1rem 1.15rem;
+  padding: 18px 16px;
   font-family: "Quicksand", "Nunito", system-ui, sans-serif;
   font-size: 1rem;
+  font-weight: 700;
   box-sizing: border-box;
 }
 
 .loading-message {
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--tasks-text-dark);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--tasks-text);
   border: 1px solid var(--tasks-border);
 }
 
 .login-prompt {
-  background: #fff7fa;
-  color: #c78599;
-  border: 1px solid #f3d6df;
+  background: rgba(255, 248, 251, 0.96);
+  color: #c88499;
+  border: 1px solid rgba(241, 210, 220, 0.95);
 }
 
-/* =========================================
+/* =========================================================
    TABLET
-========================================= */
+========================================================= */
 @media (max-width: 900px) {
-  body.route-tasks .main-content {
-    padding-top: 76px;
+  :root {
+    --tasks-nav-offset: 84px;
+    --tasks-footer-offset: 170px;
+    --tasks-max: 720px;
   }
 
   .tasks-shell {
-    padding: 14px 16px;
-  }
-
-  .tasks-panel {
-    width: min(100%, 720px);
+    padding: 12px;
+    gap: 14px;
   }
 }
 
-/* =========================================
+/* =========================================================
    MOBILE
-========================================= */
+========================================================= */
 @media (max-width: 640px) {
+  :root {
+    --tasks-nav-offset: 78px;
+    --tasks-footer-offset: 190px;
+  }
+
+  body.route-tasks {
+    overflow: auto !important;
+  }
+
+  body.route-tasks #root {
+    overflow: visible;
+  }
+
   body.route-tasks .main-content {
-    padding-top: 74px;
     overflow: visible;
   }
 
   .tasks-page {
-    align-items: start;
+    height: auto;
+    min-height: calc(100vh - var(--tasks-nav-offset));
+    overflow: visible;
+    align-items: flex-start;
+    padding: 10px 10px 20px;
   }
 
   .tasks-stage {
-    align-items: start;
+    height: auto;
   }
 
   .tasks-shell {
-    padding: 12px 10px 18px;
-    gap: 14px;
+    padding: 8px 0;
+    gap: 12px;
   }
 
+  .tasks-hero,
   .tasks-panel {
-    width: 100%;
     border-radius: 22px;
     padding: 14px;
   }
 
   .tasks-title {
-    font-size: clamp(1.95rem, 10vw, 2.75rem);
-    line-height: 0.95;
+    font-size: 2rem;
   }
 
-  .tasks-kicker {
-    min-height: 32px;
-    padding: 0 12px;
-    margin-bottom: 10px;
-    font-size: 0.78rem;
-  }
-
-  .loading-message,
-  .login-prompt {
-    font-size: 0.95rem;
-    padding: 0.95rem 1rem;
+  .tasks-subtitle {
+    font-size: 0.92rem;
   }
 }
 
-/* =========================================
+/* =========================================================
    EXTRA SMALL
-========================================= */
+========================================================= */
 @media (max-width: 380px) {
-  .tasks-shell {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .tasks-panel {
-    padding: 12px;
-    border-radius: 18px;
-  }
-}
-
-/* =========================================
-   SHORT SCREENS
-========================================= */
-@media (max-height: 700px) {
-  .tasks-shell {
-    padding-top: 10px;
-    padding-bottom: 12px;
+  .tasks-title {
+    font-size: 1.8rem;
   }
 }

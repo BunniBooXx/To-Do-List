@@ -35,7 +35,7 @@ export default function TaskItem({
 
       if (res.data.success) {
         if (updates.completed !== undefined) setIsCompleted(updates.completed);
-        if (updates.name) setTaskName(updates.name);
+        if (updates.name !== undefined) setTaskName(updates.name);
         onUpdate(task_id, updates);
       } else {
         console.error("❌ Update Failed:", res.data.error);
@@ -69,6 +69,7 @@ export default function TaskItem({
 
   const saveEdit = () => {
     const trimmedName = taskName.trim();
+
     if (!trimmedName) {
       setTaskName(name);
       setIsEditing(false);
@@ -80,59 +81,71 @@ export default function TaskItem({
   };
 
   return (
-    <div className={`task-item ${isCompleted ? "completed" : ""}`}>
-      <div className="task-content">
+    <article className={`planner-task-card ${isCompleted ? "is-completed" : ""}`}>
+      <div className="planner-task-main-row">
         <button
           type="button"
-          className="heart-checkbox"
+          className={`planner-heart-btn ${isCompleted ? "is-completed" : ""}`}
           onClick={() => handleUpdateTask({ completed: !isCompleted })}
-          aria-label={isCompleted ? "Mark task as incomplete" : "Mark task as completed"}
+          aria-label={
+            isCompleted ? "Mark task as incomplete" : "Mark task as completed"
+          }
+          title={isCompleted ? "Completed" : "Mark complete"}
         >
           {isCompleted ? "💖" : "🤍"}
         </button>
 
-        <div className="task-main">
-          {isEditing ? (
-            <input
-              type="text"
-              value={taskName}
-              onChange={(e) => setTaskName(e.target.value)}
-              onBlur={saveEdit}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") saveEdit();
-                if (e.key === "Escape") {
-                  setTaskName(name);
-                  setIsEditing(false);
-                }
-              }}
-              className="task-edit-input"
-              autoFocus
-            />
-          ) : (
-            <span
-              className="task-name"
-              onClick={() => !isCompleted && setIsEditing(true)}
-              title={taskName}
-            >
-              {taskName}
-            </span>
-          )}
-        </div>
+        <div className="planner-task-content">
+          <div className="planner-task-copy">
+            {isEditing ? (
+              <input
+                type="text"
+                value={taskName}
+                onChange={(e) => setTaskName(e.target.value)}
+                onBlur={saveEdit}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveEdit();
+                  if (e.key === "Escape") {
+                    setTaskName(name);
+                    setIsEditing(false);
+                  }
+                }}
+                className="planner-task-edit-input"
+                autoFocus
+              />
+            ) : (
+              <button
+                type="button"
+                className="planner-task-name"
+                onClick={() => !isCompleted && setIsEditing(true)}
+                title={taskName}
+              >
+                {taskName}
+              </button>
+            )}
 
-        <div className="task-actions">
-          <Link to={`/subtasks/${task_id}`} className="subtask-toggle">
-            Add Subtasks
-          </Link>
-          <button
-            type="button"
-            className="delete-task"
-            onClick={handleDeleteTask}
-            aria-label="Delete task"
-          >
-            🗑️
-          </button>
+            <span className={`planner-task-status ${isCompleted ? "done" : "open"}`}>
+              {isCompleted ? "Completed" : "Active"}
+            </span>
+          </div>
+
+          <div className="planner-task-actions">
+            <Link to={`/subtasks/${task_id}`} className="planner-subtask-link">
+              Add Subtasks
+            </Link>
+
+            <button
+              type="button"
+              className="planner-delete-btn"
+              onClick={handleDeleteTask}
+              aria-label="Delete task"
+              title="Delete task"
+            >
+              🗑️
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

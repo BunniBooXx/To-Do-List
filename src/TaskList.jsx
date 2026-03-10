@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import axios from "axios";
 import TaskItem from "./TaskItem.jsx";
 import { getAuth } from "firebase/auth";
@@ -13,7 +13,7 @@ export default function TaskList() {
 
   const showNotification = (message, type = "error") => {
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 4000);
+    window.setTimeout(() => setNotification(null), 3200);
   };
 
   const fetchTasks = useCallback(async () => {
@@ -42,10 +42,18 @@ export default function TaskList() {
     fetchTasks();
   }, [fetchTasks]);
 
+  const completedCount = useMemo(
+    () => tasks.filter((task) => task.completed).length,
+    [tasks]
+  );
+
+  const shouldScroll = tasks.length > 3;
+
   const handleAddTask = async (e) => {
     e.preventDefault();
 
-    if (!newTaskName.trim()) {
+    const trimmed = newTaskName.trim();
+    if (!trimmed) {
       return showNotification("⚠️ Task name required!", "error");
     }
 
@@ -55,7 +63,7 @@ export default function TaskList() {
 
       const res = await axios.post(
         `${backendUrl}/tasks/create`,
-        { name: newTaskName },
+        { name: trimmed },
         {
           headers: { Authorization: `Bearer ${idToken}` },
         }
@@ -66,7 +74,7 @@ export default function TaskList() {
           ...prev,
           {
             task_id: res.data.taskId,
-            name: newTaskName,
+            name: trimmed,
             completed: false,
           },
         ]);
@@ -129,50 +137,83 @@ export default function TaskList() {
   };
 
   return (
-    <div className="task-list-wrapper">
+    <section className="task-list-wrapper" aria-label="Task list">
       {notification && (
-        <div className={`notification ${notification.type}`}>
-          <span className="notification-text">{notification.message}</span>
-          <button
-            className="close-btn"
-            onClick={() => setNotification(null)}
-            type="button"
-            aria-label="Close notification"
-          >
-            ✖
-          </button>
+        <div
+          className={`tasklist-notification ${notification.type}`}
+          role="status"
+          aria-live="polite"
+        >
+          {notification.message}
         </div>
       )}
 
-      <form onSubmit={handleAddTask} className="add-task-form">
-        <input
-          type="text"
-          placeholder="✨ Add task"
-          value={newTaskName}
-          onChange={(e) => setNewTaskName(e.target.value)}
-          className="task-input"
-        />
-        <button type="submit" className="add-task-button">
-          Add Task 🎀
-        </button>
-      </form>
+      <section className="tasklist-summary-card">
+        <div className="task-list-topbar">
+          <div className="task-stat-chip">
+            <span className="task-stat-value">{tasks.length}</span>
+            <span className="task-stat-label">Total tasks</span>
+          </div>
 
-      <div className="tasks-scroll-shell">
-        <div className="tasks-wrapper">
-          {tasks.length > 0 ? (
-            tasks.map((task) => (
-              <TaskItem
-                key={task.task_id}
-                {...task}
-                onUpdate={handleUpdateTask}
-                onDelete={() => handleDeleteTask(task.task_id)}
-              />
-            ))
-          ) : (
-            <p className="no-tasks">🎀 No tasks yet! Add one above. 🎀</p>
-          )}
+          <div className="task-stat-chip">
+            <span className="task-stat-value">{completedCount}</span>
+            <span className="task-stat-label">Completed</span>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <form onSubmit={handleAddTask} className="add-task-form">
+          <div className="task-input-wrap">
+            <span className="task-input-icon" aria-hidden="true">
+              ✨
+            </span>
+
+            <input
+              type="text"
+              placeholder="Add a new task..."
+              value={newTaskName}
+              onChange={(e) => setNewTaskName(e.target.value)}
+              className="task-input"
+            />
+          </div>
+
+          <button type="submit" className="add-task-button">
+            Add Task
+          </button>
+        </form>
+      </section>
+
+      <section className="tasks-board" aria-label="Tasks board">
+        <div className="tasks-board-header">
+          <div>
+            <p className="tasks-board-kicker">Your list</p>
+            <h2 className="tasks-board-title">Today’s tasks</h2>
+          </div>
+
+          <span className="tasks-board-count">{tasks.length} items</span>
+        </div>
+
+        {tasks.length > 0 ? (
+          <div className={`tasks-scroll-shell ${shouldScroll ? "is-scrollable" : ""}`}>
+            <div className="tasks-wrapper">
+              {tasks.map((task) => (
+                <TaskItem
+                  key={task.task_id}
+                  {...task}
+                  onUpdate={handleUpdateTask}
+                  onDelete={() => handleDeleteTask(task.task_id)}
+                />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="tasklist-state-card empty">
+            <p className="tasklist-state-title">No tasks yet! 🌸</p>
+            <p className="tasklist-state-subtitle">
+              Add your first task above to start organizing your day.
+            </p>
+          </div>
+        )}
+      </section>
+    </section>
   );
 }

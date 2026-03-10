@@ -66,10 +66,14 @@ export default function TasksPage() {
     <main className="tasks-page" aria-label="Tasks page">
       <section className="tasks-stage">
         <div className="tasks-shell">
-          <header className="tasks-header">
-            <div className="tasks-header-copy">
-              <span className="tasks-kicker">Task list</span>
+          <header className="tasks-hero">
+            <span className="tasks-hero-badge">Checklist space</span>
+
+            <div className="tasks-hero-copy">
               <h1 className="tasks-title">Petite Checklist</h1>
+              <p className="tasks-subtitle">
+                Keep your day soft, structured, and easy to scan.
+              </p>
             </div>
           </header>
 
