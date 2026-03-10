@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import axios from "axios";
 import { getAuth, onIdTokenChanged } from "firebase/auth";
 import { useParams, Link } from "react-router-dom";
@@ -161,97 +161,228 @@ export default function CalendarSubtasksPage() {
     }
   };
 
+  const completedCount = useMemo(
+    () => subtasks.filter((subtask) => subtask.completed).length,
+    [subtasks]
+  );
+
+  const progressPercent =
+    subtasks.length > 0
+      ? Math.round((completedCount / subtasks.length) * 100)
+      : 0;
+
   return (
-    <main className="calendar-subtasks-page" aria-label="Calendar subtasks page">
-      <section className="calendar-subtasks-shell">
-        <div className="calendar-subtasks-card">
-          <div className="subtasks-topbar">
-            <Link to="/planner" className="back-button">
-              ← Back to Calendar
-            </Link>
-          </div>
-
-          <h1 className="title">❀ {calendarTask.name || "Task"} ❀</h1>
-
-          <button
-            type="button"
-            onClick={() => setShowSubtaskForm((prev) => !prev)}
-            className="add-task-button"
-          >
-            {showSubtaskForm ? "− Hide Subtask Form" : "+ Add New Subtask"}
-          </button>
-
-          {showSubtaskForm && (
-            <div className="task-form-container">
-              <form
-                className="task-form"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleAddSubtask();
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Enter subtask name..."
-                  value={newSubtask}
-                  onChange={(e) => setNewSubtask(e.target.value)}
-                  className="task-input"
-                />
-
-                <button type="submit" className="submit-task-button">
-                  Add Subtask 🎀
-                </button>
-              </form>
+    <main
+      className="calendar-subtasks-page"
+      aria-label="Calendar subtasks page"
+    >
+      <section className="calendar-subtasks-stage">
+        <div className="calendar-subtasks-shell">
+          <div className="calendar-subtasks-card">
+            <div className="calendar-subtasks-topbar">
+              <Link to="/planner" className="calendar-back-button">
+                ← Back to Calendar
+              </Link>
             </div>
-          )}
 
-          {loading ? (
-            <div className="loading-container">
-              <p className="loading-text">Loading your subtasks... 🎀</p>
-            </div>
-          ) : (
-            <div className="subtasks-list">
-              {subtasks.length > 0 ? (
-                subtasks.map((subtask) => (
-                  <div
-                    key={subtask.subtask_id}
-                    className={`subtask-item ${
-                      subtask.completed ? "completed" : ""
-                    }`}
-                  >
-                    <span className="subtask-name">{subtask.name}</span>
+            <header className="calendar-subtasks-hero">
+              <div className="calendar-hero-chip-row">
+                <span className="calendar-hero-chip">Planner follow-up</span>
+                <span className="calendar-hero-chip soft">
+                  {subtasks.length} subtasks
+                </span>
+              </div>
 
-                    <div className="subtask-buttons">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteSubtask(subtask.subtask_id)}
-                        className="delete-button"
-                        aria-label="Delete subtask"
-                      >
-                        🗑️
-                      </button>
+              <div className="calendar-hero-main">
+                <div className="calendar-hero-text">
+                  <p className="calendar-hero-kicker">Calendar Task</p>
+                  <h1 className="calendar-subtasks-title">
+                    {calendarTask.name || "Task"}
+                  </h1>
+                  <p className="calendar-subtasks-subtitle">
+                    Turn this scheduled task into smaller actionable steps so it
+                    feels easier to finish on time.
+                  </p>
+                </div>
 
-                      <button
-                        type="button"
-                        onClick={() =>
-                          handleToggleSubtaskCompletion(
-                            subtask.subtask_id,
-                            subtask.completed
-                          )
-                        }
-                        className="complete-button"
-                        aria-label="Toggle subtask completion"
-                      >
-                        {subtask.completed ? "💖" : "🤍"}
-                      </button>
-                    </div>
+                <div className="calendar-progress-card">
+                  <span className="calendar-progress-label">Progress</span>
+                  <span className="calendar-progress-number">
+                    {progressPercent}%
+                  </span>
+                  <div className="calendar-progress-track" aria-hidden="true">
+                    <span
+                      className="calendar-progress-fill"
+                      style={{ width: `${progressPercent}%` }}
+                    />
                   </div>
-                ))
-              ) : (
-                <p className="no-tasks">No subtasks yet! Add one above ✨</p>
+                </div>
+              </div>
+
+              <div className="calendar-subtasks-stats">
+                <div className="calendar-stat-card">
+                  <span className="calendar-stat-label">Total Steps</span>
+                  <span className="calendar-stat-value">{subtasks.length}</span>
+                </div>
+
+                <div className="calendar-stat-card">
+                  <span className="calendar-stat-label">Finished</span>
+                  <span className="calendar-stat-value">{completedCount}</span>
+                </div>
+
+                <div className="calendar-stat-card">
+                  <span className="calendar-stat-label">Status</span>
+                  <span className="calendar-stat-value">
+                    {subtasks.length > 0 && completedCount === subtasks.length
+                      ? "Complete"
+                      : "Active"}
+                  </span>
+                </div>
+              </div>
+            </header>
+
+            <section className="calendar-compose-card">
+              <div className="calendar-compose-header">
+                <div>
+                  <p className="calendar-section-kicker">Add a step</p>
+                  <h2 className="calendar-section-title">Build the breakdown</h2>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowSubtaskForm((prev) => !prev)}
+                  className="calendar-toggle-form-button"
+                >
+                  {showSubtaskForm ? "Hide form" : "New subtask"}
+                </button>
+              </div>
+
+              {showSubtaskForm && (
+                <div className="calendar-task-form-container">
+                  <form
+                    className="calendar-task-form"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      handleAddSubtask();
+                    }}
+                  >
+                    <input
+                      type="text"
+                      placeholder="Enter subtask name..."
+                      value={newSubtask}
+                      onChange={(e) => setNewSubtask(e.target.value)}
+                      className="calendar-task-input"
+                    />
+
+                    <button
+                      type="submit"
+                      className="calendar-submit-task-button"
+                    >
+                      Add to Calendar Plan
+                    </button>
+                  </form>
+                </div>
               )}
-            </div>
-          )}
+            </section>
+
+            <section className="calendar-list-card">
+              <div className="calendar-list-header">
+                <div>
+                  <p className="calendar-list-kicker">Subtasks</p>
+                  <h2 className="calendar-list-title">Scheduled action list</h2>
+                </div>
+
+                <span className="calendar-list-count">
+                  {subtasks.length} items
+                </span>
+              </div>
+
+              {loading ? (
+                <div className="calendar-state-card">
+                  <p className="calendar-state-title">
+                    Loading your subtasks... 🎀
+                  </p>
+                  <p className="calendar-state-subtitle">
+                    Pulling in the latest planner details.
+                  </p>
+                </div>
+              ) : subtasks.length > 0 ? (
+                <div className="calendar-subtasks-list">
+                  {subtasks.map((subtask, index) => (
+                    <article
+                      key={subtask.subtask_id}
+                      className={`calendar-subtask-item ${
+                        subtask.completed ? "completed" : ""
+                      }`}
+                    >
+                      <div className="calendar-subtask-left">
+                        <div className="calendar-subtask-index">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+
+                        <div className="calendar-subtask-copy">
+                          <div className="calendar-subtask-row-top">
+                            <span className="calendar-subtask-name">
+                              {subtask.name}
+                            </span>
+                            <span
+                              className={`calendar-subtask-pill ${
+                                subtask.completed ? "done" : "live"
+                              }`}
+                            >
+                              {subtask.completed ? "Done" : "In progress"}
+                            </span>
+                          </div>
+
+                          <p className="calendar-subtask-note">
+                            {subtask.completed
+                              ? "This step is finished and checked off."
+                              : "Keep going — this step is still part of today’s plan."}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="calendar-subtask-buttons">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleToggleSubtaskCompletion(
+                              subtask.subtask_id,
+                              subtask.completed
+                            )
+                          }
+                          className={`calendar-action-button complete ${
+                            subtask.completed ? "is-complete" : ""
+                          }`}
+                          aria-label="Toggle subtask completion"
+                        >
+                          {subtask.completed ? "💖 Mark Active" : "🤍 Mark Done"}
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSubtask(subtask.subtask_id)}
+                          className="calendar-action-button delete"
+                          aria-label="Delete subtask"
+                        >
+                          🗑 Delete
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="calendar-state-card empty">
+                  <p className="calendar-state-title">
+                    No subtasks yet! Add one above ✨
+                  </p>
+                  <p className="calendar-state-subtitle">
+                    Start turning this calendar task into smaller scheduled steps.
+                  </p>
+                </div>
+              )}
+            </section>
+          </div>
         </div>
       </section>
     </main>

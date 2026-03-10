@@ -47,6 +47,12 @@ export default function TaskList() {
     [tasks]
   );
 
+  const progressPercent =
+    tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+
+  const statusLabel =
+    tasks.length > 0 && completedCount === tasks.length ? "Done" : "Active";
+
   const shouldScroll = tasks.length > 3;
 
   const handleAddTask = async (e) => {
@@ -149,18 +155,34 @@ export default function TaskList() {
       )}
 
       <section className="tasklist-summary-card">
-        <div className="task-list-topbar">
-          <div className="task-stat-chip">
-            <span className="task-stat-value">{tasks.length}</span>
-            <span className="task-stat-label">Total tasks</span>
+        <div className="tasklist-summary-header">
+          <div>
+            <p className="tasklist-summary-kicker">Task overview</p>
+            <h2 className="tasklist-summary-title">Daily checklist status</h2>
           </div>
 
-          <div className="task-stat-chip">
-            <span className="task-stat-value">{completedCount}</span>
-            <span className="task-stat-label">Completed</span>
-          </div>
+          <span className="tasklist-progress-pill">{progressPercent}% complete</span>
         </div>
 
+        <div className="tasklist-stats-grid">
+          <div className="task-stat-card">
+            <span className="task-stat-label">Total</span>
+            <span className="task-stat-value">{tasks.length}</span>
+          </div>
+
+          <div className="task-stat-card">
+            <span className="task-stat-label">Completed</span>
+            <span className="task-stat-value">{completedCount}</span>
+          </div>
+
+          <div className={`task-stat-card ${statusLabel === "Done" ? "is-complete" : ""}`}>
+            <span className="task-stat-label">Status</span>
+            <span className="task-stat-value">{statusLabel}</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="tasklist-compose-card">
         <form onSubmit={handleAddTask} className="add-task-form">
           <div className="task-input-wrap">
             <span className="task-input-icon" aria-hidden="true">

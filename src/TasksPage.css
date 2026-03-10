@@ -101,63 +101,50 @@ body.route-tasks .main-content {
 }
 
 /* =========================================================
-   HERO (CENTERED)
+   HERO
 ========================================================= */
-
 .tasks-hero {
   width: 100%;
   margin: 0 auto;
   padding: 28px 32px;
-
   background: linear-gradient(
     180deg,
     var(--tasks-card-strong),
     rgba(255, 248, 251, 0.96)
   );
-
   border: 1px solid var(--tasks-border);
   border-radius: var(--tasks-radius-xl);
   box-shadow: var(--tasks-shadow-md);
-
-  /* ✅ Proper centering */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   text-align: center;
   box-sizing: border-box;
 }
 
-/* Badge */
 .tasks-hero-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-height: 32px;
   padding: 0 14px;
-
   border-radius: var(--tasks-radius-pill);
   background: rgba(255, 110, 167, 0.08);
   border: 1px solid rgba(240, 164, 194, 0.24);
-
   color: #ff6ea7;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-
   margin-bottom: 14px;
 }
 
-/* Hero copy wrapper */
 .tasks-hero-copy {
   margin: 0;
   max-width: 560px;
 }
 
-/* Title */
 .tasks-title {
   margin: 0;
   font-family: "Dancing Script", cursive;
@@ -166,7 +153,6 @@ body.route-tasks .main-content {
   color: var(--tasks-text-strong);
 }
 
-/* Subtitle */
 .tasks-subtitle {
   margin: 14px 0 0;
   font-size: 1rem;

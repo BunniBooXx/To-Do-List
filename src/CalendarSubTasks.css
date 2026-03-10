@@ -1,377 +1,831 @@
 :root {
-  --pp-pink: #ff4d8d;
-  --pp-pink2: #ff80ab;
-  --pp-bgA: #fff5f6;
-  --pp-bgB: #ffffff;
+  --cal-bg-1: #fffafc;
+  --cal-bg-2: #fff3f8;
+  --cal-bg-3: #fcecf4;
 
-  --pp-card: rgba(255, 255, 255, 0.95);
-  --pp-shadow: 0 10px 30px rgba(255, 192, 203, 0.16);
-  --pp-radius: 22px;
+  --cal-card: rgba(255, 255, 255, 0.92);
+  --cal-card-strong: rgba(255, 255, 255, 0.98);
 
-  --pp-nav-h: 72px;
-  --pp-foot-h: 150px;
+  --cal-accent: #c2769d;
+  --cal-accent-soft: #dfa7c0;
+  --cal-accent-softest: #f8dbe8;
+  --cal-text: #94667b;
+  --cal-text-soft: #bf8da4;
+  --cal-border: rgba(232, 190, 209, 0.9);
+  --cal-border-strong: rgba(214, 146, 180, 0.96);
+
+  --cal-lilac: #f3ecff;
+  --cal-lilac-border: #dfd1f7;
+
+  --cal-success-bg: #effaf3;
+  --cal-success-border: #cbe8d5;
+  --cal-success-text: #5a9871;
+
+  --cal-shadow-lg: 0 26px 60px rgba(224, 164, 189, 0.14);
+  --cal-shadow-md: 0 16px 34px rgba(224, 164, 189, 0.12);
+  --cal-shadow-sm: 0 8px 18px rgba(224, 164, 189, 0.08);
+
+  --cal-radius-xl: 30px;
+  --cal-radius-lg: 22px;
+  --cal-radius-md: 16px;
+  --cal-radius-pill: 999px;
+
+  --cal-nav-offset: 88px;
+  --cal-footer-offset: 150px;
+  --cal-max: 820px;
 }
 
-/* =========================================
+/* =========================================================
    ROUTE SCOPE
-   same idea as calendar page reference
-========================================= */
+========================================================= */
 body.route-calendar-subtasks {
   margin: 0 !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-  height: auto !important;
+  background: transparent;
+  overflow: hidden !important;
 }
 
-/* =========================================
-   PAGE WRAPPER
-   centered and pushed down from navbar
-========================================= */
+body.route-calendar-subtasks #root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+body.route-calendar-subtasks .main-content {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: var(--cal-nav-offset) 0 0;
+  box-sizing: border-box;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* =========================================================
+   PAGE LAYOUT
+========================================================= */
 .calendar-subtasks-page {
   width: 100%;
-  padding: 0 16px;
-  box-sizing: border-box;
-
+  height: calc(100vh - var(--cal-nav-offset) - var(--cal-footer-offset));
+  min-height: 0;
   display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: flex-start;
-
-  padding-top: 120px;
-  padding-bottom: 40px;
+  padding: 16px 18px 20px;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(255, 228, 239, 0.8), transparent 24%),
+    radial-gradient(circle at 88% 18%, rgba(245, 232, 255, 0.7), transparent 20%),
+    linear-gradient(180deg, var(--cal-bg-1) 0%, var(--cal-bg-2) 50%, var(--cal-bg-3) 100%);
+  color: var(--cal-text);
+  font-family: "Inter", "Poppins", sans-serif;
+  overflow: hidden;
 }
 
-/* =========================================
-   OUTER SHELL
-========================================= */
+.calendar-subtasks-stage {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .calendar-subtasks-shell {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-/* =========================================
-   MAIN CARD
-========================================= */
-.calendar-subtasks-card {
-  width: min(760px, 100%);
-  background: rgba(255, 255, 255, 0.58);
-  border-radius: 18px;
-  padding: clamp(16px, 2vw, 24px);
-  box-shadow: var(--pp-shadow);
+  width: min(100%, var(--cal-max));
+  max-height: 100%;
+  padding: 8px;
   box-sizing: border-box;
+  display: grid;
+  margin: 0 auto;
 }
 
-/* =========================================
-   TOP BAR
-========================================= */
-.subtasks-topbar {
+.calendar-subtasks-card {
+  width: 100%;
+  min-height: 0;
+  background: linear-gradient(180deg, var(--cal-card-strong), rgba(255, 248, 252, 0.98));
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius-xl);
+  box-shadow: var(--cal-shadow-lg);
+  padding: 20px;
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+  gap: 18px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
+.calendar-subtasks-topbar {
   width: 100%;
   display: flex;
-  justify-content: center;
-  margin-bottom: 0.7rem;
+  justify-content: flex-start;
 }
 
-.back-button {
+.calendar-back-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: var(--cal-radius-pill);
+  border: 1px solid var(--cal-border);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 242, 247, 0.98));
+  color: var(--cal-accent);
   text-decoration: none;
-  text-align: center;
-
-  background: #fffdfd;
-  border: 2px solid #f6bcc7;
-  color: #f3a9b8;
-
-  border-radius: 999px;
-  padding: 0.82rem 1.45rem;
-  min-height: 48px;
-
-  font-size: 1rem;
-  font-weight: 700;
-  white-space: nowrap;
-
-  box-shadow: 0 4px 12px rgba(255, 181, 192, 0.2);
-  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+  font-size: 0.88rem;
+  font-weight: 800;
+  box-shadow: var(--cal-shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-.back-button:hover {
-  background: #fff3f6;
+.calendar-back-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 7px 16px rgba(255, 181, 192, 0.28);
+  box-shadow: var(--cal-shadow-md);
+  border-color: var(--cal-border-strong);
 }
 
-/* =========================================
-   TITLE
-========================================= */
-.title {
-  margin: 0 0 1rem;
-  text-align: center;
-  font-family: "Dancing Script", cursive;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 700;
-  line-height: 1.1;
-  color: #f3a9b8;
-  text-shadow: 1px 1px 0 #fff;
-}
-
-/* =========================================
-   ADD BUTTON
-========================================= */
-.add-task-button {
-  width: min(630px, 100%);
-  display: block;
-  margin: 0 auto 1rem;
-
-  border: none;
-  border-radius: 999px;
-  background: linear-gradient(45deg, #f7b6c3, #f9c9d2);
-  color: #ffffff;
-
-  font-size: 1.02rem;
-  font-weight: 700;
-  padding: 0.95rem 1.2rem;
-  min-height: 52px;
-  cursor: pointer;
-
-  box-shadow: 0 8px 18px rgba(255, 181, 192, 0.18);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
-}
-
-.add-task-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(255, 181, 192, 0.26);
-  filter: brightness(1.01);
-}
-
-/* =========================================
-   FORM CONTAINER
-========================================= */
-.task-form-container {
-  width: min(630px, 100%);
-  margin: 0 auto 1rem;
-  background: rgba(255, 255, 255, 0.8);
-  border-radius: 1.35rem;
-  padding: 1.35rem;
-  box-shadow: 0 10px 22px rgba(255, 181, 192, 0.14);
-  box-sizing: border-box;
-}
-
-.task-form {
+/* =========================================================
+   HERO
+========================================================= */
+.calendar-subtasks-hero {
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
+  padding: 22px;
+  border-radius: var(--cal-radius-xl);
+  border: 1px solid var(--cal-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 245, 249, 0.98));
+  box-shadow: var(--cal-shadow-md);
+  box-sizing: border-box;
+  display: grid;
+  gap: 18px;
+}
 
+.calendar-hero-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.calendar-hero-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: var(--cal-radius-pill);
+  background: rgba(194, 118, 157, 0.08);
+  border: 1px solid rgba(214, 146, 180, 0.2);
+  color: var(--cal-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.calendar-hero-chip.soft {
+  background: rgba(243, 236, 255, 0.9);
+  border-color: var(--cal-lilac-border);
+  color: #9d82c7;
+}
+
+.calendar-hero-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.calendar-hero-text {
+  min-width: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.calendar-hero-kicker {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cal-text-soft);
+}
+
+.calendar-subtasks-title {
+  margin: 0;
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2.15rem, 3.1vw, 2.9rem);
+  line-height: 1;
+  color: var(--cal-accent);
+}
+
+.calendar-subtasks-subtitle {
+  margin: 0;
+  max-width: 560px;
+  font-size: 0.96rem;
+  line-height: 1.55;
+  color: var(--cal-text);
+  font-weight: 600;
+}
+
+.calendar-progress-card {
+  border-radius: 24px;
+  border: 1px solid rgba(222, 138, 175, 0.18);
+  background: linear-gradient(180deg, #fff7fb, #fdf0f6);
+  padding: 16px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.calendar-progress-label {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cal-text-soft);
+}
+
+.calendar-progress-number {
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: var(--cal-accent);
+  line-height: 1;
+}
+
+.calendar-progress-track {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: #f7e5ef;
+  overflow: hidden;
+}
+
+.calendar-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #e3b2ca, #c97fa5);
+}
+
+.calendar-subtasks-stats {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.calendar-stat-card {
+  background: linear-gradient(180deg, rgba(255, 248, 251, 0.98), rgba(255, 243, 248, 0.98));
+  border: 1px solid var(--cal-border);
+  border-radius: 18px;
+  padding: 13px 14px;
+  box-shadow: var(--cal-shadow-sm);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.task-input {
-  width: 100%;
+  gap: 4px;
+  min-height: 76px;
+  justify-content: center;
   box-sizing: border-box;
-  display: block;
-
-  border: 2px solid #f4c3cc;
-  border-radius: 14px;
-  background: #fff8fa;
-  color: #ef8fa3;
-
-  font-size: 1rem;
-  padding: 0.98rem 1rem;
-  text-align: center;
-  outline: none;
-
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
-.task-input::placeholder {
-  color: #e5a9b7;
-  opacity: 1;
-  font-style: italic;
+.calendar-stat-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cal-text-soft);
 }
 
-.task-input:focus {
-  border-color: #efb1bf;
-  box-shadow: 0 0 0 4px rgba(255, 181, 192, 0.16);
-  background: #fffdfd;
+.calendar-stat-value {
+  font-size: 1.06rem;
+  font-weight: 800;
+  color: var(--cal-accent);
 }
 
-.submit-task-button {
+/* =========================================================
+   COMPOSE
+========================================================= */
+.calendar-compose-card {
   width: 100%;
-  display: block;
-
-  border: none;
-  border-radius: 14px;
-  background: linear-gradient(45deg, #dfb1bb, #eac2ca);
-  color: #ffffff;
-
-  font-size: 1rem;
-  font-weight: 700;
-  padding: 0.95rem 1rem;
-  min-height: 50px;
-  cursor: pointer;
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
-}
-
-.submit-task-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 18px rgba(255, 181, 192, 0.22);
-  filter: brightness(1.01);
-}
-
-/* =========================================
-   LIST / LOADING WRAPPERS
-========================================= */
-.subtasks-list,
-.loading-container {
-  width: min(630px, 100%);
-  margin: 0 auto;
-}
-
-/* =========================================
-   SUBTASK ITEM
-========================================= */
-.subtask-item {
-  width: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 251, 0.98));
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius-xl);
+  box-shadow: var(--cal-shadow-sm);
+  padding: 18px;
   box-sizing: border-box;
-  background: #fffdfd;
-  border-radius: 1rem;
-  padding: 1rem 1.1rem;
-  margin-bottom: 0.85rem;
+  display: grid;
+  gap: 14px;
+}
 
+.calendar-compose-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-
-  box-shadow: 0 6px 16px rgba(255, 181, 192, 0.12);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  gap: 12px;
 }
 
-.subtask-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 22px rgba(255, 181, 192, 0.18);
+.calendar-section-kicker {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cal-text-soft);
 }
 
-.subtask-name {
-  flex: 1;
+.calendar-section-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--cal-accent);
+}
+
+.calendar-toggle-form-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius-pill);
+  background: linear-gradient(180deg, #fff7fb, #fff0f6);
+  color: var(--cal-accent);
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--cal-shadow-sm);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.calendar-toggle-form-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--cal-shadow-md);
+}
+
+.calendar-task-form-container {
+  background: linear-gradient(180deg, rgba(255, 251, 253, 0.98), rgba(255, 244, 249, 0.98));
+  border: 1px solid rgba(232, 190, 209, 0.5);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.calendar-task-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 12px;
+  align-items: center;
+}
+
+.calendar-task-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 2px solid rgba(236, 186, 205, 0.95);
+  border-radius: 18px;
+  box-sizing: border-box;
+  background: white;
+  color: var(--cal-text);
+  font-size: 0.96rem;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.calendar-task-input::placeholder {
+  color: #d5a3b8;
+}
+
+.calendar-task-input:focus {
+  border-color: var(--cal-border-strong);
+  box-shadow: 0 0 0 4px rgba(236, 186, 205, 0.22);
+}
+
+.calendar-submit-task-button {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: var(--cal-radius-pill);
+  background: linear-gradient(180deg, #c97fa5, #b86c93);
+  color: white;
+  font-size: 0.94rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--cal-shadow-sm);
+  transition: transform 0.18s ease, filter 0.18s ease, box-shadow 0.18s ease;
+}
+
+.calendar-submit-task-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+  box-shadow: var(--cal-shadow-md);
+}
+
+/* =========================================================
+   LIST CARD
+========================================================= */
+.calendar-list-card {
+  width: 100%;
+  min-height: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 247, 251, 0.98));
+  border: 1px solid var(--cal-border);
+  border-radius: var(--cal-radius-xl);
+  box-shadow: var(--cal-shadow-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.calendar-list-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calendar-list-kicker {
+  margin: 0 0 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cal-text-soft);
+}
+
+.calendar-list-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: var(--cal-accent);
+}
+
+.calendar-list-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--cal-radius-pill);
+  background: var(--cal-lilac);
+  border: 1px solid var(--cal-lilac-border);
+  color: #9d82c7;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.calendar-subtasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(208, 148, 180, 0.8) rgba(255, 241, 246, 0.88);
+}
+
+.calendar-subtasks-list::-webkit-scrollbar {
+  width: 10px;
+}
+
+.calendar-subtasks-list::-webkit-scrollbar-track {
+  background: rgba(255, 241, 246, 0.92);
+  border-radius: 999px;
+}
+
+.calendar-subtasks-list::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #efbfd2, #d791b2);
+  border-radius: 999px;
+  border: 2px solid rgba(255, 241, 246, 0.92);
+}
+
+.calendar-subtask-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 249, 252, 0.98));
+  border: 1px solid rgba(239, 196, 213, 0.95);
+  border-radius: 22px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.calendar-subtask-item::before {
+  content: "";
+  position: absolute;
+  inset: 10px auto 10px 10px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e6b1c9, #cf7ea5);
+}
+
+.calendar-subtask-item:hover {
+  transform: translateY(-1px);
+  border-color: var(--cal-border-strong);
+  box-shadow: var(--cal-shadow-sm);
+}
+
+.calendar-subtask-item.completed {
+  background: linear-gradient(180deg, rgba(245, 255, 249, 0.98), rgba(240, 252, 245, 0.98));
+  border-color: var(--cal-success-border);
+}
+
+.calendar-subtask-item.completed::before {
+  background: linear-gradient(180deg, #b8e0c4, #7fb993);
+}
+
+.calendar-subtask-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
   min-width: 0;
-  color: #ef8fa3;
-  font-size: 1rem;
-  line-height: 1.4;
-  word-break: break-word;
-  text-align: left;
 }
 
-.subtask-item.completed .subtask-name {
-  color: #c5939f;
-  text-decoration: line-through;
-  opacity: 0.75;
-  font-style: italic;
+.calendar-subtask-index {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fff1f7, #ffe7ef);
+  border: 1px solid rgba(239, 196, 213, 0.95);
+  color: var(--cal-text-soft);
+  font-size: 0.86rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
-/* =========================================
-   ACTION BUTTONS
-========================================= */
-.subtask-buttons {
+.calendar-subtask-item.completed .calendar-subtask-index {
+  background: linear-gradient(180deg, #f2fbf5, #e7f7ec);
+  border-color: var(--cal-success-border);
+  color: var(--cal-success-text);
+}
+
+.calendar-subtask-copy {
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.calendar-subtask-row-top {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-shrink: 0;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.complete-button,
-.delete-button {
-  border: none;
-  background: transparent;
+.calendar-subtask-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--cal-accent);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.calendar-subtask-item.completed .calendar-subtask-name {
+  color: var(--cal-success-text);
+}
+
+.calendar-subtask-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+.calendar-subtask-pill.live {
+  background: #fff1f7;
+  border: 1px solid #f0cfdd;
+  color: var(--cal-accent);
+}
+
+.calendar-subtask-pill.done {
+  background: #effaf3;
+  border: 1px solid var(--cal-success-border);
+  color: var(--cal-success-text);
+}
+
+.calendar-subtask-note {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--cal-text-soft);
+}
+
+.calendar-subtask-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.calendar-action-button {
+  min-height: 40px;
+  padding: 8px 13px;
+  border-radius: var(--cal-radius-pill);
+  border: 1px solid rgba(241, 194, 212, 0.95);
+  background: white;
+  color: var(--cal-accent);
+  font-size: 0.8rem;
+  font-weight: 800;
   cursor: pointer;
-
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0.4rem;
-  border-radius: 0.6rem;
-
-  transition: transform 0.2s ease, background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
-.complete-button:hover,
-.delete-button:hover {
-  transform: scale(1.1);
-  background: rgba(255, 236, 241, 0.95);
+.calendar-action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--cal-shadow-sm);
 }
 
-/* =========================================
-   EMPTY / LOADING
-========================================= */
-.loading-text,
-.no-tasks {
+.calendar-action-button.complete {
+  background: linear-gradient(180deg, #fff8fb, #fff0f6);
+}
+
+.calendar-action-button.complete.is-complete {
+  background: linear-gradient(180deg, #effaf3, #e7f6ec);
+  border-color: var(--cal-success-border);
+  color: var(--cal-success-text);
+}
+
+.calendar-action-button.delete {
+  background: linear-gradient(180deg, #faf4ff, #f5edff);
+  border-color: #dfd1f7;
+  color: #8e79bd;
+}
+
+/* =========================================================
+   STATES
+========================================================= */
+.calendar-state-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 248, 251, 0.99));
+  border: 1px dashed rgba(236, 186, 205, 0.95);
+  border-radius: 24px;
+  padding: 30px 22px;
   text-align: center;
-  color: #efabc0;
-  font-size: 1.02rem;
-  font-weight: 600;
-
-  background: #fffdfd;
-  padding: 1.05rem 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 6px 16px rgba(255, 181, 192, 0.1);
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
-@media (max-width: 768px) {
+.calendar-state-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--cal-accent);
+}
+
+.calendar-state-subtitle {
+  margin: 8px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--cal-text);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+@media (max-width: 900px) {
+  :root {
+    --cal-nav-offset: 84px;
+    --cal-footer-offset: 170px;
+    --cal-max: 760px;
+  }
+
+  .calendar-subtasks-shell {
+    padding: 12px;
+  }
+
+  .calendar-hero-main {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-subtasks-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .calendar-task-form {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-subtask-item {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-subtask-buttons {
+    justify-content: flex-start;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+@media (max-width: 640px) {
+  :root {
+    --cal-nav-offset: 78px;
+    --cal-footer-offset: 190px;
+  }
+
+  body.route-calendar-subtasks {
+    overflow: auto !important;
+  }
+
+  body.route-calendar-subtasks #root {
+    overflow: visible;
+  }
+
+  body.route-calendar-subtasks .main-content {
+    overflow: visible;
+  }
+
   .calendar-subtasks-page {
-    padding-top: 90px;
-    padding-bottom: 30px;
+    height: auto;
+    min-height: calc(100vh - var(--cal-nav-offset));
+    overflow: visible;
+    align-items: flex-start;
+    padding: 10px 10px 20px;
+  }
+
+  .calendar-subtasks-stage {
+    height: auto;
+  }
+
+  .calendar-subtasks-shell {
+    padding: 8px 0;
   }
 
   .calendar-subtasks-card {
-    padding: 16px;
+    padding: 14px;
+    gap: 14px;
+    border-radius: 24px;
   }
 
-  .task-form-container {
-    padding: 1rem;
+  .calendar-subtasks-hero,
+  .calendar-compose-card,
+  .calendar-list-card {
+    border-radius: 22px;
+    padding: 14px;
   }
 
-  .subtask-item {
-    padding: 0.95rem;
+  .calendar-compose-header,
+  .calendar-list-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .calendar-subtasks-title {
+    font-size: 2rem;
+  }
+
+  .calendar-subtasks-subtitle {
+    font-size: 0.92rem;
+  }
+
+  .calendar-subtasks-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-subtask-row-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .calendar-subtask-buttons {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .calendar-action-button {
+    width: 100%;
   }
 }
 
-@media (max-width: 560px) {
-  .back-button {
-    width: 100%;
-    font-size: 0.95rem;
-    padding: 0.76rem 1rem;
+/* =========================================================
+   EXTRA SMALL
+========================================================= */
+@media (max-width: 380px) {
+  .calendar-subtasks-title {
+    font-size: 1.8rem;
   }
 
-  .title {
-    font-size: clamp(1.8rem, 8vw, 2.4rem);
-  }
-
-  .add-task-button {
-    font-size: 0.98rem;
-    padding: 0.9rem 1rem;
-  }
-
-  .task-input,
-  .submit-task-button {
-    font-size: 0.95rem;
-  }
-
-  .subtask-item {
-    gap: 0.75rem;
-    padding: 0.9rem;
-  }
-
-  .subtask-name {
-    font-size: 0.95rem;
-  }
-
-  .complete-button,
-  .delete-button {
-    font-size: 1.15rem;
+  .calendar-subtask-index {
+    width: 40px;
+    height: 40px;
+    margin-left: 6px;
   }
 }
