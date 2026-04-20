@@ -10,76 +10,51 @@ function Footer() {
       <div className="pp-footer__shell">
         <div className="pp-footer__grid">
           <section className="pp-footer__section pp-footer__brand">
-            <div className="pp-footer__brandBadge">🌸</div>
-
-            <div className="pp-footer__brandCopy">
-              <h3 className="pp-footer__brandTitle">Petite Planner</h3>
-              <p className="pp-footer__brandText">
-                Organize your life with charm and clarity.
-              </p>
-            </div>
+            <h3 className="pp-footer__brandTitle">Petite Planner</h3>
+            <p className="pp-footer__brandText">
+              A lightweight planning workspace for tasks and calendar-based scheduling.
+            </p>
           </section>
 
           <section className="pp-footer__section pp-footer__links">
             <h4 className="pp-footer__heading">Quick Links</h4>
 
-            <nav className="pp-footer__nav">
+            <nav className="pp-footer__nav" aria-label="Quick links">
               <Link to="/tasks" className="pp-footer__link">
-                <span className="pp-footer__linkIcon">📝</span>
-                <span>Tasks</span>
+                Tasks
               </Link>
 
               <Link to="/planner" className="pp-footer__link">
-                <span className="pp-footer__linkIcon">🗓️</span>
-                <span>Calendar</span>
+                Calendar
               </Link>
 
               <Link to="/signup" className="pp-footer__link">
-                <span className="pp-footer__linkIcon">✨</span>
-                <span>Sign Up</span>
+                Sign Up
               </Link>
             </nav>
           </section>
 
-          <section className="pp-footer__section pp-footer__social">
-            <h4 className="pp-footer__heading">Connect</h4>
+          <section className="pp-footer__section pp-footer__product">
+            <h4 className="pp-footer__heading">Product</h4>
 
-            <div className="pp-footer__socialRow">
-              <a
-                href="https://instagram.com/petiteplanner"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="pp-footer__socialLink"
-              >
-                🌺
-              </a>
-
-              <a
-                href="https://twitter.com/petiteplanner"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-                className="pp-footer__socialLink"
-              >
-                🎀
-              </a>
-
-              <a
-                href="https://pinterest.com/petiteplanner"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Pinterest"
-                className="pp-footer__socialLink"
-              >
-                💖
-              </a>
-            </div>
+            <ul className="pp-footer__list" aria-label="Product features">
+              <li>
+                <span className="pp-footer__linkLike">Task Management</span>
+              </li>
+              <li>
+                <span className="pp-footer__linkLike">Calendar View</span>
+              </li>
+              <li>
+                <span className="pp-footer__linkLike">Responsive Layout</span>
+              </li>
+            </ul>
           </section>
         </div>
 
         <div className="pp-footer__bottom">
-          <p>© {currentYear} Petite Planner. All rights reserved. ✨</p>
+          <p className="pp-footer__copy">
+            Copyright © {currentYear} Petite Planner. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

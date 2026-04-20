@@ -1,288 +1,1428 @@
+/* Petite Planner — Tasks route
+   Layout: viewport-contained app section (no document growth). Internal scroll lives in task list. */
+
 :root {
-  --tasks-bg-1: #fff9fc;
-  --tasks-bg-2: #fff2f7;
-  --tasks-bg-3: #ffeaf2;
+  /* Premium SaaS canvas — cool blue/slate, similar to homepage */
+  --tasks-bg: #f3f6fc;
+  --tasks-bg-top: #eef3ff;
+  --tasks-bg-mid: #e3ecff;
+  --tasks-bg-deep: #dde4f4;
+  --tasks-page-bg:
+    radial-gradient(ellipse 95% 60% at 50% -14%, rgba(37, 99, 235, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 8% 40%, rgba(59, 130, 246, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 52% 38% at 92% 30%, rgba(30, 64, 175, 0.045) 0%, transparent 52%),
+    linear-gradient(180deg, var(--tasks-bg-top) 0%, var(--tasks-bg-mid) 32%, var(--tasks-bg) 62%, var(--tasks-bg-deep) 100%);
+  --tasks-surface: #ffffff;
+  --tasks-surface-elevated: rgba(255, 255, 255, 0.97);
+  --tasks-surface-soft: #f8fafc;
 
-  --tasks-card: rgba(255, 255, 255, 0.9);
-  --tasks-card-strong: rgba(255, 255, 255, 0.97);
+  --tasks-text: #0f172a;
+  --tasks-text-soft: #475569;
+  --tasks-text-strong: #020617;
+  --tasks-text-faint: #94a3b8;
 
-  --tasks-pink-1: #ffd8e5;
-  --tasks-pink-2: #ffc5d8;
-  --tasks-pink-3: #eba8c1;
-  --tasks-pink-4: #d985a5;
-  --tasks-pink-5: #bf6789;
+  --tasks-border: rgba(15, 23, 42, 0.088);
+  --tasks-border-strong: rgba(15, 23, 42, 0.12);
+  --tasks-border-accent: rgba(30, 64, 175, 0.14);
 
-  --tasks-text: #9f667f;
-  --tasks-text-soft: #c78fa8;
-  --tasks-text-strong: #bf6f8f;
+  --tasks-accent: #1e4bb8;
+  --tasks-accent-hover: #1e40af;
+  --tasks-accent-soft: rgba(30, 64, 175, 0.08);
+  --tasks-accent-muted: rgba(30, 64, 175, 0.12);
 
-  --tasks-border: rgba(237, 191, 209, 0.85);
-  --tasks-border-strong: rgba(222, 138, 175, 0.95);
+  --tasks-shadow-md:
+    0 1px 0 rgba(255, 255, 255, 0.96) inset,
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 14px 36px -20px rgba(15, 23, 42, 0.11),
+    0 0 0 1px rgba(15, 23, 42, 0.055);
+  --tasks-shadow-card:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 1px 2px rgba(15, 23, 42, 0.035),
+    0 16px 42px -22px rgba(15, 23, 42, 0.13),
+    0 0 0 1px rgba(15, 23, 42, 0.065),
+    0 0 0 3px rgba(30, 64, 175, 0.04);
+  --tasks-shadow-card-hover:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 2px 4px rgba(15, 23, 42, 0.045),
+    0 20px 50px -24px rgba(15, 23, 42, 0.15),
+    0 0 0 1px rgba(15, 23, 42, 0.075),
+    0 0 0 4px rgba(30, 64, 175, 0.05);
+  --tasks-shadow-sm: 0 1px 0 rgba(15, 23, 42, 0.04);
+  --tasks-shadow-panel:
+    0 1px 0 rgba(255, 255, 255, 0.98) inset,
+    0 -1px 0 rgba(15, 23, 42, 0.03) inset,
+    0 1px 3px rgba(15, 23, 42, 0.035),
+    0 26px 58px -32px rgba(15, 23, 42, 0.13),
+    0 12px 36px -18px rgba(15, 23, 42, 0.075),
+    0 0 0 1px rgba(15, 23, 42, 0.065),
+    0 0 0 6px rgba(30, 58, 138, 0.02);
+  --tasks-shadow-panel-hover:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 -1px 0 rgba(15, 23, 42, 0.028) inset,
+    0 2px 5px rgba(15, 23, 42, 0.045),
+    0 32px 68px -34px rgba(15, 23, 42, 0.15),
+    0 14px 40px -14px rgba(30, 58, 138, 0.07),
+    0 0 0 1px rgba(15, 23, 42, 0.072),
+    0 0 0 8px rgba(30, 58, 138, 0.03);
 
-  --tasks-shadow-lg: 0 24px 56px rgba(230, 167, 190, 0.14);
-  --tasks-shadow-md: 0 14px 30px rgba(230, 167, 190, 0.11);
-  --tasks-shadow-sm: 0 8px 18px rgba(230, 167, 190, 0.08);
+  --tasks-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --tasks-ease-surface: cubic-bezier(0.16, 1, 0.3, 1);
+  --tasks-ease-tap: cubic-bezier(0.33, 1, 0.68, 1);
+  --tasks-dur-enter: 0.62s;
+  --tasks-dur-stagger-step: 0.055s;
+  --tasks-dur-ui: 0.18s;
+  --tasks-dur-press: 0.1s;
 
-  --tasks-radius-xl: 28px;
-  --tasks-radius-lg: 22px;
-  --tasks-radius-md: 16px;
+  --tasks-radius-xl: 16px;
+  --tasks-radius-lg: 11px;
+  --tasks-radius-md: 9px;
   --tasks-radius-pill: 999px;
 
-  --tasks-nav-offset: 88px;
-  --tasks-footer-offset: 150px;
-  --tasks-max: 760px;
+  --tasks-nav-gap: 8px;
+  --tasks-nav-offset: calc(var(--pp-nav-height, 72px) + var(--tasks-nav-gap));
+
+  --tasks-shell-max: clamp(640px, 72vw, 880px);
+  --tasks-hero-max: min(46rem, min(92vw, 880px));
+
+  --tasks-page-pad-x: clamp(18px, 3.2vw, 34px);
+  --tasks-page-pad-y: clamp(10px, min(1.5vw, 1.55vh), 18px);
+  --tasks-page-pad-bottom: clamp(12px, min(2.3vw, 2.1vh), 22px);
+
+  --tasks-stack-gap: clamp(16px, min(2.4vw, 2.35vh), 26px);
+
+  --tasks-inner-stack-gap: clamp(10px, min(1.65vw, 1.55vh), 16px);
+
+  --tasks-panel-pad-y: clamp(16px, min(2.2vw, 2.1vh), 26px);
+  --tasks-panel-pad-x: clamp(18px, min(2.6vw, 2.4vh), 30px);
+
+  --tasks-touch-min: 44px;
+  --tasks-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
-/* =========================================================
-   ROUTE SCOPE
-========================================================= */
+/* --------------------------------------------------------------------------
+   ROUTE: Homepage-like page flow by default (content-sized, footer visible)
+   - Logged out / loading: no forced fullscreen panels
+   - Authed: adds a body class to enable height-aware internal scrolling
+--------------------------------------------------------------------------- */
 body.route-tasks {
   margin: 0 !important;
-  background: transparent;
-  overflow: hidden !important;
-}
-
-body.route-tasks #root {
+  overflow-x: clip;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+}
+
+/* Ensure app container doesn't override the route background */
+body.route-tasks .app-container {
+  background: transparent;
 }
 
 body.route-tasks .main-content {
   width: 100%;
-  max-width: none;
-  margin: 0;
-  padding: var(--tasks-nav-offset) 0 0;
+  max-width: none !important;
+  margin: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   box-sizing: border-box;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  background: transparent !important;
+  overflow-x: clip;
 }
 
-/* =========================================================
-   PAGE LAYOUT
-========================================================= */
+/* Authed only: keep route sizing consistent with other pages (no extra overflow traps).
+   Internal scroll is handled by TaskList's .tasks-scroll-shell. */
+
+/* --------------------------------------------------------------------------
+   PAGE
+--------------------------------------------------------------------------- */
+@keyframes tasks-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tasks-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tasks-shell-in {
+  from {
+    transform: translateY(8px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes tasks-lock-icon-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .tasks-page {
   width: 100%;
-  height: calc(100vh - var(--tasks-nav-offset) - var(--tasks-footer-offset));
+  flex: 1 1 auto;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 14px 18px 18px;
   box-sizing: border-box;
-  background:
-    radial-gradient(circle at top left, rgba(255, 230, 239, 0.75), transparent 26%),
-    radial-gradient(circle at top right, rgba(255, 240, 246, 0.8), transparent 24%),
-    linear-gradient(180deg, var(--tasks-bg-1) 0%, var(--tasks-bg-2) 48%, var(--tasks-bg-3) 100%);
-  color: var(--tasks-text);
-  font-family: "Inter", "Poppins", sans-serif;
-  overflow: hidden;
-}
-
-.tasks-stage {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.tasks-shell {
-  width: min(100%, var(--tasks-max));
-  max-height: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 16px;
-  margin: 0 auto;
-}
-
-/* =========================================================
-   HERO
-========================================================= */
-.tasks-hero {
-  width: 100%;
-  margin: 0 auto;
-  padding: 28px 32px;
+  position: relative;
+  isolation: isolate;
+  padding:
+    calc(var(--pp-nav-height, 72px) + clamp(6px, 1vh, 10px))
+    clamp(18px, 3vw, 34px)
+    clamp(20px, 3vh, 32px);
   background: linear-gradient(
     180deg,
-    var(--tasks-card-strong),
-    rgba(255, 248, 251, 0.96)
+    #eef4ff 0%,
+    #e9f0ff 22%,
+    #e4ecfb 48%,
+    #dfe7f6 72%,
+    #d9e1f0 100%
   );
-  border: 1px solid var(--tasks-border);
-  border-radius: var(--tasks-radius-xl);
-  box-shadow: var(--tasks-shadow-md);
+  color: var(--tasks-text);
+  font-family: var(--tasks-font);
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-x: clip;
+}
+
+.tasks-page::before {
+  content: none;
+}
+
+.tasks-page::after {
+  content: none;
+}
+
+.tasks-stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
   justify-content: center;
+  align-items: flex-start;
+  padding-inline: clamp(12px, 2.5vw, 28px);
+  padding-top: clamp(8px, 1.2vh, 14px);
+  box-sizing: border-box;
+}
+
+.tasks-shell {
+  width: min(100%, var(--tasks-shell-max));
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.2vw, 16px);
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Align hero + panel to same max width as tokens */
+@media (min-width: 860px) {
+  .tasks-shell {
+    max-width: min(900px, var(--tasks-shell-max));
+  }
+}
+
+@media (min-width: 1280px) {
+  .tasks-shell {
+    max-width: min(960px, var(--tasks-shell-max));
+  }
+}
+
+/* Authed: allow shell to size naturally (internal scroll lives in TaskList) */
+
+/* --------------------------------------------------------------------------
+   HERO — product header, not generic centered copy
+--------------------------------------------------------------------------- */
+.tasks-hero {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   box-sizing: border-box;
+  padding: 0 0 6px;
+}
+
+.tasks-hero::after {
+  content: none;
+}
+
+.tasks-hero-inner {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 16px 24px;
+  box-sizing: border-box;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.tasks-hero-inner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 8px 32px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  z-index: 0;
+}
+
+.tasks-hero-inner::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  background: radial-gradient(
+    circle at center,
+    rgba(59, 130, 246, 0.12),
+    transparent 70%
+  );
+  z-index: -1;
+}
+
+.tasks-hero-badge,
+.tasks-title,
+.tasks-subtitle {
+  position: relative;
+  z-index: 1;
 }
 
 .tasks-hero-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 32px;
-  padding: 0 14px;
+  min-height: 21px;
+  padding: 0 10px;
   border-radius: var(--tasks-radius-pill);
-  background: rgba(255, 110, 167, 0.08);
-  border: 1px solid rgba(240, 164, 194, 0.24);
-  color: #ff6ea7;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(241, 245, 249, 0.92) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  color: #475569;
+  font-size: clamp(0.5625rem, 1.15vw, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  margin-bottom: 14px;
+  margin-bottom: 5px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+  animation: tasks-fade-up var(--tasks-dur-enter) var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 1);
+  transition:
+    box-shadow 0.3s var(--tasks-ease-out),
+    border-color 0.25s var(--tasks-ease-out);
 }
 
-.tasks-hero-copy {
-  margin: 0;
-  max-width: 560px;
+@supports (backdrop-filter: blur(8px)) {
+  .tasks-hero-badge {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
 .tasks-title {
   margin: 0;
-  font-family: "Dancing Script", cursive;
-  font-size: clamp(2.2rem, 3vw, 2.8rem);
-  line-height: 1.1;
-  color: var(--tasks-text-strong);
+  font-size: clamp(1.18rem, 1.7vw, 1.54rem);
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  color: transparent;
+  font-weight: 700;
+  font-feature-settings: "ss01" 1, "cv01" 1;
+  background: linear-gradient(120deg, #0f172a 0%, #1e40af 38%, #2563eb 70%, #0ea5e9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+  animation: tasks-fade-up var(--tasks-dur-enter) var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 3);
+  transition:
+    background-position 0.5s var(--tasks-ease-out),
+    filter 0.3s var(--tasks-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tasks-title:hover {
+    background-position: 8% 0;
+    filter: brightness(1.03);
+  }
+
+  .tasks-hero-inner:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .tasks-subtitle {
-  margin: 14px 0 0;
-  font-size: 1rem;
-  line-height: 1.6;
-  color: var(--tasks-text);
-  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
-  font-weight: 600;
+  margin: 4px 0 0;
+  font-size: clamp(0.76rem, 0.88vw, 0.84rem);
+  line-height: 1.34;
+  letter-spacing: -0.013em;
+  color: #5c6570;
+  font-weight: 400;
+  max-width: 32ch;
+  overflow-wrap: break-word;
+  animation: tasks-fade-up var(--tasks-dur-enter) var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 5);
 }
 
-/* =========================================================
-   PANEL
-========================================================= */
-.tasks-panel {
-  width: 100%;
-  min-height: 0;
-  margin: 0 auto;
-  background: linear-gradient(180deg, var(--tasks-card-strong), rgba(255, 248, 251, 0.96));
-  border: 1px solid var(--tasks-border);
-  border-radius: var(--tasks-radius-xl);
-  box-shadow: var(--tasks-shadow-md);
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  overflow: hidden;
+/* Keep hero centered across sizes (matches overall Tasks layout) */
+
+@supports (text-wrap: balance) {
+  .tasks-title,
+  .tasks-subtitle {
+    text-wrap: balance;
+  }
 }
 
-.tasks-feedback {
-  width: 100%;
-}
+@media (max-height: 950px) {
+  .tasks-page {
+    padding-top: calc(var(--pp-nav-height, 72px) + 8px);
+    padding-bottom: clamp(14px, 2.5vh, 26px);
+  }
 
-.loading-message,
-.login-prompt {
-  margin: 0;
-  width: 100%;
-  text-align: center;
-  border-radius: 18px;
-  padding: 18px 16px;
-  font-family: "Quicksand", "Nunito", system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  box-sizing: border-box;
-}
-
-.loading-message {
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--tasks-text);
-  border: 1px solid var(--tasks-border);
-}
-
-.login-prompt {
-  background: rgba(255, 248, 251, 0.96);
-  color: #c88499;
-  border: 1px solid rgba(241, 210, 220, 0.95);
-}
-
-/* =========================================================
-   TABLET
-========================================================= */
-@media (max-width: 900px) {
-  :root {
-    --tasks-nav-offset: 84px;
-    --tasks-footer-offset: 170px;
-    --tasks-max: 720px;
+  .tasks-stage {
+    align-items: flex-start;
+    padding-top: clamp(6px, 1vh, 12px);
   }
 
   .tasks-shell {
-    padding: 12px;
-    gap: 14px;
+    gap: 10px;
+  }
+
+  .tasks-hero {
+    padding: 0 0 7px;
+  }
+
+  .tasks-hero-inner {
+    max-width: 610px;
+    padding: 15px 22px;
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: 4px;
+  }
+
+  .tasks-title {
+    font-size: clamp(1.12rem, 1.62vw, 1.46rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: 3px;
+    font-size: clamp(0.74rem, 0.86vw, 0.82rem);
+    line-height: 1.35;
+  }
+
+  .tasks-panel {
+    padding: clamp(9px, 1.05vw, 13px) clamp(10px, 1.4vw, 16px);
+  }
+
+  .task-list-wrapper {
+    gap: 6px;
+  }
+
+  .tasklist-summary-card {
+    padding: 7px 2px 8px;
+  }
+
+  .tasklist-compose-card {
+    padding: 1px 2px 8px;
+  }
+
+  .tasks-board {
+    padding: 5px 2px 4px;
+    gap: 6px;
+  }
+
+  /* Taller-than-940 laptop band: cap panel so hero + shell fit; list scrolls inside. */
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact) {
+    max-height: min(478px, 64vh);
   }
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
-@media (max-width: 640px) {
-  :root {
-    --tasks-nav-offset: 78px;
-    --tasks-footer-offset: 190px;
+@media (max-height: 940px) {
+  .tasks-page {
+    padding-top: calc(var(--pp-nav-height, 72px) + 6px);
+    padding-bottom: 14px;
   }
 
+  .tasks-stage {
+    align-items: flex-start;
+    padding-top: 6px;
+  }
+
+  .tasks-shell {
+    gap: 8px;
+  }
+
+  .tasks-hero {
+    padding: 0 0 4px;
+  }
+
+  .tasks-hero-inner {
+    max-width: 600px;
+    padding: 14px 20px;
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: 4px;
+  }
+
+  .tasks-title {
+    font-size: clamp(1.08rem, 1.55vw, 1.4rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: 3px;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    max-width: 34ch;
+  }
+
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact) {
+    max-height: min(470px, 63vh);
+  }
+}
+
+@media (max-height: 840px) {
+  .tasks-page {
+    padding-top: calc(var(--pp-nav-height, 72px) + 4px);
+    padding-bottom: 8px;
+  }
+
+  .tasks-stage {
+    align-items: flex-start;
+    padding-top: 4px;
+  }
+
+  .tasks-shell {
+    gap: 8px;
+  }
+
+  .tasks-hero {
+    padding: 0 0 4px;
+  }
+
+  .tasks-title {
+    font-size: clamp(1.1rem, 1.7vw, 1.42rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: 3px;
+    font-size: 0.78rem;
+    line-height: 1.34;
+    max-width: 36ch;
+  }
+
+  .tasks-panel {
+    padding: 9px 10px;
+    border-radius: 16px;
+  }
+
+  .tasklist-summary-card {
+    padding: 6px 2px 7px;
+  }
+
+  .tasklist-compose-card {
+    padding: 1px 2px 8px;
+  }
+
+  .tasklist-progress-track {
+    margin-top: 6px;
+  }
+
+  .tasks-board {
+    padding: 4px 2px 3px;
+    gap: 5px;
+  }
+
+  body.route-tasks .tasks-board .planner-task-main-row {
+    grid-template-columns: 34px minmax(0, 1fr);
+    gap: 8px;
+    padding: 7px 9px;
+  }
+
+  body.route-tasks .tasks-board .planner-heart-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+  }
+}
+
+/* Very short screens: allow page scroll so content remains reachable */
+@media (max-height: 700px) {
   body.route-tasks {
-    overflow: auto !important;
+    overflow-y: auto;
+    overflow-x: clip;
   }
 
-  body.route-tasks #root {
+  body.route-tasks .main-content,
+  body.route-tasks .tasks-page,
+  body.route-tasks .tasks-shell,
+  body.route-tasks .tasks-panel {
     overflow: visible;
   }
 
   body.route-tasks .main-content {
-    overflow: visible;
-  }
-
-  .tasks-page {
     height: auto;
-    min-height: calc(100vh - var(--tasks-nav-offset));
-    overflow: visible;
-    align-items: flex-start;
-    padding: 10px 10px 20px;
-  }
-
-  .tasks-stage {
-    height: auto;
-  }
-
-  .tasks-shell {
-    padding: 8px 0;
-    gap: 12px;
-  }
-
-  .tasks-hero,
-  .tasks-panel {
-    border-radius: 22px;
-    padding: 14px;
-  }
-
-  .tasks-title {
-    font-size: 2rem;
-  }
-
-  .tasks-subtitle {
-    font-size: 0.92rem;
   }
 }
 
-/* =========================================================
-   EXTRA SMALL
-========================================================= */
-@media (max-width: 380px) {
-  .tasks-title {
-    font-size: 1.8rem;
+/* --------------------------------------------------------------------------
+   PANEL
+--------------------------------------------------------------------------- */
+.tasks-panel {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  position: relative;
+  isolation: isolate;
+  padding: clamp(9px, 1.1vw, 14px) clamp(11px, 1.5vw, 18px);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(248, 250, 252, 0.96) 100%
+  );
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: calc(var(--tasks-radius-xl) + 1px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 12px 30px rgba(15, 23, 42, 0.08),
+    0 2px 10px rgba(15, 23, 42, 0.04);
+  animation: tasks-panel-in calc(var(--tasks-dur-enter) + 0.04s) var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 6);
+  transition:
+    box-shadow 0.45s var(--tasks-ease-out),
+    border-color 0.32s var(--tasks-ease-out),
+    transform 0.45s var(--tasks-ease-out);
+}
+
+.tasks-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.98),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.018);
+}
+
+@supports (backdrop-filter: blur(12px)) {
+  .tasks-panel {
+    backdrop-filter: saturate(1.08) blur(0.5px);
   }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact):hover {
+    box-shadow: var(--tasks-shadow-panel-hover);
+    border-color: rgba(15, 23, 42, 0.082);
+    transform: translateY(-1px);
+  }
+}
+
+.tasks-panel > * {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+
+/* Tighter chrome when only auth/loading UI (not full TaskList dashboard) */
+.tasks-panel--compact {
+  --tasks-panel-pad-y: clamp(14px, min(2.4vw, 2.15vh), 18px);
+  --tasks-panel-pad-x: clamp(14px, min(2.6vw, 2.35vh), 20px);
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  transform: translateZ(0);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, #f4f7fb 100%);
+  border-color: rgba(15, 23, 42, 0.1);
+  border-radius: calc(var(--tasks-radius-xl) + 1px);
+  box-shadow: var(--tasks-shadow-card);
+  transition:
+    transform 0.42s var(--tasks-ease-out),
+    box-shadow 0.42s var(--tasks-ease-out),
+    border-color 0.32s var(--tasks-ease-out);
+  animation: tasks-panel-in calc(var(--tasks-dur-enter) + 0.06s) var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 7);
+}
+
+/* Compact states should not feel like a full-height workspace panel */
+body.route-tasks .tasks-panel--compact {
+  width: min(100%, min(640px, var(--tasks-shell-max)));
+  margin-inline: auto;
+}
+
+/* When panel is compact (loading / locked), center it within the available shell space */
+body.route-tasks:not(.route-tasks-authed) .tasks-shell {
+  justify-content: center;
+}
+
+.tasks-panel--compact::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    0 -1px 0 rgba(15, 23, 42, 0.03) inset;
+}
+
+.tasks-panel--compact > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tasks-feedback {
+  width: 100%;
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------------------
+   LOCKED — intentional product state (auth gate)
+--------------------------------------------------------------------------- */
+.tasks-locked {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.tasks-locked-inner {
+  width: 100%;
+  max-width: min(19rem, 100%);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+}
+
+.tasks-locked-iconWrap {
+  width: clamp(44px, min(8vw, 7.2vh), 50px);
+  height: clamp(44px, min(8vw, 7.2vh), 50px);
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(155deg, #ffffff 0%, rgba(37, 99, 235, 0.06) 100%);
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  color: #1d4ed8;
+  margin-bottom: clamp(11px, min(2vw, 1.8vh), 14px);
+  flex-shrink: 0;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.75) inset,
+    0 1px 2px rgba(15, 23, 42, 0.045),
+    0 6px 16px -8px rgba(37, 99, 235, 0.16);
+  animation: tasks-lock-icon-in 0.56s var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 9);
+}
+
+.tasks-locked-svg {
+  width: clamp(22px, 4.6vw, 26px);
+  height: clamp(22px, 4.6vw, 26px);
+  opacity: 0.94;
+}
+
+.tasks-locked-eyebrow {
+  margin: 0 0 clamp(6px, 1vh, 8px);
+  font-size: clamp(0.5625rem, 1.45vw, 0.625rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #64748b;
+  animation: tasks-fade-up 0.5s var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 11);
+}
+
+.tasks-locked-title {
+  margin: 0;
+  font-size: clamp(1.05rem, min(2.6vw, 2.4vh), 1.22rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  color: var(--tasks-text-strong);
+  animation: tasks-fade-up 0.5s var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 12);
+}
+
+.tasks-locked-desc {
+  margin: clamp(8px, min(1.5vw, 1.4vh), 12px) 0 0;
+  font-size: clamp(0.8125rem, min(1.9vw, 1.75vh), 0.90625rem);
+  line-height: 1.48;
+  color: #64748b;
+  font-weight: 400;
+  max-width: 30ch;
+  overflow-wrap: break-word;
+  animation: tasks-fade-up 0.5s var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 13);
+}
+
+.tasks-locked-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(8px, min(1.6vh, 1.6vw), 9px);
+  margin-top: clamp(14px, min(2.6vh, 2.6vw), 18px);
+  width: 100%;
+  max-width: min(16rem, 100%);
+  animation: tasks-fade-up 0.5s var(--tasks-ease-surface) both;
+  animation-delay: calc(var(--tasks-dur-stagger-step) * 14);
+}
+
+.tasks-locked-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: clamp(42px, min(9vw, 8.5vh), 44px);
+  padding: 12px 24px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 48%, #1e40af 100%);
+  color: #ffffff;
+  font-size: clamp(0.890625rem, 1.95vw, 0.9375rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  transition:
+    background 0.2s var(--tasks-ease-out),
+    box-shadow 0.2s var(--tasks-ease-out),
+    transform 0.18s var(--tasks-ease-tap),
+    filter 0.2s var(--tasks-ease-out),
+    border-color 0.2s var(--tasks-ease-out);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28) inset,
+    0 -1px 0 rgba(15, 23, 42, 0.12) inset,
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 8px 22px -8px rgba(37, 99, 235, 0.38);
+}
+
+.tasks-locked-cta:hover {
+  background: linear-gradient(180deg, #1d4ed8 0%, #1e40af 50%, #1d4ed8 100%);
+  color: #ffffff;
+  transform: translateY(-1px);
+  filter: brightness(1.015);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.34) inset,
+    0 -1px 0 rgba(15, 23, 42, 0.08) inset,
+    0 4px 12px rgba(15, 23, 42, 0.07),
+    0 14px 36px -10px rgba(37, 99, 235, 0.38);
+}
+
+.tasks-locked-cta:active {
+  transform: translateY(0) scale(0.992);
+  filter: brightness(0.99);
+  transition-duration: var(--tasks-dur-press);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 2px 8px -2px rgba(30, 64, 175, 0.35);
+}
+
+.tasks-locked-cta:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 2px;
+}
+
+.tasks-locked-link {
+  font-size: clamp(0.8125rem, 1.85vw, 0.875rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #475569;
+  text-decoration: none;
+  padding: 8px 12px;
+  margin-top: 0;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  transition:
+    color 0.18s var(--tasks-ease-out),
+    background-color 0.18s var(--tasks-ease-out),
+    border-color 0.18s var(--tasks-ease-out),
+    box-shadow 0.18s var(--tasks-ease-out);
+}
+
+.tasks-locked-link:hover {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.1);
+  box-shadow: none;
+}
+
+.tasks-locked-link:active {
+  background: rgba(37, 99, 235, 0.09);
+}
+
+.tasks-locked-link:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+  border-radius: 9px;
+}
+
+/* --------------------------------------------------------------------------
+   WIDTH: large desktop → tablet
+--------------------------------------------------------------------------- */
+@media (min-width: 1280px) {
+  :root {
+    --tasks-shell-max: clamp(720px, 58vw, 960px);
+    --tasks-hero-max: min(56rem, min(58vw, 960px));
+  }
+}
+
+@media (min-width: 1536px) {
+  :root {
+    --tasks-page-pad-x: clamp(18px, 2.6vw, 36px);
+  }
+}
+
+/* Medium desktop — same band as homepage @ 1180px */
+@media (max-width: 1180px) {
+  :root {
+    --tasks-stack-gap: clamp(10px, min(2.1vw, 1.95vh), 18px);
+    --tasks-hero-max: min(48rem, 92vw);
+  }
+}
+
+/* Laptop / small desktop — ~1044×834 and similar: contained rail, tighter rhythm */
+@media (max-width: 1100px) {
+  :root {
+    --tasks-shell-max: min(900px, 92vw);
+    --tasks-hero-max: min(48rem, min(92vw, 900px));
+    --tasks-stack-gap: clamp(10px, min(1.9vw, 1.75vh), 18px);
+    --tasks-inner-stack-gap: clamp(9px, min(1.45vw, 1.35vh), 14px);
+    --tasks-page-pad-y: clamp(6px, min(1.5vw, 1.45vh), 14px);
+    --tasks-page-pad-bottom: clamp(10px, min(2.4vw, 2.3vh), 20px);
+    --tasks-panel-pad-y: clamp(12px, min(2.1vw, 1.95vh), 20px);
+    --tasks-panel-pad-x: clamp(14px, 2.2vw, 24px);
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(5px, min(1.35vw, 1.2vh), 10px);
+  }
+
+  .tasks-title {
+    font-size: clamp(1.26rem, min(2.55vw, 2.35vh), 1.68rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(4px, 0.85vw, 7px);
+  }
+
+  .tasks-panel--compact {
+    --tasks-panel-pad-y: clamp(12px, min(2.4vw, 2.1vh), 18px);
+    --tasks-panel-pad-x: clamp(12px, 2.6vw, 20px);
+  }
+}
+
+/* 1160×~950 band — tighten shell and panel so everything fits without page scroll */
+@media (max-width: 1200px) and (max-height: 950px) {
+  :root {
+    --tasks-shell-max: min(820px, 88vw);
+    --tasks-hero-max: min(42rem, min(88vw, 820px));
+    --tasks-stack-gap: clamp(4px, min(1.0vw, 0.9vh), 10px);
+    --tasks-inner-stack-gap: clamp(4px, min(0.9vw, 0.85vh), 9px);
+    --tasks-page-pad-y: clamp(2px, min(0.9vw, 0.8vh), 8px);
+    --tasks-page-pad-bottom: clamp(4px, min(1.1vw, 1.0vh), 10px);
+    --tasks-panel-pad-y: clamp(8px, min(1.3vw, 1.2vh), 14px);
+    --tasks-panel-pad-x: clamp(12px, min(1.9vw, 1.7vh), 20px);
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(4px, min(1vw, 0.9vh), 10px);
+  }
+
+  /* Height-aware cap aligns with max-height: 940px band; avoids overriding shorter caps. */
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact) {
+    max-height: min(470px, 63vh);
+  }
+}
+
+/* Laptop band ~1160×926 — extra tightening to mirror auth routes */
+@media (min-width: 1024px) and (max-width: 1200px) and (min-height: 820px) and (max-height: 960px) {
+  :root {
+    --tasks-shell-max: min(840px, 88vw);
+    --tasks-hero-max: min(40rem, min(88vw, 840px));
+    --tasks-stack-gap: clamp(4px, min(1.0vw, 0.9vh), 10px);
+    --tasks-inner-stack-gap: clamp(4px, min(0.9vw, 0.85vh), 9px);
+    --tasks-page-pad-y: clamp(2px, min(0.8vw, 0.8vh), 8px);
+    --tasks-page-pad-bottom: clamp(4px, min(1.1vw, 1.0vh), 10px);
+    --tasks-panel-pad-y: clamp(8px, min(1.2vw, 1.1vh), 14px);
+    --tasks-panel-pad-x: clamp(11px, min(1.8vw, 1.6vh), 20px);
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(2px, min(0.6vw, 0.55vh), 5px);
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: clamp(2px, min(0.7vw, 0.65vh), 5px);
+  }
+
+  .tasks-title {
+    font-size: clamp(1.05rem, min(1.95vw, 1.8vh), 1.4rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(1px, min(0.6vw, 0.55vh), 4px);
+    max-width: min(30ch, 80vw);
+    font-size: clamp(0.74rem, min(0.9vw, 0.86vh), 0.82rem);
+    line-height: 1.34;
+  }
+
+  /* Match laptop-height panel cap with max-height: 940px rule (list scrolls inside). */
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact) {
+    max-height: min(470px, 63vh);
+  }
+}
+
+/* Tablet / laptop width (768–1100px): footer reserve for TaskList scroll calc — not on narrow phones */
+@media (max-width: 1100px) and (min-width: 768px) {
+  :root {
+    --tasks-footer-reserve: 122px;
+  }
+}
+
+/* Short viewports — wide-but-not-laptop widths only (does NOT apply at 1044px; avoids overriding 1100×900 band) */
+@media (min-width: 1101px) and (max-width: 1200px) and (max-height: 900px) {
+  :root {
+    --tasks-stack-gap: clamp(6px, min(1.95vw, 1.75vh), 12px);
+    --tasks-page-pad-y: clamp(3px, min(1.45vw, 1.35vh), 11px);
+    --tasks-page-pad-bottom: clamp(7px, min(2.2vw, 2.1vh), 17px);
+    --tasks-panel-pad-y: clamp(9px, min(2.05vw, 1.9vh), 15px);
+    --tasks-panel-pad-x: clamp(10px, 2.1vw, 19px);
+    --tasks-inner-stack-gap: clamp(7px, min(1.4vw, 1.3vh), 11px);
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(5px, min(1.35vw, 1.2vh), 10px);
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: clamp(5px, min(1.15vw, 1.05vh), 9px);
+    min-height: 21px;
+  }
+
+  .tasks-title {
+    font-size: clamp(1.24rem, min(2.5vw, 2.25vh), 1.62rem);
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(4px, 0.85vh, 7px);
+    line-height: 1.4;
+  }
+}
+
+/*
+ * Laptop target ~1044×834: fit hero + panel + footer in one screen — no page-level scroll.
+ * Space budget: reserve footer below main; push overflow into .tasks-scroll-shell only.
+ */
+@media (max-width: 1100px) and (max-height: 900px) {
+  :root {
+    --tasks-footer-reserve: 118px;
+    --tasks-shell-max: min(860px, 92vw);
+    --tasks-hero-max: min(46rem, min(92vw, 860px));
+    --tasks-stack-gap: clamp(8px, min(1.45vw, 1.35vh), 16px);
+    --tasks-inner-stack-gap: clamp(8px, min(1.15vw, 1.1vh), 12px);
+    --tasks-page-pad-y: clamp(4px, min(1.1vw, 1vh), 12px);
+    --tasks-page-pad-bottom: clamp(8px, min(1.75vw, 1.65vh), 16px);
+    --tasks-panel-pad-y: clamp(12px, min(1.55vw, 1.45vh), 18px);
+    --tasks-panel-pad-x: clamp(12px, min(1.85vw, 1.7vh), 22px);
+  }
+
+  .tasks-shell {
+    padding-block: 0;
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(3px, min(1vw, 0.95vh), 8px);
+  }
+
+  .tasks-hero-badge {
+    min-height: 20px;
+    padding: 0 clamp(8px, 1.8vw, 12px);
+    margin-bottom: clamp(3px, min(0.95vw, 0.85vh), 7px);
+  }
+
+  .tasks-title {
+    font-size: clamp(1.16rem, min(2.25vw, 2.05vh), 1.52rem);
+    line-height: 1.05;
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(2px, min(0.75vw, 0.7vh), 5px);
+    max-width: min(32ch, 92vw);
+    font-size: clamp(0.75rem, min(0.98vw, 0.92vh), 0.875rem);
+    line-height: 1.36;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --tasks-stack-gap: clamp(8px, min(2.2vw, 2vh), 14px);
+    --tasks-inner-stack-gap: clamp(8px, min(1.5vw, 1.4vh), 12px);
+  }
+
+  .tasks-hero-inner {
+    max-width: min(100%, 31rem);
+    padding: 8px 16px 10px;
+  }
+
+  .tasks-subtitle {
+    max-width: 32ch;
+  }
+}
+
+/* Tablet: keep viewport-contained behavior (only list scrolls) */
+@media (max-width: 950px) {
+  body.route-tasks .main-content {
+    padding-top: 64px !important;
+    overflow: hidden;
+  }
+
+  :root {
+    --tasks-shell-max: min(900px, 100%);
+    --tasks-stack-gap: clamp(12px, min(2.4vw, 2.2vh), 20px);
+  }
+
+  .tasks-subtitle {
+    max-width: min(44ch, 100%);
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --tasks-nav-gap: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --tasks-page-pad-y: clamp(8px, 2.5vh, 18px);
+    --tasks-panel-pad-y: clamp(12px, 3.2vw, 18px);
+  }
+
+  .tasks-panel--compact {
+    --tasks-panel-pad-y: clamp(10px, 2.8vw, 16px);
+  }
+
+  .tasks-title {
+    font-size: clamp(1.12rem, 4vw, 1.45rem);
+  }
+
+  .tasks-hero-inner {
+    max-width: min(100%, 28rem);
+    padding: 8px 14px 10px;
+    border-radius: 28px;
+  }
+
+  .tasks-subtitle {
+    max-width: 30ch;
+    font-size: 0.82rem;
+    line-height: 1.38;
+  }
+}
+
+/* Mobile — match homepage tight horizontal padding */
+@media (max-width: 600px) {
+  body.route-tasks .main-content {
+    padding-top: 64px !important;
+  }
+
+  .tasks-page {
+    padding: 16px 14px 22px;
+    padding-left: max(14px, env(safe-area-inset-left, 0px));
+    padding-right: max(14px, env(safe-area-inset-right, 0px));
+    padding-bottom: max(22px, env(safe-area-inset-bottom, 0px));
+  }
+
+  :root {
+    --tasks-stack-gap: clamp(12px, 2.8vh, 18px);
+  }
+
+  .tasks-hero-inner {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 12px 10px;
+    border-radius: 24px;
+  }
+
+  .tasks-subtitle {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --tasks-shell-max: 100%;
+    --tasks-page-pad-x: clamp(12px, 4vw, 18px);
+    --tasks-stack-gap: clamp(12px, 3vh, 18px);
+  }
+
+  .tasks-panel,
+  .tasks-panel--compact {
+    border-radius: var(--tasks-radius-lg);
+  }
+}
+
+@media (max-width: 420px) {
+  .tasks-locked-actions {
+    max-width: none;
+  }
+
+  .tasks-locked-cta {
+    width: 100%;
+    min-height: var(--tasks-touch-min);
+  }
+}
+
+@media (max-width: 360px) {
+  .tasks-page {
+    padding-left: max(10px, env(safe-area-inset-left, 0px));
+    padding-right: max(10px, env(safe-area-inset-right, 0px));
+  }
+}
+
+/* --------------------------------------------------------------------------
+   HEIGHT: tall viewports (1100px+)
+   Vertically center hero + panel cluster; cap authed panel so it does not stretch
+   with the viewport. Does not apply when max-height bands (950/940/840/700) are active.
+--------------------------------------------------------------------------- */
+@media (min-height: 1100px) {
+  .tasks-stage {
+    align-items: center;
+    justify-content: center;
+    /* Slight top bias vs. perfect center: less pad-top, more pad-bottom */
+    padding-top: clamp(4px, 1vh, 14px);
+    padding-bottom: clamp(18px, 3vh, 40px);
+  }
+
+  .tasks-shell {
+    flex: 0 1 auto;
+    gap: clamp(12px, 1.5vh, 22px);
+  }
+
+  .tasks-hero {
+    padding: 0 0 clamp(8px, 1.1vh, 16px);
+  }
+
+  /* Full workspace panel: bounded height; TaskList keeps scroll inside .tasks-scroll-shell */
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact) {
+    flex: 0 1 auto;
+    max-height: min(560px, 52vh);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   HEIGHT: shorter viewports — wide screens only (≥1101px).
+   Laptop ≤1100px uses the dedicated 1100×900 band so it is not overridden here.
+--------------------------------------------------------------------------- */
+@media (max-height: 900px) and (min-width: 1101px) {
+  :root {
+    --tasks-stack-gap: clamp(6px, min(2.1vw, 1.9vh), 14px);
+    --tasks-page-pad-y: clamp(4px, min(1.8vw, 1.6vh), 14px);
+    --tasks-page-pad-bottom: clamp(8px, min(2.4vw, 2.4vh), 18px);
+    --tasks-inner-stack-gap: clamp(6px, min(1.35vw, 1.3vh, 1.85vmin), 11px);
+  }
+
+  .tasks-hero {
+    padding-bottom: clamp(6px, min(1.5vw, 1.3vh), 12px);
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: clamp(5px, min(1.3vw, 1.2vh), 10px);
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(4px, 1vh, 8px);
+  }
+
+  .tasks-panel--compact {
+    --tasks-panel-pad-y: clamp(12px, min(2.4vw, 2.1vh), 18px);
+  }
+}
+
+@media (max-height: 800px) {
+  :root {
+    --tasks-nav-gap: 6px;
+    --tasks-stack-gap: clamp(4px, min(1.6vw, 1.5vh), 10px);
+    --tasks-page-pad-y: clamp(2px, min(1.3vw, 1.2vh), 10px);
+    --tasks-page-pad-bottom: clamp(6px, min(2.2vw, 2.1vh), 14px);
+  }
+
+  .tasks-hero-badge {
+    margin-bottom: clamp(4px, 1.2vh, 8px);
+  }
+
+  .tasks-subtitle {
+    margin-top: clamp(3px, 0.85vh, 6px);
+  }
+
+  .tasks-panel--compact {
+    --tasks-panel-pad-y: clamp(10px, min(2.2vw, 1.9vh), 14px);
+  }
+}
+
+@media (max-height: 700px) {
+  :root {
+    --tasks-nav-gap: 4px;
+    --tasks-stack-gap: clamp(6px, min(1.85vw, 1.75vh), 12px);
+    --tasks-inner-stack-gap: clamp(5px, min(1.2vw, 1.15vh, 1.6vmin), 9px);
+    --tasks-panel-pad-y: clamp(8px, min(1.75vw, 1.65vh), 14px);
+    --tasks-panel-pad-x: clamp(10px, min(2vw, 1.85vh), 18px);
+  }
+
+  .tasks-title {
+    font-size: clamp(1.25rem, min(3.5vw, 3vh), 1.65rem);
+  }
+
+  .tasks-locked-actions {
+    margin-top: clamp(10px, 2vh, 14px);
+  }
+}
+
+@media (max-height: 600px) {
+  .tasks-page {
+    padding-top: clamp(4px, 1.5vh, 10px);
+  }
+
+  .tasks-locked-iconWrap {
+    margin-bottom: clamp(4px, 1vh, 8px);
+  }
+
+  .tasks-locked-desc {
+    margin-top: clamp(4px, 1vh, 8px);
+  }
+
+}
+
+@media (max-height: 520px) and (max-width: 1024px) {
+  .tasks-hero-badge {
+    min-height: 22px;
+    padding: 0 8px;
+    font-size: 0.6rem;
+  }
+
+  .tasks-subtitle {
+    line-height: 1.4;
+  }
+}
+
+/* Touch: keep targets; compact mode already uses min clamp */
+@media (hover: none) and (pointer: coarse) {
+  .tasks-locked-cta {
+    min-height: max(var(--tasks-touch-min), 44px);
+  }
+
+  .tasks-locked-link {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tasks-panel--compact:hover {
+    border-color: rgba(15, 23, 42, 0.1);
+    box-shadow: var(--tasks-shadow-card-hover);
+    transform: translateY(-2px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tasks-shell,
+  .tasks-hero-badge,
+  .tasks-title,
+  .tasks-subtitle,
+  .tasks-panel,
+  .tasks-panel--compact,
+  .tasks-locked-iconWrap,
+  .tasks-locked-eyebrow,
+  .tasks-locked-title,
+  .tasks-locked-desc,
+  .tasks-locked-actions {
+    animation: none !important;
+  }
+
+  .tasks-panel--compact {
+    transform: none !important;
+  }
+
+  body.route-tasks.route-tasks-authed .tasks-panel:not(.tasks-panel--compact):hover {
+    box-shadow: var(--tasks-shadow-panel);
+    transform: none;
+  }
+
+  .tasks-locked-cta,
+  .tasks-locked-link,
+  .tasks-panel--compact {
+    transition: none;
+  }
+
+  .tasks-locked-cta:hover,
+  .tasks-locked-cta:active {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   LOGGED OUT ONLY: vertically center hero + compact panel
+   - Does not affect authed workspace layout
+--------------------------------------------------------------------------- */
+body.route-tasks:not(.route-tasks-authed) .tasks-stage {
+  align-items: center;
+  justify-content: center;
+}
+
+body.route-tasks:not(.route-tasks-authed) .tasks-page {
+  padding-top: calc(var(--pp-nav-height, 72px) + 12px);
 }

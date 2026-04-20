@@ -16,6 +16,9 @@ let firebaseConfigCache = null;
 const fetchFirebaseConfig = async () => {
   if (firebaseConfigCache) return firebaseConfigCache;
   try {
+    if (!backendUrl) {
+      throw new Error("Missing REACT_APP_BACKEND_URL (cannot fetch Firebase config).");
+    }
     console.log("🔍 Fetching Firebase Config from:", `${backendUrl}/api/firebase-config`);
     const response = await fetch(`${backendUrl}/api/firebase-config`);
     if (!response.ok) throw new Error("Failed to fetch Firebase config.");
@@ -50,6 +53,11 @@ export const getFirebaseServices = async () => {
 
   const auth = getAuth(app);
   const database = getDatabase(app);
+
+  // Guard against a "resolved but unusable" state (prevents UIs from getting stuck on "Initializing…")
+  if (!auth || typeof auth !== "object") {
+    throw new Error("❌ Firebase Auth instance is unavailable.");
+  }
 
   // ✅ Automatically Refresh ID Token — fully commented out for safety
   onIdTokenChanged(auth, async (user) => {

@@ -30,11 +30,11 @@ export default function TaskList() {
       if (res.data.success) {
         setTasks(Object.values(res.data.tasks || {}));
       } else {
-        showNotification("❌ Error fetching tasks", "error");
+        showNotification("Error fetching tasks", "error");
       }
     } catch (error) {
-      console.error("❌ API Request Failed:", error);
-      showNotification("❌ Error fetching tasks", "error");
+      console.error("API request failed:", error);
+      showNotification("Error fetching tasks", "error");
     }
   }, []);
 
@@ -47,20 +47,26 @@ export default function TaskList() {
     [tasks]
   );
 
-  const progressPercent =
-    tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0;
+  const progressPercent = useMemo(
+    () =>
+      tasks.length > 0 ? Math.round((completedCount / tasks.length) * 100) : 0,
+    [tasks.length, completedCount]
+  );
 
-  const statusLabel =
-    tasks.length > 0 && completedCount === tasks.length ? "Done" : "Active";
+  const summaryText = useMemo(() => {
+    if (tasks.length === 0) return "No tasks yet";
+    return `${completedCount} of ${tasks.length} complete`;
+  }, [tasks.length, completedCount]);
 
-  const shouldScroll = tasks.length > 3;
+  /* Cap list height whenever there are tasks so the Tasks page can stay within the viewport on laptop widths (e.g. 1044px). */
+  const shouldScroll = tasks.length > 0;
 
   const handleAddTask = async (e) => {
     e.preventDefault();
 
     const trimmed = newTaskName.trim();
     if (!trimmed) {
-      return showNotification("⚠️ Task name required!", "error");
+      return showNotification("Task name is required", "error");
     }
 
     try {
@@ -85,13 +91,13 @@ export default function TaskList() {
           },
         ]);
         setNewTaskName("");
-        showNotification("🎀 Task added!", "success");
+        showNotification("Task added successfully", "success");
       } else {
-        showNotification("❌ Failed to add task", "error");
+        showNotification("Failed to add task", "error");
       }
     } catch (error) {
-      console.error("❌ Error adding task:", error);
-      showNotification("❌ Failed to add task", "error");
+      console.error("Error adding task:", error);
+      showNotification("Failed to add task", "error");
     }
   };
 
@@ -116,8 +122,8 @@ export default function TaskList() {
         );
       }
     } catch (error) {
-      console.error("❌ Error updating task:", error);
-      showNotification("❌ Failed to update task", "error");
+      console.error("Error updating task:", error);
+      showNotification("Failed to update task", "error");
     }
   };
 
@@ -132,13 +138,13 @@ export default function TaskList() {
 
       if (res.status === 200 && res.data.success) {
         setTasks((prev) => prev.filter((task) => task.task_id !== taskId));
-        showNotification("✨ Task deleted!", "success");
+        showNotification("Task deleted", "success");
       } else {
-        showNotification("❌ Failed to delete task", "error");
+        showNotification("Failed to delete task", "error");
       }
     } catch (error) {
-      console.error("❌ Error deleting task:", error);
-      showNotification("❌ Failed to delete task", "error");
+      console.error("Error deleting task:", error);
+      showNotification("Failed to delete task", "error");
     }
   };
 
@@ -154,44 +160,38 @@ export default function TaskList() {
         </div>
       )}
 
-      <section className="tasklist-summary-card">
+      <section className="tasklist-summary-card" aria-label="Task overview">
         <div className="tasklist-summary-header">
-          <div>
-            <p className="tasklist-summary-kicker">Task overview</p>
-            <h2 className="tasklist-summary-title">Daily checklist status</h2>
-          </div>
-
-          <span className="tasklist-progress-pill">{progressPercent}% complete</span>
+          <p className="tasklist-summary-line">{summaryText}</p>
+          {tasks.length > 0 && (
+            <span className="tasklist-summary-pct" aria-hidden="true">
+              {progressPercent}%
+            </span>
+          )}
         </div>
-
-        <div className="tasklist-stats-grid">
-          <div className="task-stat-card">
-            <span className="task-stat-label">Total</span>
-            <span className="task-stat-value">{tasks.length}</span>
+        {tasks.length > 0 && (
+          <div
+            className="tasklist-progress-track"
+            role="progressbar"
+            aria-valuenow={progressPercent}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={`${progressPercent}% complete`}
+          >
+            <div
+              className="tasklist-progress-fill"
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
-
-          <div className="task-stat-card">
-            <span className="task-stat-label">Completed</span>
-            <span className="task-stat-value">{completedCount}</span>
-          </div>
-
-          <div className={`task-stat-card ${statusLabel === "Done" ? "is-complete" : ""}`}>
-            <span className="task-stat-label">Status</span>
-            <span className="task-stat-value">{statusLabel}</span>
-          </div>
-        </div>
+        )}
       </section>
 
       <section className="tasklist-compose-card">
         <form onSubmit={handleAddTask} className="add-task-form">
           <div className="task-input-wrap">
-            <span className="task-input-icon" aria-hidden="true">
-              ✨
-            </span>
-
             <input
               type="text"
-              placeholder="Add a new task..."
+              placeholder="Add a task…"
               value={newTaskName}
               onChange={(e) => setNewTaskName(e.target.value)}
               className="task-input"
@@ -199,19 +199,14 @@ export default function TaskList() {
           </div>
 
           <button type="submit" className="add-task-button">
-            Add Task
+            Add task
           </button>
         </form>
       </section>
 
       <section className="tasks-board" aria-label="Tasks board">
         <div className="tasks-board-header">
-          <div>
-            <p className="tasks-board-kicker">Your list</p>
-            <h2 className="tasks-board-title">Today’s tasks</h2>
-          </div>
-
-          <span className="tasks-board-count">{tasks.length} items</span>
+          <h2 className="tasks-board-title">Tasks</h2>
         </div>
 
         {tasks.length > 0 ? (
@@ -229,9 +224,9 @@ export default function TaskList() {
           </div>
         ) : (
           <div className="tasklist-state-card empty">
-            <p className="tasklist-state-title">No tasks yet! 🌸</p>
+            <p className="tasklist-state-title">No tasks yet</p>
             <p className="tasklist-state-subtitle">
-              Add your first task above to start organizing your day.
+              Add a task above to begin tracking work.
             </p>
           </div>
         )}

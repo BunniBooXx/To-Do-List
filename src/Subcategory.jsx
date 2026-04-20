@@ -39,13 +39,13 @@ export default function Subcategory() {
         });
 
         if (subtaskRes.data.success) {
-          setTaskName(subtaskRes.data.task.name || "Unnamed Task");
+          setTaskName(subtaskRes.data.task.name || "Unnamed task");
           setTaskCompleted(subtaskRes.data.task.completed || false);
           setSubtasks(Object.values(subtaskRes.data.subtasks || {}));
         }
       } catch (error) {
-        console.error("❌ Error fetching task/subtasks:", error);
-        showNotification("Failed to fetch task data.", "error");
+        console.error("Error fetching task/subtasks:", error);
+        showNotification("Could not load task data. Try again.", "error");
       } finally {
         setLoading(false);
       }
@@ -60,7 +60,9 @@ export default function Subcategory() {
 
     try {
       const auth = getAuth();
-      const idToken = await auth.currentUser.getIdToken();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
 
       const res = await axios.post(
         `${backendUrl}/subtasks/create`,
@@ -78,18 +80,20 @@ export default function Subcategory() {
           },
         ]);
         setNewSubtaskName("");
-        showNotification("🎀 Subtask added successfully!", "success");
+        showNotification("Subtask added.", "success");
       }
     } catch (error) {
-      console.error("❌ Failed to add subtask:", error);
-      showNotification("❌ Failed to add subtask", "error");
+      console.error("Failed to add subtask:", error);
+      showNotification("Could not add subtask.", "error");
     }
   };
 
   const handleUpdateSubtask = async (subtaskId, currentCompletedState) => {
     try {
       const auth = getAuth();
-      const idToken = await auth.currentUser.getIdToken();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
       const updatedCompleted = !currentCompletedState;
 
       const res = await axios.put(
@@ -119,18 +123,20 @@ export default function Subcategory() {
           setTaskCompleted(allCompleted);
         }
 
-        showNotification("🎀 Subtask updated!", "success");
+        showNotification("Subtask updated.", "success");
       }
     } catch (error) {
-      console.error("❌ Failed to update subtask:", error);
-      showNotification("❌ Failed to update subtask", "error");
+      console.error("Failed to update subtask:", error);
+      showNotification("Could not update subtask.", "error");
     }
   };
 
   const handleDeleteSubtask = async (subtaskId) => {
     try {
       const auth = getAuth();
-      const idToken = await auth.currentUser.getIdToken();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
 
       const res = await axios.delete(
         `${backendUrl}/subtasks/delete/${taskId}/${subtaskId}`,
@@ -141,162 +147,230 @@ export default function Subcategory() {
         const updated = subtasks.filter((s) => s.subtask_id !== subtaskId);
         setSubtasks(updated);
         setTaskCompleted(updated.length > 0 && updated.every((s) => s.completed));
-        showNotification("🎀 Subtask deleted!", "success");
+        showNotification("Subtask removed.", "success");
       }
     } catch (error) {
-      console.error("❌ Failed to delete subtask:", error);
-      showNotification("❌ Failed to delete subtask", "error");
+      console.error("Failed to delete subtask:", error);
+      showNotification("Could not delete subtask.", "error");
     }
   };
 
   const totalCount = subtasks.length;
   const completedCount = subtasks.filter((s) => s.completed).length;
-  const shouldScroll = subtasks.length > 3;
 
   return (
-    <main className="subcategory-page">
-      {notification && (
-        <div
-          className={`subcategory-notification ${notification.type}`}
-          role="status"
-          aria-live="polite"
-        >
-          {notification.message}
-        </div>
-      )}
+    <main className="subcategory-page" aria-label="Task detail">
+      <section className="subcategory-shell">
+        {notification && (
+          <div
+            className={`subcategory-notification ${notification.type}`}
+            role="status"
+            aria-live="polite"
+          >
+            <span className="subcategory-notification__accent" aria-hidden="true" />
+            <span className="subcategory-notification__icon" aria-hidden="true">
+              {notification.type === "success" ? (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M20 6L9 17l-5-5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+            </span>
+            <span className="subcategory-notification__text">{notification.message}</span>
+          </div>
+        )}
 
-      <section className="subcategory-stage">
-        <div className="subcategory-shell">
+        <div className="subcategory-workspace">
           <div className="subcategory-topbar">
-            <Link to="/tasks" className="back-to-tasks-btn">
-              ← Back to Tasks
+            <Link to="/tasks" className="subcategory-back">
+              <span className="subcategory-back__icon" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              Back to tasks
             </Link>
           </div>
 
-          <header className="subcategory-top">
-            <div className="task-summary-card">
-              <p className="summary-kicker">Task details</p>
-              <h1 className="subcategory-title">♡ {taskName} ♡</h1>
-              <p className="summary-text">
-                Break this task into smaller, manageable steps so it feels easier to
-                finish.
+          <header className="subcategory-header">
+            <div className="subcategory-header__copy">
+              <p className="subcategory-header__eyebrow">Task workspace</p>
+              <h1 className="subcategory-title">{taskName}</h1>
+              <p className="subcategory-description">
+                Organize this task into clear, trackable subtasks. Completion updates progress
+                automatically.
               </p>
 
-              <div className="stats-grid">
-                <div className="stat-card">
-                  <span className="stat-label">Total</span>
-                  <span className="stat-number">{totalCount}</span>
+              {!loading && (
+                <div className="subcategory-meta" aria-label="Subtask summary">
+                  <span className="subcategory-meta__text">
+                    {totalCount} subtask{totalCount !== 1 ? "s" : ""}
+                    <span className="subcategory-meta__sep" aria-hidden="true">
+                      {" "}
+                      ·{" "}
+                    </span>
+                    {completedCount} done
+                  </span>
+                  <span
+                    className={`subcategory-status ${taskCompleted ? "subcategory-status--done" : ""}`}
+                  >
+                    {taskCompleted ? "Complete" : "In progress"}
+                  </span>
                 </div>
-
-                <div className="stat-card">
-                  <span className="stat-label">Completed</span>
-                  <span className="stat-number">{completedCount}</span>
-                </div>
-
-                <div className={`stat-card ${taskCompleted ? "is-complete" : ""}`}>
-                  <span className="stat-label">Task</span>
-                  <span className="stat-number">{taskCompleted ? "Done" : "Active"}</span>
-                </div>
-              </div>
+              )}
             </div>
           </header>
 
-          <section className="compose-card">
-            <form className="subcategory-form" onSubmit={handleAddSubtask}>
-              <label className="sr-only" htmlFor="subtaskName">
-                Enter subtask name
-              </label>
-
-              <input
-                id="subtaskName"
-                type="text"
-                className="subcategory-input"
-                value={newSubtaskName}
-                onChange={(e) => setNewSubtaskName(e.target.value)}
-                placeholder="✨ Enter subtask name..."
-              />
-
-              <button type="submit" className="subcategory-submit">
-                Add Subtask 🎀
-              </button>
-            </form>
-          </section>
-
-          <section className="list-card">
-            <div className="list-card-header">
-              <div>
-                <p className="list-kicker">Subtasks</p>
-                <h2 className="list-title">Step-by-step breakdown</h2>
-              </div>
-              <span className="list-count">{totalCount} items</span>
+          <section className="subcategory-todo-card" aria-label="Subtasks">
+            <div className="subcategory-card-head">
+              <h2 className="subcategory-card-head__title">Subtasks</h2>
+              {!loading && totalCount > 0 && (
+                <span className="subcategory-card-head__badge" aria-hidden="true">
+                  {completedCount}/{totalCount}
+                </span>
+              )}
             </div>
 
-            {loading ? (
-              <div className="state-card">
-                <p className="state-title">Loading subtasks... ⏳</p>
-                <p className="state-subtitle">Pulling in the latest task details.</p>
+            <form className="subcategory-form" onSubmit={handleAddSubtask}>
+              <label className="sr-only" htmlFor="subtaskName">
+                Subtask name
+              </label>
+              <div className="subcategory-form__field">
+                <input
+                  id="subtaskName"
+                  type="text"
+                  className="subcategory-input"
+                  value={newSubtaskName}
+                  onChange={(e) => setNewSubtaskName(e.target.value)}
+                  placeholder="Add a subtask…"
+                  autoComplete="off"
+                />
               </div>
-            ) : subtasks.length > 0 ? (
-              <div className={`subtask-scroll ${shouldScroll ? "is-scrollable" : ""}`}>
-                <div className="subtask-list">
-                  {subtasks.map((subtask, index) => (
-                    <article
-                      key={subtask.subtask_id}
-                      className={`subtask-row ${subtask.completed ? "is-completed" : ""}`}
-                    >
-                      <div className="subtask-left">
-                        <div className="subtask-index">
-                          {String(index + 1).padStart(2, "0")}
-                        </div>
+              <button type="submit" className="subcategory-submit">
+                Add
+              </button>
+            </form>
 
-                        <div className="subtask-copy">
+            <div className="subcategory-todo-card__body">
+              {loading ? (
+                <div
+                  className="subcategory-state subcategory-state--loading"
+                  aria-busy="true"
+                  aria-live="polite"
+                >
+                  <div className="subcategory-state__skeleton" aria-hidden="true">
+                    <span className="subcategory-state__skeleton-line subcategory-state__skeleton-line--lg" />
+                    <span className="subcategory-state__skeleton-line" />
+                    <span className="subcategory-state__skeleton-line subcategory-state__skeleton-line--sm" />
+                  </div>
+                  <p className="subcategory-state__title">Loading subtasks</p>
+                  <p className="subcategory-state__text">Fetching the latest details.</p>
+                </div>
+              ) : subtasks.length > 0 ? (
+                <div className="subtask-scroll">
+                  <ul className="subtask-list" aria-label="Subtask list">
+                    {subtasks.map((subtask) => (
+                      <li key={subtask.subtask_id}>
+                        <article
+                          className={`subtask-row ${subtask.completed ? "is-completed" : ""}`}
+                        >
+                          <button
+                            type="button"
+                            className={`subtask-check ${subtask.completed ? "is-on" : ""}`}
+                            onClick={() =>
+                              handleUpdateSubtask(subtask.subtask_id, subtask.completed)
+                            }
+                            aria-label={
+                              subtask.completed
+                                ? "Mark subtask incomplete"
+                                : "Mark subtask complete"
+                            }
+                          >
+                            {subtask.completed ? (
+                              <svg
+                                className="subtask-check__icon"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                aria-hidden="true"
+                              >
+                                <path
+                                  d="M20 6L9 17l-5-5"
+                                  stroke="currentColor"
+                                  strokeWidth="2.25"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            ) : (
+                              <span className="subtask-check__empty" aria-hidden="true" />
+                            )}
+                          </button>
+
                           <span
-                            className={`subtask-name ${
-                              subtask.completed ? "completed" : ""
-                            }`}
+                            className={`subtask-name ${subtask.completed ? "is-done" : ""}`}
                           >
                             {subtask.name}
                           </span>
-                          <span className="subtask-status">
-                            {subtask.completed ? "Completed" : "In progress"}
-                          </span>
-                        </div>
-                      </div>
 
-                      <div className="subtask-actions">
-                        <button
-                          type="button"
-                          className={`subtask-action toggle-btn ${
-                            subtask.completed ? "completed" : ""
-                          }`}
-                          onClick={() =>
-                            handleUpdateSubtask(subtask.subtask_id, subtask.completed)
-                          }
-                        >
-                          {subtask.completed ? "🩷 Done" : "🤍 Complete"}
-                        </button>
-
-                        <button
-                          type="button"
-                          className="subtask-action delete-btn"
-                          onClick={() => handleDeleteSubtask(subtask.subtask_id)}
-                        >
-                          🗑️ Delete
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                          <button
+                            type="button"
+                            className="subtask-delete"
+                            onClick={() => handleDeleteSubtask(subtask.subtask_id)}
+                            aria-label="Delete subtask"
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                stroke="currentColor"
+                                strokeWidth="1.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        </article>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
-            ) : (
-              <div className="state-card empty">
-                <p className="state-title">No subtasks yet! 🌸</p>
-                <p className="state-subtitle">
-                  Add your first subtask to turn this goal into something easier to
-                  finish.
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="subcategory-state subcategory-state--empty">
+                  <p className="subcategory-state__title">No subtasks yet</p>
+                  <p className="subcategory-state__text">
+                    Add items above to split this task into trackable steps.
+                  </p>
+                </div>
+              )}
+            </div>
           </section>
         </div>
       </section>

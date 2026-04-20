@@ -104,9 +104,6 @@ function Navbar() {
         <div className="pp-nav__left">
           <NavLink to="/" className="pp-nav__brand" onClick={closeMenu}>
             <span className="pp-nav__brandText">Petite Planner</span>
-            <span className="pp-nav__brandSparkle" aria-hidden="true">
-              ✨
-            </span>
           </NavLink>
         </div>
 
@@ -118,7 +115,7 @@ function Navbar() {
                 `pp-nav__link ${isActive ? "is-active" : ""}`
               }
             >
-              📝 Tasks
+              Tasks
             </NavLink>
 
             <NavLink
@@ -127,7 +124,7 @@ function Navbar() {
                 `pp-nav__link ${isActive ? "is-active" : ""}`
               }
             >
-              🗓️ Calendar
+              Calendar
             </NavLink>
           </div>
         </div>
@@ -140,7 +137,7 @@ function Navbar() {
                 className="pp-nav__cta pp-nav__cta--soft"
                 onClick={handleLogout}
               >
-                🌸 Logout
+                Logout
               </button>
             ) : (
               <>
@@ -150,11 +147,11 @@ function Navbar() {
                     `pp-nav__link pp-nav__link--small ${isActive ? "is-active" : ""}`
                   }
                 >
-                  🌸 Login
+                  Login
                 </NavLink>
 
                 <NavLink to="/signup" className="pp-nav__cta">
-                  ✨ Sign Up
+                  Sign Up
                 </NavLink>
               </>
             )}
@@ -185,7 +182,6 @@ function Navbar() {
                 }
                 onClick={closeMenu}
               >
-                <span className="pp-nav__itemIcon">📝</span>
                 <span>Tasks</span>
               </NavLink>
 
@@ -196,7 +192,6 @@ function Navbar() {
                 }
                 onClick={closeMenu}
               >
-                <span className="pp-nav__itemIcon">🗓️</span>
                 <span>Calendar</span>
               </NavLink>
 
@@ -208,7 +203,6 @@ function Navbar() {
                   className="pp-nav__item pp-nav__itemBtn"
                   onClick={handleLogout}
                 >
-                  <span className="pp-nav__itemIcon">🌸</span>
                   <span>Logout</span>
                 </button>
               ) : (
@@ -220,7 +214,6 @@ function Navbar() {
                     }
                     onClick={closeMenu}
                   >
-                    <span className="pp-nav__itemIcon">🌸</span>
                     <span>Login</span>
                   </NavLink>
 
@@ -231,7 +224,6 @@ function Navbar() {
                     }
                     onClick={closeMenu}
                   >
-                    <span className="pp-nav__itemIcon">✨</span>
                     <span>Sign Up</span>
                   </NavLink>
                 </>

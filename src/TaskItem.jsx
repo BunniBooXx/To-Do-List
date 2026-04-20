@@ -92,7 +92,41 @@ export default function TaskItem({
           }
           title={isCompleted ? "Completed" : "Mark complete"}
         >
-          {isCompleted ? "💖" : "🤍"}
+          {isCompleted ? (
+            <svg
+              className="planner-heart-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M20 6L9 17l-5-5"
+                stroke="currentColor"
+                strokeWidth="2.25"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <svg
+              className="planner-heart-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <rect
+                x="4"
+                y="4"
+                width="16"
+                height="16"
+                rx="3"
+                stroke="currentColor"
+                strokeWidth="1.75"
+              />
+            </svg>
+          )}
         </button>
 
         <div className="planner-task-content">
@@ -123,25 +157,39 @@ export default function TaskItem({
                 {taskName}
               </button>
             )}
-
-            <span className={`planner-task-status ${isCompleted ? "done" : "open"}`}>
-              {isCompleted ? "Completed" : "Active"}
-            </span>
           </div>
 
           <div className="planner-task-actions">
-            <Link to={`/subtasks/${task_id}`} className="planner-subtask-link">
-              Add Subtasks
+            <Link
+              to={`/subtasks/${task_id}`}
+              className="planner-subtask-link"
+              title="Open subtasks"
+            >
+              Subtasks
             </Link>
 
             <button
               type="button"
-              className="planner-delete-btn"
+              className="planner-delete-btn planner-delete-btn--icon"
               onClick={handleDeleteTask}
               aria-label="Delete task"
-              title="Delete task"
+              title="Delete"
             >
-              🗑️
+              <svg
+                className="planner-delete-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                <path
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
           </div>
         </div>

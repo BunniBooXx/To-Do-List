@@ -1,39 +1,44 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import './NotFound.css';
+import React, { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import "./NotFound.css";
 
-const NotFound = () => {
+export default function NotFound() {
+  const location = useLocation();
+
+  useEffect(() => {
+    document.body.classList.add("route-notfound");
+    return () => document.body.classList.remove("route-notfound");
+  }, []);
+
   return (
-    <div className="not-found-container">
-      <div className="not-found-content">
-      <div className="bow-decoration left">
-          <span>🎀</span>
-          <span>💖</span>
-          <span>🎀</span>
-        </div>
-        <div className="bow-decoration right">
-          <span>🎀</span>
-          <span>💖</span>
-          <span>🎀</span>
-        </div>  
-        <h1 className="error-code">4🎀4</h1>
-        <h2 className="error-message">Oh no! Page not found</h2>
-        <p className="error-description">
-          The page you're looking for has wandered off to dreamland~ ✨
-        </p>
-        
-        <div className="hearts-decoration">
-          <span>💗</span>
-          <span>💝</span>
-          <span>💖</span>
-        </div>
-        
-        <Link to="/" className="return-home-button">
-          Take Me Home 🏡
-        </Link>
-      </div>
-    </div>
-  );
-};
+    <main className="nf-page" role="main">
+      <section className="nf-card" aria-labelledby="nf-title">
+        <div className="nf-badge">Navigation</div>
 
-export default NotFound;
+        <div className="nf-visual" aria-hidden="true">
+          <div className="nf-orbit nf-orbit--outer" />
+          <div className="nf-orbit nf-orbit--inner" />
+          <div className="nf-core" />
+        </div>
+
+        <h1 className="nf-code">404</h1>
+        <h2 className="nf-title" id="nf-title">
+          Page not found
+        </h2>
+        <p className="nf-subtitle">
+          We couldn’t find <span className="nf-path">{location.pathname}</span>.
+          Try heading back to a known page.
+        </p>
+
+        <div className="nf-actions">
+          <Link to="/" className="nf-btn nf-btn--primary">
+            Back to Home
+          </Link>
+          <Link to="/tasks" className="nf-btn nf-btn--secondary">
+            Open Tasks
+          </Link>
+        </div>
+      </section>
+    </main>
+  );
+}

@@ -30,7 +30,7 @@ export default function CalendarSubtasksPage() {
           const token = await user.getIdToken(true);
           setIdToken(token);
         } catch (error) {
-          console.error("❌ Error getting Firebase token:", error);
+          console.error("Error getting Firebase token:", error);
         }
       } else {
         window.location.href = "/login";
@@ -55,7 +55,7 @@ export default function CalendarSubtasksPage() {
         setCalendarTask(response.data.task || {});
       }
     } catch (error) {
-      console.error("❌ Error fetching calendar task:", error);
+      console.error("Error fetching calendar task:", error);
     }
   }, [calendarTaskId, idToken]);
 
@@ -76,7 +76,7 @@ export default function CalendarSubtasksPage() {
         setSubtasks(response.data.subtasks || []);
       }
     } catch (error) {
-      console.error("❌ Error fetching calendar subtasks:", error);
+      console.error("Error fetching calendar subtasks:", error);
     } finally {
       setLoading(false);
     }
@@ -110,7 +110,7 @@ export default function CalendarSubtasksPage() {
         fetchSubtasks();
       }
     } catch (error) {
-      console.error("❌ Error adding subtask:", error);
+      console.error("Error adding subtask:", error);
     }
   };
 
@@ -136,7 +136,7 @@ export default function CalendarSubtasksPage() {
         );
       }
     } catch (error) {
-      console.error("❌ Error updating subtask:", error);
+      console.error("Error updating subtask:", error);
     }
   };
 
@@ -157,7 +157,7 @@ export default function CalendarSubtasksPage() {
         );
       }
     } catch (error) {
-      console.error("❌ Error deleting subtask:", error);
+      console.error("Error deleting subtask:", error);
     }
   };
 
@@ -171,220 +171,176 @@ export default function CalendarSubtasksPage() {
       ? Math.round((completedCount / subtasks.length) * 100)
       : 0;
 
+  const statusLabel =
+    subtasks.length > 0 && completedCount === subtasks.length
+      ? "Done"
+      : "Open";
+
   return (
-    <main
-      className="calendar-subtasks-page"
-      aria-label="Calendar subtasks page"
-    >
-      <section className="calendar-subtasks-stage">
-        <div className="calendar-subtasks-shell">
-          <div className="calendar-subtasks-card">
-            <div className="calendar-subtasks-topbar">
-              <Link to="/planner" className="calendar-back-button">
-                ← Back to Calendar
-              </Link>
-            </div>
+    <main className="cst-page" aria-label="Calendar subtasks">
+      <div className="cst-container">
+        <Link to="/planner" className="cst-back">
+          ← Calendar
+        </Link>
 
-            <header className="calendar-subtasks-hero">
-              <div className="calendar-hero-chip-row">
-                <span className="calendar-hero-chip">Planner follow-up</span>
-                <span className="calendar-hero-chip soft">
-                  {subtasks.length} subtasks
-                </span>
+        <header className="cst-hero">
+          <div className="cst-hero__intro">
+            <h1 className="cst-title">
+              <span className="cst-title__shimmer">
+                {calendarTask.name || "Task"}
+              </span>
+            </h1>
+            {subtasks.length > 0 && (
+              <p className="cst-lede">
+                {subtasks.length} step{subtasks.length === 1 ? "" : "s"}
+              </p>
+            )}
+          </div>
+
+          <div className="cst-metrics" aria-label="Progress">
+            <div className="cst-metrics__progress">
+              <div
+                className="cst-metrics__track"
+                role="progressbar"
+                aria-valuenow={progressPercent}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <span
+                  className="cst-metrics__fill"
+                  style={{ width: `${progressPercent}%` }}
+                />
               </div>
+              <span className="cst-metrics__pct">{progressPercent}%</span>
+            </div>
+            <dl className="cst-metrics__stats">
+              <div className="cst-metric">
+                <dt className="cst-metric__label">Total</dt>
+                <dd className="cst-metric__val">{subtasks.length}</dd>
+              </div>
+              <div className="cst-metric">
+                <dt className="cst-metric__label">Done</dt>
+                <dd className="cst-metric__val">{completedCount}</dd>
+              </div>
+              <div className="cst-metric">
+                <dt className="cst-metric__label">Status</dt>
+                <dd className="cst-metric__val cst-metric__val--sm">
+                  {statusLabel}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </header>
 
-              <div className="calendar-hero-main">
-                <div className="calendar-hero-text">
-                  <p className="calendar-hero-kicker">Calendar Task</p>
-                  <h1 className="calendar-subtasks-title">
-                    {calendarTask.name || "Task"}
-                  </h1>
-                  <p className="calendar-subtasks-subtitle">
-                    Turn this scheduled task into smaller actionable steps so it
-                    feels easier to finish on time.
-                  </p>
-                </div>
+        <section
+          className="cst-panel cst-panel--add"
+          aria-labelledby="cst-add-title"
+        >
+          <div className="cst-panel__row">
+            <h2 id="cst-add-title" className="cst-panel__title">
+              Add step
+            </h2>
+            <button
+              type="button"
+              className="cst-panel__toggle"
+              onClick={() => setShowSubtaskForm((prev) => !prev)}
+              aria-expanded={showSubtaskForm}
+              aria-controls="cst-add-form"
+            >
+              {showSubtaskForm ? "Close" : "Add"}
+            </button>
+          </div>
 
-                <div className="calendar-progress-card">
-                  <span className="calendar-progress-label">Progress</span>
-                  <span className="calendar-progress-number">
-                    {progressPercent}%
-                  </span>
-                  <div className="calendar-progress-track" aria-hidden="true">
-                    <span
-                      className="calendar-progress-fill"
-                      style={{ width: `${progressPercent}%` }}
+          {showSubtaskForm && (
+            <form
+              id="cst-add-form"
+              className="cst-add-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleAddSubtask();
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Step name"
+                value={newSubtask}
+                onChange={(e) => setNewSubtask(e.target.value)}
+                className="cst-input"
+                autoComplete="off"
+              />
+              <button type="submit" className="cst-btn cst-btn--primary">
+                Add
+              </button>
+            </form>
+          )}
+        </section>
+
+        <section
+          className="cst-panel cst-panel--list"
+          aria-labelledby="cst-list-title"
+        >
+          <div className="cst-panel__row">
+            <h2 id="cst-list-title" className="cst-panel__title">
+              Subtasks
+            </h2>
+            {subtasks.length > 0 && (
+              <span className="cst-panel__meta">{subtasks.length}</span>
+            )}
+          </div>
+
+          {loading ? (
+            <p className="cst-state cst-state--muted">Loading…</p>
+          ) : subtasks.length > 0 ? (
+            <ul className="cst-rows">
+              {subtasks.map((subtask) => (
+                <li
+                  key={subtask.subtask_id}
+                  className={`cst-row ${subtask.completed ? "cst-row--done" : ""}`}
+                >
+                  <div className="cst-row__check">
+                    <input
+                      type="checkbox"
+                      id={`subtask-${subtask.subtask_id}`}
+                      className="cst-checkbox"
+                      checked={subtask.completed}
+                      onChange={() =>
+                        handleToggleSubtaskCompletion(
+                          subtask.subtask_id,
+                          subtask.completed
+                        )
+                      }
+                      aria-label={
+                        subtask.completed
+                          ? `Mark "${subtask.name}" not done`
+                          : `Mark "${subtask.name}" done`
+                      }
                     />
                   </div>
-                </div>
-              </div>
-
-              <div className="calendar-subtasks-stats">
-                <div className="calendar-stat-card">
-                  <span className="calendar-stat-label">Total Steps</span>
-                  <span className="calendar-stat-value">{subtasks.length}</span>
-                </div>
-
-                <div className="calendar-stat-card">
-                  <span className="calendar-stat-label">Finished</span>
-                  <span className="calendar-stat-value">{completedCount}</span>
-                </div>
-
-                <div className="calendar-stat-card">
-                  <span className="calendar-stat-label">Status</span>
-                  <span className="calendar-stat-value">
-                    {subtasks.length > 0 && completedCount === subtasks.length
-                      ? "Complete"
-                      : "Active"}
-                  </span>
-                </div>
-              </div>
-            </header>
-
-            <section className="calendar-compose-card">
-              <div className="calendar-compose-header">
-                <div>
-                  <p className="calendar-section-kicker">Add a step</p>
-                  <h2 className="calendar-section-title">Build the breakdown</h2>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowSubtaskForm((prev) => !prev)}
-                  className="calendar-toggle-form-button"
-                >
-                  {showSubtaskForm ? "Hide form" : "New subtask"}
-                </button>
-              </div>
-
-              {showSubtaskForm && (
-                <div className="calendar-task-form-container">
-                  <form
-                    className="calendar-task-form"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleAddSubtask();
-                    }}
+                  <label
+                    htmlFor={`subtask-${subtask.subtask_id}`}
+                    className="cst-row__name"
                   >
-                    <input
-                      type="text"
-                      placeholder="Enter subtask name..."
-                      value={newSubtask}
-                      onChange={(e) => setNewSubtask(e.target.value)}
-                      className="calendar-task-input"
-                    />
-
-                    <button
-                      type="submit"
-                      className="calendar-submit-task-button"
-                    >
-                      Add to Calendar Plan
-                    </button>
-                  </form>
-                </div>
-              )}
-            </section>
-
-            <section className="calendar-list-card">
-              <div className="calendar-list-header">
-                <div>
-                  <p className="calendar-list-kicker">Subtasks</p>
-                  <h2 className="calendar-list-title">Scheduled action list</h2>
-                </div>
-
-                <span className="calendar-list-count">
-                  {subtasks.length} items
-                </span>
-              </div>
-
-              {loading ? (
-                <div className="calendar-state-card">
-                  <p className="calendar-state-title">
-                    Loading your subtasks... 🎀
-                  </p>
-                  <p className="calendar-state-subtitle">
-                    Pulling in the latest planner details.
-                  </p>
-                </div>
-              ) : subtasks.length > 0 ? (
-                <div className="calendar-subtasks-list">
-                  {subtasks.map((subtask, index) => (
-                    <article
-                      key={subtask.subtask_id}
-                      className={`calendar-subtask-item ${
-                        subtask.completed ? "completed" : ""
-                      }`}
-                    >
-                      <div className="calendar-subtask-left">
-                        <div className="calendar-subtask-index">
-                          {String(index + 1).padStart(2, "0")}
-                        </div>
-
-                        <div className="calendar-subtask-copy">
-                          <div className="calendar-subtask-row-top">
-                            <span className="calendar-subtask-name">
-                              {subtask.name}
-                            </span>
-                            <span
-                              className={`calendar-subtask-pill ${
-                                subtask.completed ? "done" : "live"
-                              }`}
-                            >
-                              {subtask.completed ? "Done" : "In progress"}
-                            </span>
-                          </div>
-
-                          <p className="calendar-subtask-note">
-                            {subtask.completed
-                              ? "This step is finished and checked off."
-                              : "Keep going — this step is still part of today’s plan."}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="calendar-subtask-buttons">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleToggleSubtaskCompletion(
-                              subtask.subtask_id,
-                              subtask.completed
-                            )
-                          }
-                          className={`calendar-action-button complete ${
-                            subtask.completed ? "is-complete" : ""
-                          }`}
-                          aria-label="Toggle subtask completion"
-                        >
-                          {subtask.completed ? "💖 Mark Active" : "🤍 Mark Done"}
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteSubtask(subtask.subtask_id)}
-                          className="calendar-action-button delete"
-                          aria-label="Delete subtask"
-                        >
-                          🗑 Delete
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <div className="calendar-state-card empty">
-                  <p className="calendar-state-title">
-                    No subtasks yet! Add one above ✨
-                  </p>
-                  <p className="calendar-state-subtitle">
-                    Start turning this calendar task into smaller scheduled steps.
-                  </p>
-                </div>
-              )}
-            </section>
-          </div>
-        </div>
-      </section>
+                    {subtask.name}
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSubtask(subtask.subtask_id)}
+                    className="cst-del"
+                    aria-label={`Delete ${subtask.name}`}
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="cst-empty">
+              <p className="cst-empty__line">No steps yet</p>
+              <p className="cst-empty__hint">Add a step above.</p>
+            </div>
+          )}
+        </section>
+      </div>
     </main>
   );
 }
